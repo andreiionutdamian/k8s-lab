@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guestbook
+  labels:
+    app: guestbook 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: guestbook
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: guestbook
+    spec:
+      containers:
+      - image: guestbook:v1
+        name: guestbook
+        ports:
+        - containerPort: 3000
+          name: http
+        resources:
+          limits:
+            cpu: 20m
+          requests:
+            cpu: 5m  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: guestbook
+  labels:
+    app: guestbook
+spec:
+  type: NodePort
+  selector:
+    app: guestbook
+  ports:
+  - port: 3000       # this is the port exposed by the service
+    protocol: TCP
+    targetPort: 3000 # this is the port your app listens to
+    nodePort: 30000  # this is the port exposed externally by the service

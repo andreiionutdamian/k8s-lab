@@ -1,0 +1,25 @@
+{
+  "name": "K8s study/test Project",
+  "dockerFile": "Dockerfile",
+  "runArgs": [
+    "--privileged", // Required for DinD
+    "--gpus", "all",
+    "--name=k8s-course-devcontainer"
+  ],
+  
+  // following command not working...
+  "postStartCommand": "nohup /bin/sh -c '/workspace/start-dockerd.sh > /workspace/startup.log 2>&1' &",
+
+  // VSCode extensions
+  "extensions": [
+    "eamodio.gitlens",
+    "ms-python.python",
+    "GitHub.copilot",
+    "github.vscode-github-actions",
+    "ms-azuretools.vscode-docker"
+  ],
+
+"remoteEnv": {
+    "REBUILD_BUMP": "0.0.5"
+  }
+}

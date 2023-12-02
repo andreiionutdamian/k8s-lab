@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-hpa
+spec:
+  selector:
+    matchLabels:
+      run: hello-world-hpa
+  template:
+    metadata:
+      labels:
+        run: hello-world-hpa
+    spec:
+      containers:
+      - name: hello-world
+        image: hello-world:1
+        ports:
+        - containerPort: 8080
+          name: http
+        resources:
+          limits:
+            cpu: 50m
+          requests:
+            cpu: 20m
+        

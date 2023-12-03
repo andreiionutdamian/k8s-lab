@@ -5,7 +5,7 @@ declare -A times
 
 url="http://localhost:30000/hello"
 T=100  # Print message every T requests
-NR_REQUESTS=5000
+NR_REQUESTS=1000
 total_time=0
 max_time=0
 min_time=99999999

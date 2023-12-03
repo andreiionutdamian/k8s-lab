@@ -1,0 +1,5 @@
+{
+  "yaml.schemas": {
+    "kubernetes://schema/v1%40service": "file:///home/andrei/work/k8s/lab_05_ibm_project/local/local_redis.yaml"
+  }
+}

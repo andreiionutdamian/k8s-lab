@@ -1,0 +1,41 @@
+guestbook:
+  guestbook:
+    image:
+      repository: guestbook
+      tag: v1
+    resources:
+      limits:
+        cpu: 20m
+      requests:
+        cpu: 5m
+  ports:
+  - nodePort: 30000
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  replicas: 2
+  type: NodePort
+kubernetesClusterDomain: cluster.local
+master:
+  ports:
+  - port: 6379
+    targetPort: redis-server
+  redisMaster:
+    image:
+      repository: redis
+      tag: 5.0.5
+  replicas: 1
+  type: ClusterIP
+slave:
+  ports:
+  - port: 6379
+    targetPort: redis-server
+  redisSlave:
+    args:
+    - -c
+    - redis-server --slaveof redis-master 6379
+    image:
+      repository: redis
+      tag: 5.0.5
+  replicas: 2
+  type: ClusterIP

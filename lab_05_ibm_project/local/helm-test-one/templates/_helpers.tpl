@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "full-chart.name" -}}
+{{- define "helm-test-one.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "full-chart.fullname" -}}
+{{- define "helm-test-one.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "full-chart.chart" -}}
+{{- define "helm-test-one.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "full-chart.labels" -}}
-helm.sh/chart: {{ include "full-chart.chart" . }}
-{{ include "full-chart.selectorLabels" . }}
+{{- define "helm-test-one.labels" -}}
+helm.sh/chart: {{ include "helm-test-one.chart" . }}
+{{ include "helm-test-one.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "full-chart.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "full-chart.name" . }}
+{{- define "helm-test-one.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "helm-test-one.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "full-chart.serviceAccountName" -}}
+{{- define "helm-test-one.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "full-chart.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "helm-test-one.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

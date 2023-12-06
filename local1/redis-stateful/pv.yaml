@@ -1,0 +1,17 @@
+# not mandatory to create a PV, but it is recommended to do so
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-master-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  hostPath:
+    # Host path for storage - if not present, it will be created
+    path: /home/andrei/work/k8s-lab/local1/_data/redis-master  
+

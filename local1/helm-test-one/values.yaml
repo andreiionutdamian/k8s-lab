@@ -2,7 +2,7 @@ guestbook:
   guestbook:
     image:
       repository: guestbook
-      tag: v1
+      tag: v0
     resources:
       limits:
         cpu: 20m

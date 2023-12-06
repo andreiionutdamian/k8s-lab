@@ -7,5 +7,8 @@ kubectl delete \
   service/redis-master \
   service/redis-slave \
   deployment/redis-master \
-  deployment/redis-slave 
+  deployment/redis-slave  \
+  statefulset/redis-master \
+  statefulset/redis-slave
+
 

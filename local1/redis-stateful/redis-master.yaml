@@ -1,0 +1,57 @@
+# the Redis master deployment
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-master
+  labels:
+    app: redis
+    role: master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      role: master
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: master
+    spec:
+      containers:
+      - name: redis-master
+        image: redis:5.0.5
+        ports:
+        - name: redis-server
+          containerPort: 6379
+        volumeMounts:
+        - name: redis-storage
+          mountPath: /data
+        env:
+          - name: SAVE_INTERVAL
+            value: "60 1"  # Save the dataset every 60 seconds if at least one key changed          
+  volumeClaimTemplates:  # Persistent storage configuration
+  - metadata:
+      name: redis-storage
+    spec:
+      volumeName: redis-master-pv  # Name of the predefined PV to use - can be missing
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+---
+# the Redis master service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master
+  labels:
+    app: redis
+    role: master
+spec:
+  ports:
+  - port: 6379
+    targetPort: redis-server
+  selector:
+    app: redis
+    role: master

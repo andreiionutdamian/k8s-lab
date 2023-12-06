@@ -20,7 +20,7 @@ spec:
         app: guestbook
     spec:
       containers:
-      - image: guestbook:v1
+      - image: guestbook:v0
         name: guestbook
         ports:
         - containerPort: 3000

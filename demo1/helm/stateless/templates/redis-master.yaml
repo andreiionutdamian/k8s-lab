@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-master
+  labels:
+    app: redis
+    role: master
+  {{- include "helm-test-one.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.master.replicas }}
+  selector:
+    matchLabels:
+      app: redis
+      role: master
+    {{- include "helm-test-one.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: master
+      {{- include "helm-test-one.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.master.redisMaster.image.repository }}:{{ .Values.master.redisMaster.image.tag
+          | default .Chart.AppVersion }}
+        name: redis-master
+        ports:
+        - containerPort: 6379
+          name: redis-server
+        resources: {}
+        volumeMounts:
+        - mountPath: /data
+          name: redis-storage
+      volumes:
+      - emptyDir: {}
+        name: redis-storage
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master
+  labels:
+    app: redis
+    role: master
+  {{- include "helm-test-one.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.master.type }}
+  selector:
+    app: redis
+    role: master
+  {{- include "helm-test-one.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.master.ports | toYaml | nindent 2 -}}

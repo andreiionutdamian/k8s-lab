@@ -11,4 +11,6 @@ kubectl delete \
   statefulset/redis-master \
   statefulset/redis-slave
 
+kubectl delete pvc --all
+kubectl delete pv --all # can delete as they are recreated on paths
 

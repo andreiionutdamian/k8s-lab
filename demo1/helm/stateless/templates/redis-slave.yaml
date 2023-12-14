@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-slave
+  labels:
+    app: redis
+    role: slave
+  {{- include "helm-test-one.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.slave.replicas }}
+  selector:
+    matchLabels:
+      app: redis
+      role: slave
+    {{- include "helm-test-one.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: slave
+      {{- include "helm-test-one.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - args: {{- toYaml .Values.slave.redisSlave.args | nindent 8 }}
+        command:
+        - /bin/sh
+        env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.slave.redisSlave.image.repository }}:{{ .Values.slave.redisSlave.image.tag
+          | default .Chart.AppVersion }}
+        name: redis-slave
+        ports:
+        - containerPort: 6379
+          name: redis-server
+        resources: {}
+        volumeMounts:
+        - mountPath: /data
+          name: redis-storage
+      volumes:
+      - emptyDir: {}
+        name: redis-storage
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-slave
+  labels:
+    app: redis
+    role: slave
+  {{- include "helm-test-one.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.slave.type }}
+  selector:
+    app: redis
+    role: slave
+  {{- include "helm-test-one.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.slave.ports | toYaml | nindent 2 -}}

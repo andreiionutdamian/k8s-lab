@@ -21,6 +21,8 @@ spec:
       containers:
       - name: redis-master
         image: redis:5.0.5
+        command: ["/bin/sh"]
+        args: ["-c","redis-server --loglevel debug"]
         ports:
         - name: redis-server
           containerPort: 6379
@@ -39,19 +41,3 @@ spec:
       resources:
         requests:
           storage: 1Gi
----
-# the Redis master service
-apiVersion: v1
-kind: Service
-metadata:
-  name: redis-master
-  labels:
-    app: redis
-    role: master
-spec:
-  ports:
-  - port: 6379
-    targetPort: redis-server
-  selector:
-    app: redis
-    role: master

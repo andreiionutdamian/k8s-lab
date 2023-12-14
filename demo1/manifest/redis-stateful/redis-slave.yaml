@@ -22,7 +22,7 @@ spec:
       - name: redis-slave
         image: redis:5.0.5
         command: ["/bin/sh"]
-        args: ["-c","redis-server --slaveof redis-master 6379"]
+        args: ["-c","redis-server --slaveof redis-master 6379 --loglevel debug"]
         ports:
         - name: redis-server
           containerPort: 6379
@@ -40,19 +40,3 @@ spec:
       resources:
         requests:
           storage: 1Gi
----
-# the Redis slave service
-apiVersion: v1
-kind: Service
-metadata:
-  name: redis-slave
-  labels:
-    app: redis
-    role: slave
-spec:
-  ports:
-  - port: 6379
-    targetPort: redis-server
-  selector:
-    app: redis
-    role: slave

@@ -3,7 +3,7 @@
 
 ## Introduction to Kubernetes
 
-<p align="center"> <img src="img/k8s-control-plane.png" alt="K8s Control Plane" width="700"/></p>
+<p align="center"> <img src="../img/k8s-control-plane.png" alt="K8s Control Plane" width="700"/></p>
 The control plane works on the "master" node. It is responsible for managing the cluster. It is made up of the following components:
 - kube-apiserver: responsible for exposing the Kubernetes API
 - etcd: responsible for storing the cluster state
@@ -18,7 +18,7 @@ The worker nodes are responsible for running the pods. A pod is a group of one o
 The communication between the control plane and the worker plane is done through the Kubernetes API. The communication between the worker nodes is done through the Kubernetes API.
 
 
-<p align="center"><img src="img/k8s-worker-plane.png" alt="K8s Worker Plane" width="700"/></p>
+<p align="center"><img src="../img/k8s-worker-plane.png" alt="K8s Worker Plane" width="700"/></p>
 The worker plane works on the "worker" node. It is responsible for running the pods. It is made up of the following components:
 
  - kubelet: responsible for running the pods

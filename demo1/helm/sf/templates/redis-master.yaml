@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "sf.fullname" . }}-master
+  labels:
+    app: redis
+    role: master
+  {{- include "sf.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.master.replicas }}
+  selector:
+    matchLabels:
+      app: redis
+      role: master
+    # here helmify did not correctly add the selectorLabels
+    # thus we need to add them manually otherwise the pods will not
+    # have the correct labels and the service will not be able to find them
+    {{- include "sf.selectorLabels" . | nindent 6 }}
+  serviceName: ""
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: master
+      # here helmify did not correctly add the selectorLabels
+      # thus we need to add them manually otherwise the pods will not
+      # have the correct labels and the service will not be able to find them
+      {{- include "sf.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - args: {{- toYaml .Values.master.redisMaster.args | nindent 8 }}
+        command:
+        - /bin/sh
+        env:
+        - name: SAVE_INTERVAL
+          value: {{ quote .Values.master.redisMaster.env.saveInterval }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.master.redisMaster.image.repository }}:{{ .Values.master.redisMaster.image.tag
+          | default .Chart.AppVersion }}
+        name: redis-master
+        ports:
+        - containerPort: 6379
+          name: redis-server
+        resources: {}
+        volumeMounts:
+        - mountPath: /data
+          name: redis-storage
+  updateStrategy: {}
+  volumeClaimTemplates:
+  - metadata:
+      creationTimestamp: null
+      name: redis-storage
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources: {{ .Values.master.volumeClaims.redisStorage | toYaml | nindent 8 }}
+      volumeName: {{ include "sf.fullname" . }}-master-pv
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master
+  labels:
+    app: redis
+    role: master
+  {{- include "sf.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.master.type }}
+  selector:
+    app: redis
+    role: master
+  {{- include "sf.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.master.ports | toYaml | nindent 2 -}}

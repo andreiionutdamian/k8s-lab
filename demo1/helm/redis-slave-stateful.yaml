@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "sf.fullname" . }}-slave
+  labels:
+    app: redis
+    role: slave
+  {{- include "sf.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.slave.replicas }}
+  selector:
+    matchLabels:
+      app: redis
+      role: slave
+    # here helmify did not correctly add the selectorLabels
+    # thus we need to add them manually otherwise the pods will not
+    # have the correct labels and the service will not be able to find them
+    {{- include "sf.selectorLabels" . | nindent 6 }}
+  serviceName: ""
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: slave
+      # here helmify did not correctly add the selectorLabels
+      # thus we need to add them manually otherwise the pods will not
+      # have the correct labels and the service will not be able to find them
+      {{- include "sf.selectorLabels" . | nindent 8 }}        
+    spec:
+      containers:
+      - args: {{- toYaml .Values.slave.redisSlave.args | nindent 8 }}
+        command:
+        - /bin/sh
+        env:
+        - name: SAVE_INTERVAL
+          value: {{ quote .Values.slave.redisSlave.env.saveInterval }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.slave.redisSlave.image.repository }}:{{ .Values.slave.redisSlave.image.tag
+          | default .Chart.AppVersion }}
+        name: redis-slave
+        ports:
+        - containerPort: 6379
+          name: redis-server
+        resources: {}
+        volumeMounts:
+        - mountPath: /data
+          name: redis-storage
+  updateStrategy: {}
+  volumeClaimTemplates:
+  - metadata:
+      creationTimestamp: null
+      name: redis-storage
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources: {{ .Values.slave.volumeClaims.redisStorage | toYaml | nindent 8 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-slave
+  labels:
+    app: redis
+    role: slave
+  {{- include "sf.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.slave.type }}
+  selector:
+    app: redis
+    role: slave
+  {{- include "sf.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.slave.ports | toYaml | nindent 2 -}}

@@ -21,8 +21,10 @@ spec:
       containers:
       - name: redis-slave
         image: redis:5.0.5
+        # command: ["redis-server"]
+        # args: ["--slaveof", "redis-master", "6379", "--loglevel", "debug"]
         command: ["/bin/sh"]
-        args: ["-c","redis-server --slaveof redis-master 6379"]
+        args: ["-c","redis-server --slaveof redis-master 6379 --loglevel debug"]
         ports:
         - name: redis-server
           containerPort: 6379

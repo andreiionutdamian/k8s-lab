@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redis-slave
+  name: {{ include "sf.fullname" . }}-slave
   labels:
     app: redis
     role: slave
-  {{- include "stateless.labels" . | nindent 4 }}
+  {{- include "sf.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.slave.replicas }}
   selector:
     matchLabels:
       app: redis
       role: slave
-    {{- include "stateless.selectorLabels" . | nindent 6 }}
+    {{- include "sf.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
         app: redis
         role: slave
-      {{- include "stateless.selectorLabels" . | nindent 8 }}
+      {{- include "sf.selectorLabels" . | nindent 8 }}
     spec:
       containers:
       - args: {{- toYaml .Values.slave.redisSlave.args | nindent 8 }}
@@ -48,12 +48,12 @@ metadata:
   labels:
     app: redis
     role: slave
-  {{- include "stateless.labels" . | nindent 4 }}
+  {{- include "sf.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.slave.type }}
   selector:
     app: redis
     role: slave
-  {{- include "stateless.selectorLabels" . | nindent 4 }}
+  {{- include "sf.selectorLabels" . | nindent 4 }}
   ports:
 	{{- .Values.slave.ports | toYaml | nindent 2 -}}

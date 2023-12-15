@@ -8,7 +8,8 @@ spec:
     storage: 1Gi
   accessModes:
     - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
+  # now reason for reclaiming the PV
+  persistentVolumeReclaimPolicy: Delete
   storageClassName: hostpath
   hostPath:
     # Host path for storage - if not present, it will be created

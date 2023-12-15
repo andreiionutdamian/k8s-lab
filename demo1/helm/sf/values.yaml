@@ -2,7 +2,7 @@ guestbook:
   guestbook:
     image:
       repository: guestbook
-      tag: v1
+      tag: v0
     resources:
       limits:
         cpu: 20m
@@ -24,11 +24,17 @@ master:
     args:
     - -c
     - redis-server --loglevel debug
+    env:
+      saveInterval: 60 1
     image:
       repository: redis
       tag: 5.0.5
   replicas: 1
   type: ClusterIP
+  volumeClaims:
+    redisStorage:
+      requests:
+        storage: 1Gi
 slave:
   ports:
   - port: 6379
@@ -37,8 +43,14 @@ slave:
     args:
     - -c
     - redis-server --slaveof redis-master 6379 --loglevel debug
+    env:
+      saveInterval: 60 1
     image:
       repository: redis
       tag: 5.0.5
   replicas: 2
   type: ClusterIP
+  volumeClaims:
+    redisStorage:
+      requests:
+        storage: 1Gi

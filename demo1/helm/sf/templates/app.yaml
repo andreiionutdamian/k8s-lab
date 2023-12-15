@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sf.fullname" . }}-guestbook
+  labels:
+    app: guestbook
+  {{- include "sf.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.guestbook.replicas }}
+  selector:
+    matchLabels:
+      app: guestbook
+    {{- include "sf.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: guestbook
+      {{- include "sf.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.guestbook.guestbook.image.repository }}:{{ .Values.guestbook.guestbook.image.tag
+          | default .Chart.AppVersion }}
+        name: guestbook
+        ports:
+        - containerPort: 3000
+          name: http
+        resources: {{- toYaml .Values.guestbook.guestbook.resources | nindent 10 }}

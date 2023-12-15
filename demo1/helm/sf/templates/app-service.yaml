@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "sf.fullname" . }}-guestbook
+  labels:
+    app: guestbook
+  {{- include "sf.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.guestbook.type }}
+  selector:
+    app: guestbook
+  {{- include "sf.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.guestbook.ports | toYaml | nindent 2 -}}

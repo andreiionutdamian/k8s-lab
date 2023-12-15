@@ -1,88 +1,78 @@
-# Local tests
+# Insights
 
+
+## Install stuff
 
 https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 
 
 
+## Helmify issues
 
-/var/lib/k8s-pvs/redis-storage-redis-slave-1/pvc-4ec7d473-e326-41df-8c93-0542f2091e68
-/var/lib/k8s-pvs/redis-storage-redis-slave-0/pvc-0731f096-2ea3-4320-a736-ead7c367aee7
+### StatefulSet
 
-# Source: hg2/templates/redis-master.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: redis-master
-  labels:
-    app: redis
-    role: master
-    helm.sh/chart: hg2-0.1.0
-    app.kubernetes.io/name: hg2
-    app.kubernetes.io/instance: hg
-    app.kubernetes.io/version: "0.1.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  selector:
-    app: redis
-    role: master
-    app.kubernetes.io/name: hg2
-    app.kubernetes.io/instance: hg
-  ports:
-  - port: 6379
-    targetPort: redis-server
+In this case we have a statefulset that is not correctly helmified in the target `sf` chart. Basically the selectorLabels are not added to the selector section of the statefulset. This is a problem because the service will not be able to find the pods as the pods will have different labels than the StatefulSet.
 
-# Source: hg2/templates/redis-master.yaml
-apiVersion: apps/v1
+```yaml
 kind: StatefulSet
 metadata:
-  name: redis-master
+  name: {{ include "sf.fullname" . }}-slave
   labels:
     app: redis
-    role: master
-    helm.sh/chart: hg2-0.1.0
-    app.kubernetes.io/name: hg2
-    app.kubernetes.io/instance: hg
-    app.kubernetes.io/version: "0.1.0"
-    app.kubernetes.io/managed-by: Helm
+    role: slave
+  {{- include "sf.labels" . | nindent 4 }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.slave.replicas }}
   selector:
     matchLabels:
       app: redis
-      role: master
+      role: slave
+    # here helmify did not correctly add the selectorLabels
+    # thus we need to add them manually otherwise the pods will not
+    # have the correct labels and the service will not be able to find them
+    {{- include "sf.selectorLabels" . | nindent 6 }}
   serviceName: ""
   template:
     metadata:
       labels:
         app: redis
-        role: master
-    spec:
-      containers:
-      - env:
-        - name: SAVE_INTERVAL
-          value: "60 1"
-        - name: KUBERNETES_CLUSTER_DOMAIN
-          value: "cluster.local"
-        image: redis:5.0.5
-        name: redis-master
-        ports:
-        - containerPort: 6379
-          name: redis-server
-        resources: {}
-        volumeMounts:
-        - mountPath: /data
-          name: redis-storage
-  updateStrategy: {}
-  volumeClaimTemplates:
-  - metadata:
-      creationTimestamp: null
-      name: redis-storage
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      resources: 
-        requests:
-          storage: 1Gi
-      volumeName: hg-hg2-master-pv    
+        role: slave
+      # here helmify did not correctly add the selectorLabels
+      # thus we need to add them manually otherwise the pods will not
+      # have the correct labels and the service will not be able to find them
+      {{- include "sf.selectorLabels" . | nindent 8 }}    
+```
+
+This behaviour is not consistent as in the case of `Deployment` helmify correctly adds the selectorLabels to the selector section.
+
+### Service
+
+Another issue was related to the service. While the service template for the `master` was generated as
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "sf.fullname" . }}-master
+```
+in the `slave` case the service template was generated with wrong connection
+```yaml
+Containers:
+  redis-slave:
+    Container ID:  docker://9ad9bdd31e2d9c91edcbd1c0931979c89ac82cc84b2bbe33c40d33089e0169c6
+    Image:         redis:5.0.5
+    Image ID:      docker-pullable://redis@sha256:5dcccb533dc0deacce4a02fe9035134576368452db0b4323b98a4b2ba2d3b302
+    Port:          6379/TCP
+    Host Port:     0/TCP
+    Command:
+      /bin/sh
+    Args:
+      -c
+      redis-server --slaveof redis-master 6379 --loglevel debug
+```
+
+so there is a name mismatch between the hard-coded service name and the generated service name. In this case we need to fix the service name in the template to match the generated service name.
+
+
+### Redis stuff
+
+Seems that redis slave is trying to bind to the same volume as the master. The first work-around was to deploy the slave as deployment rather than StatefulSet

@@ -21,6 +21,10 @@ spec:
       containers:
       - name: redis-master
         image: redis:5.0.5
+        # command: ["redis-server"]
+        # args: ["--loglevel", "debug"]        
+        command: ["/bin/sh"]
+        args: ["-c","redis-server --loglevel debug"]
         ports:
         - name: redis-server
           containerPort: 6379

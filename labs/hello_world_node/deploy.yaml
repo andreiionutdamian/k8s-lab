@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      run: hello-world
+  template:
+    metadata:
+      labels:
+        run: hello-world
+    spec:
+      containers:
+      - image: aidamian/basic-test-node
+        name: hello-world
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world-service
+spec:
+  type: NodePort
+  selector:
+    run: hello-world
+  ports:
+    - protocol: TCP
+      port: 8080
+      nodePort: 30080  # Optional: Remove or change this if you want Kubernetes to assign a port automatically

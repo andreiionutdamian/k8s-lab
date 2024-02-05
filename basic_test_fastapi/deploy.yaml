@@ -13,8 +13,8 @@ spec:
         run: basic-test-py
     spec:
       containers:
-      - image: aidamian/basic_test_fastapi
-        name: test-py-container
+      - name: test-py-container
+        image: aidamian/basic_test_fastapi        
         ports:
         - containerPort: 5050
           protocol: TCP

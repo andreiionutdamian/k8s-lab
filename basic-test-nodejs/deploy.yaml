@@ -13,8 +13,8 @@ spec:
         run: basic-test-nodejs
     spec:
       containers:
-      - image: aidamian/basic-test-nodejs
-        name: test-nodejs-container
+      - name: test-nodejs-container
+        image: aidamian/basic-test-nodejs        
         ports:
         - containerPort: 8080
           protocol: TCP

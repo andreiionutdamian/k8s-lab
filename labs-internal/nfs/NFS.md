@@ -160,12 +160,12 @@ To perform a simple test of writing and reading data across workers in your Kube
 First, manually test the NFS mount on your worker nodes to ensure they can correctly mount the NFS share and read/write data.
 
 1. **Mount the NFS Share on a Worker Node**:
-  - Pick a worker node and SSH into it.
-  - Create a mount point (e.g., `/mnt/nfs`):
-    ```
-    sudo mkdir -p /mnt/nfs
-    ```
-  - Mount the NFS share:
+- Pick a worker node and SSH into it.
+- Create a mount point (e.g., `/mnt/nfs`):
+```bash 
+sudo mkdir -p /mnt/nfs
+```
+- Mount the NFS share:
 
 ```bash
 sudo mount -t nfs 192.168.1.56:/srv/nfs/k8s /mnt/nfs

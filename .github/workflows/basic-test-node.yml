@@ -1,0 +1,29 @@
+name: Basic Node.js test container
+
+on: 
+  push:
+    paths:
+      - 'basic-test-nodejs/**'  # Specify path to your directory
+
+jobs:
+  build-and-push-collection:
+    runs-on: ubuntu-latest
+  
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USR }}
+          password: ${{ secrets.DOCKERHUB_PWD }}
+
+      - name: Build and Push
+        run: |
+          cd basic-test-nodejs
+          chmod +x build.sh  # Ensure the script is executable
+          ./build.sh        

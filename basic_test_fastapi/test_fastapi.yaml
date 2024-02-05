@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-py
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      run: test-py
+  template:
+    metadata:
+      labels:
+        run: test-py
+    spec:
+      containers:
+      - image: aidamian/basic_test_fastapi
+        name: test-py-container
+        ports:
+        - containerPort: 5050
+          protocol: TCP
+        #enviroment variables
+        env:
+        - name: PORT
+          value: "5050"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-py-svc
+spec:
+  type: NodePort
+  selector:
+    run: test-py
+  ports:
+    - protocol: TCP
+      port: 5050
+      nodePort: 30050  # Optional: Remove or change this if you want Kubernetes to assign a port automatically

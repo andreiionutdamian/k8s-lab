@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-nodejs
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      run: test-nodejs
+  template:
+    metadata:
+      labels:
+        run: test-nodejs
+    spec:
+      containers:
+      - image: aidamian/basic-test-nodejs
+        name: test-n1
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-nodejs-svc
+spec:
+  type: NodePort
+  selector:
+    run: test-nodejs
+  ports:
+    - protocol: TCP
+      port: 8080
+      nodePort: 30080  # Optional: Remove or change this if you want Kubernetes to assign a port automatically

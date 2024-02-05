@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: test-nodejs
+  name: basic-test-nodejs
 spec:
   replicas: 4
   selector:
     matchLabels:
-      run: test-nodejs
+      run: basic-test-nodejs
   template:
     metadata:
       labels:
-        run: test-nodejs
+        run: basic-test-nodejs
     spec:
       containers:
       - image: aidamian/basic-test-nodejs
-        name: test-n1
+        name: test-nodejs-container
         ports:
         - containerPort: 8080
           protocol: TCP
@@ -22,11 +22,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: test-nodejs-svc
+  name: basic-test-nodejs-svc
 spec:
   type: NodePort
   selector:
-    run: test-nodejs
+    run: basic-test-nodejs
   ports:
     - protocol: TCP
       port: 8080

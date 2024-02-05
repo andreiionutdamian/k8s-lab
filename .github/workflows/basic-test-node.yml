@@ -6,7 +6,7 @@ on:
       - 'basic-test-nodejs/**'  # Specify path to your directory
 
 jobs:
-  build-and-push-collection:
+  build-and-push-nodejs-test-image:
     runs-on: ubuntu-latest
   
     steps:

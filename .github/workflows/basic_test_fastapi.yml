@@ -6,7 +6,7 @@ on:
       - 'basic_test_fastapi/**'  # Specify path to your directory
 
 jobs:
-  build-and-push-collection:
+  build-and-push-py-test-image:
     runs-on: ubuntu-latest
   
     steps:

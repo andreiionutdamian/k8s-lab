@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: test-py
+  name: basic-test-py
 spec:
   replicas: 4
   selector:
     matchLabels:
-      run: test-py
+      run: basic-test-py
   template:
     metadata:
       labels:
-        run: test-py
+        run: basic-test-py
     spec:
       containers:
       - image: aidamian/basic_test_fastapi
@@ -26,11 +26,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: test-py-svc
+  name: basic-test-py-svc
 spec:
   type: NodePort
   selector:
-    run: test-py
+    run: basic-test-py
   ports:
     - protocol: TCP
       port: 5050

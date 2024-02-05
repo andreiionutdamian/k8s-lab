@@ -3,7 +3,7 @@ echo "Deleting the NFS test pods..."
 
 kubectl delete -f test-1.yaml -f test-2.yaml
 
-echop "Cleaning up the NFS mount point..."
+echo "Cleaning up the NFS mount point..."
 
 # Define the NFS mount point and NFS server
 MOUNT_POINT="/mnt/nfs"
@@ -29,10 +29,8 @@ mount_nfs() {
 
 # Function to check for an active NFS mount
 check_mount() {
-    echo "Mount point $MOUNT_POINT contains the following files:"
-    ls -l "$MOUNT_POINT"
     echo "Checking for an active NFS mount on $MOUNT_POINT..."
-    if mount | grep " on $MOUNT_POINT type nfs " > /dev/null; then
+    if mount | grep $MOUNT_POINT > /dev/null; then
         echo "An active NFS mount is found on $MOUNT_POINT."
         return 0
     else
@@ -43,6 +41,8 @@ check_mount() {
 
 # Function to delete all files in the mount point
 delete_files() {
+    echo "Mount point $MOUNT_POINT contains the following files:"
+    ls -l "$MOUNT_POINT"
     echo "Deleting all files in $MOUNT_POINT..."
     rm -rf --preserve-root "$MOUNT_POINT/$NFS_FILES" && echo "All files in $MOUNT_POINT have been successfully deleted." || echo "Error: Failed to delete files in $MOUNT_POINT."
 }

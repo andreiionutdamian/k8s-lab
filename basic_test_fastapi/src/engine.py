@@ -6,7 +6,7 @@ from datetime import datetime
 
 from app_utils import safe_jsonify
 
-__VER__ = '0.2.1'
+__VER__ = '0.2.2'
 
 
 class AppPaths:
@@ -55,12 +55,17 @@ class AppHandler:
         # redis_master_port = dct_redis.get("REDIS_MASTER_PORT")
       else:
         self.P("Setting up simple Redis with configuration:\n{}".format(safe_jsonify(dct_redis)))
-        redis_host = os.getenv("REDIS_SERVICE_HOST")
-        redis_port = int(os.getenv("REDIS_SERVICE_PORT", 6379))
-        redis_password = os.getenv("REDIS_PASSWORD", None)
+        redis_host = dct_redis.get("REDIS_SERVICE_HOST")
+        redis_port = dct_redis.get("REDIS_SERVICE_PORT", 6379)
+        redis_password = dct_redis.get("REDIS_PASSWORD", None)
+      hidden_password = redis_password[:2] + "*" * (len(redis_password) - 4) + redis_password[-2:] if redis_password is not None else None
+      self.P("Connecting to Redis at {}:{} with password: {}".format(
+        redis_host, redis_port, hidden_password
+      ))
       self.__redis = redis.Redis(
         host=redis_host, port=redis_port, 
-        password=redis_password, decode_responses=True,
+        password=redis_password, 
+        decode_responses=True,
       )
       self.__has_redis = True
       self.P("Connected to Redis at {}:{}".format(redis_host, redis_port))

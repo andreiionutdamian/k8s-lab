@@ -18,7 +18,7 @@ kubectl apply -f secrets.yaml
 
 ## Tests
 
-Finally you can run the full tests with the following command:
+Finally you can run the full tests by changing to either `nodeport_examples` or `production_like` dirs and run the following command:
 
 ```bash
 ./test_nodeport.sh

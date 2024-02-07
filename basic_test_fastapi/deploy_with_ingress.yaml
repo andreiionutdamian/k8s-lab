@@ -1,7 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: basic-ns12
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: basic-test-py
+  namespace: basic-ns12
 spec:
   replicas: 4
   selector:
@@ -27,11 +33,30 @@ apiVersion: v1
 kind: Service
 metadata:
   name: basic-test-py-svc
+  namespace: basic-ns12
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     run: basic-test-py
   ports:
     - protocol: TCP
       port: 5050
-      nodePort: 30050  # Optional: Remove or change this if you want Kubernetes to assign a port automatically
+      targetPort: 5050
+---
+apiVersion: v1
+kind: Ingress
+metadata:
+  name: basic-test-py-ingress
+  namespace: basic-ns12
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /basic_test
+        pathType: Prefix
+        backend:
+          service:
+            name: basic-test-py-svc
+            port:
+              number: 5050
+

@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: basic-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:alpine
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: basic-test-app-secrets
+              key: redis-password
+        args: ["--requirepass", "$(REDIS_PASSWORD)"]        
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - name: redis-storage
+          mountPath: /data
+      volumes:
+      - name: redis-storage
+        emptyDir: {}        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: basic-postgres
+spec:
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: basic-test-py
+  namespace: basic-postgres
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      run: basic-test-py
+  template:
+    metadata:
+      labels:
+        run: basic-test-py
+    spec:
+      containers:
+      - name: test-py-container
+        image: aidamian/basic_test_fastapi        
+        ports:
+        - containerPort: 5050
+          protocol: TCP
+        # enviroment variables
+        env:
+        - name: PORT
+          value: "5050"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: basic-test-app-secrets
+              key: redis-password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: basic-test-py-svc
+  namespace: basic-postgres
+spec:
+  type: NodePort
+  selector:
+    run: basic-test-py
+  ports:
+    - protocol: TCP
+      port: 5050
+      nodePort: 30050  # Optional: Remove or change this if you want Kubernetes to assign a port automatically

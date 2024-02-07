@@ -1,12 +1,13 @@
 import os
 import redis
-import json
+
+
 from uuid import uuid4
 from datetime import datetime
 
-from app_utils import safe_jsonify
+from app_utils import safe_jsonify, get_packages
 
-__VER__ = '0.3.2'
+__VER__ = '0.3.3'
 
 
 class AppPaths:
@@ -56,6 +57,8 @@ class AppHandler:
       self.__class__.__name__, __VER__,
       self.str_local_id, self.hostname
     ))
+    self.__packs = get_packages()
+    self.P("Packages:\n{}".format("\n".join(self.__packs)))
     dct_env = dict(os.environ)
     self.P("Environement:\n{}".format(safe_jsonify(dct_env, indent=2)))
     self.__maybe_setup_redis()
@@ -94,8 +97,12 @@ class AppHandler:
     return
     
     
-  def _pack_result(self, message):
-    return {"result": message}
+  def _pack_result(self, message, path=None, parameter=None):
+    return {
+      "result": message,
+      "path": path,
+      "parameter": parameter,
+    }
 
 
   def _inc_cluster_count(self):
@@ -126,14 +133,14 @@ class AppHandler:
     return
   
   
-  def handle_request(self, path):
+  def handle_request(self, path, parameter=None):
     self.process_data()
     if path in self.__avail_paths:
       func_name = '_handle_' + self.__path_to_func[path]
       msg = getattr(self, func_name)(path=path)
     else:
       msg = self.__handle_generic(path)
-    result = self._pack_result(msg)
+    result = self._pack_result(msg, path=path, parameter=parameter)
     return result
     
 
@@ -156,9 +163,9 @@ class AppHandler:
     return dct_result
   
   
-  def __handle_generic(self, path, **kwargs):
-    msg = "Generic handler '{}', Local/Global: {}/{}, HOSTNAME: '{}', ID: '{}'".format(
-      path, self.__local_count, self.get_cluster_count(),
+  def __handle_generic(self, path, parameter=None, **kwargs):
+    msg = "Generic handler '{}', Param='{}', Local/Global: {}/{}, HOSTNAME: '{}', ID: '{}'".format(
+      path, parameter, self.__local_count, self.get_cluster_count(),
       self.hostname, self.str_local_id
     )  
     return msg

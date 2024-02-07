@@ -7,7 +7,8 @@ Goal:
 
 
 Setup:
- - Python app (1 replica) deployment downloads models - uses Redis to announce update
+ - Python app (1 replica) deployment downloads model
+    - uses Redis to announce update
  - Python app (4 replicas) sfs 
     - loads models from PV and serves using GPU
     - uses Redis to get models

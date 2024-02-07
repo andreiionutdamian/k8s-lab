@@ -1,6 +1,23 @@
 import json
 import numpy as np
+import pkg_resources
+
 from datetime import datetime
+
+def get_packages(monitored_packages=None):
+  packs = [x for x in pkg_resources.working_set]
+  maxlen = max([len(x.key) for x in packs]) + 1
+  if isinstance(monitored_packages, list) and len(monitored_packages) > 0:
+    packs = [
+        "{}{}".format(x.key + ' ' * (maxlen - len(x.key)), x.version) for x in packs
+        if x.key in monitored_packages
+    ]
+  else:
+    packs = [
+        "{}{}".format(x.key + ' ' * (maxlen - len(x.key)), x.version) for x in packs
+    ]
+  packs = sorted(packs)
+  return packs
 
 class NPJson(json.JSONEncoder):
   """

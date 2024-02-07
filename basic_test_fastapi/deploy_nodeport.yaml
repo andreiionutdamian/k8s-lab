@@ -6,6 +6,45 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: redis
+  namespace: basic-ns11
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:alpine
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - name: redis-storage
+          mountPath: /data
+      volumes:
+      - name: redis-storage
+        emptyDir: {}        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: basic-ns11
+spec:
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: basic-test-py
   namespace: basic-ns11
 spec:

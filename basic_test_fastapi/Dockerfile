@@ -4,4 +4,5 @@ RUN pip install fastapi uvicorn redis
 COPY src/ .
 ENV PORT=5050
 EXPOSE $PORT
+# ENV PYTHONPATH="/test_app"
 CMD uvicorn main:app --host 0.0.0.0 --port $PORT

@@ -3,6 +3,8 @@ import redis
 import json
 from uuid import uuid4
 
+__VER__ = '0.1.0'
+
 class AppPaths:
   PATH_ROOT = "/"
   PATH_STAT = "/stats"
@@ -25,7 +27,8 @@ class AppHandler:
     self.__local_count = 0
     self.__has_redis = False
     self.hostname = os.environ.get("HOSTNAME", "unknown")    
-    self.P("Initializing App app with ID: {}, HOSTNAME: {}...".format(
+    self.P("Initializing {} v{}  with ID: {}, HOSTNAME: {}...".format(
+      self.__class__.__name__, __VER__,
       self.str_local_id, self.hostname
     ))
     dct_env = dict(os.environ)

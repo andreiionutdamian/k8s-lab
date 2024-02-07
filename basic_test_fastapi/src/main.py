@@ -1,7 +1,7 @@
 import os
 from uuid import uuid4
 from fastapi import FastAPI, APIRouter
-from .engine import AppHandler, AppPaths
+from engine import AppHandler, AppPaths
 
 
 engine = AppHandler()

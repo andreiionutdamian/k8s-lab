@@ -4,3 +4,5 @@ for i in $(seq 1 10); do
     curl -L $ADDR_PORT
     echo " "
 done
+
+curl -s $ADDR_PORT/stats | jq .

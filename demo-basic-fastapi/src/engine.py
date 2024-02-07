@@ -6,7 +6,7 @@ from datetime import datetime
 
 from app_utils import safe_jsonify
 
-__VER__ = '0.3.0'
+__VER__ = '0.3.2'
 
 
 class AppPaths:
@@ -19,6 +19,7 @@ class AppHandler:
     self.__setup()
     return
   
+  
   def P(self, s, **kwargs):
     if vars(self).get('log') is not None :
       self.log.P(s, **kwargs)
@@ -27,9 +28,26 @@ class AppHandler:
       print('[APH][{}]'.format(str_date) + s, flush=True, **kwargs)
     return
   
+  
+  def __check_handlers(self):
+    requested_funcs = ["_handle_" + x for x in self.__path_to_func.values()]
+    for func in requested_funcs:
+      if not hasattr(self, func):
+        msg = "Handler function '{}' not found in class '{}'. Available handlers: {}, Paths: {}".format(
+          func, self.__class__.__name__,
+          [x for x in dir(self) if x.startswith("_handle_")],
+          {k:v for k, v in vars(AppPaths).items() if k.startswith("PATH_")},
+        )
+        raise Exception(msg)
+      #end if not hasattr
+    #end check for handlers
+    return
+  
+  
   def __setup(self):
     self.__avail_paths = [v['PATH'] for k, v in vars(AppPaths).items() if k.startswith("PATH_")]
     self.__path_to_func = {v['PATH']: v['FUNC'] for k, v in vars(AppPaths).items() if k.startswith("PATH_")}
+    self.__check_handlers()
     self.str_local_id = "test_" + str(uuid4())[:5]
     self.__local_count = 0
     self.__has_redis = False
@@ -42,6 +60,7 @@ class AppHandler:
     self.P("Environement:\n{}".format(safe_jsonify(dct_env, indent=2)))
     self.__maybe_setup_redis()
     return
+  
     
   def __maybe_setup_redis(self):
     dct_redis = {k : v for k, v in os.environ.items() if k.startswith("REDIS_")}
@@ -74,13 +93,16 @@ class AppHandler:
     self.__has_redis = False
     return
     
+    
   def _pack_result(self, message):
     return {"result": message}
+
 
   def _inc_cluster_count(self):
     if self.__has_redis:
       self.__redis.incr("cluster_count")
     return
+  
   
   def get_cluster_count(self):
     result = self.__local_count
@@ -122,7 +144,7 @@ class AppHandler:
     )    
     return msg
   
-  def _handle_stat(self, **kwargs):
+  def _handle_stats(self, **kwargs):
     dct_result = {
       'info' : "Handler '{}', Worker HOSTNAME: '{}', ID: '{}'".format(
         kwargs['path'], self.hostname, self.str_local_id

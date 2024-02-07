@@ -1,3 +1,7 @@
+#!/bin/bash
+
+source ../utils.sh
+
 APP_NAME="basic-test-py"
 NAMESPACE="basic-ns11"
 kubectl delete -f deploy_nodeport.yaml
@@ -7,7 +11,7 @@ while true; do
   OUTPUT=$(kubectl get pods -l run=$APP_NAME -n $NAMESPACE 2>&1)
   echo "$OUTPUT"
   if [[ "$OUTPUT" == *"No resources found"* ]]; then
-    echo "All pods terminated."
+    log_with_color "All pods terminated." green
     break
   fi
   sleep 5

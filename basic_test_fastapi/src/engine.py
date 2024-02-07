@@ -6,7 +6,7 @@ from datetime import datetime
 
 from app_utils import safe_jsonify
 
-__VER__ = '0.1.1'
+__VER__ = '0.1.2'
 
 
 class AppPaths:

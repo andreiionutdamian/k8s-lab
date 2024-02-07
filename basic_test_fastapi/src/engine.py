@@ -2,8 +2,12 @@ import os
 import redis
 import json
 from uuid import uuid4
+from datetime import datetime
 
-__VER__ = '0.1.0'
+from app_utils import safe_jsonify
+
+__VER__ = '0.1.1'
+
 
 class AppPaths:
   PATH_ROOT = "/"
@@ -19,7 +23,8 @@ class AppHandler:
     if vars(self).get('log') is not None :
       self.log.P(s, **kwargs)
     else:
-      print('[APH]' + s, flush=True, **kwargs)
+      str_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+      print('[APH][{}]'.format(str_date) + s, flush=True, **kwargs)
     return
   
   def __setup(self):
@@ -27,16 +32,36 @@ class AppHandler:
     self.__local_count = 0
     self.__has_redis = False
     self.hostname = os.environ.get("HOSTNAME", "unknown")    
-    self.P("Initializing {} v{}  with ID: {}, HOSTNAME: {}...".format(
+    self.P("Initializing {} v{} ID: {}, HOSTNAME: {}...".format(
       self.__class__.__name__, __VER__,
       self.str_local_id, self.hostname
     ))
     dct_env = dict(os.environ)
-    self.P("Environement:\n{}".format(json.dumps(dct_env, indent=2)))
+    self.P("Environement:\n{}".format(safe_jsonify(dct_env, indent=2)))
     self.__maybe_setup_redis()
     return
     
   def __maybe_setup_redis(self):
+    dct_redis = {k : v for k, v in os.environ.items() if k.startswith("REDIS_")}
+    if len(dct_redis) > 0:
+      if "REDIS_MASTER_SERVICE_HOST" in dct_redis:
+        # this is a redis master/slave setup
+        self.P("Setting up Redis with master/slave configuration:\n{}".format(safe_jsonify(dct_redis)))
+        redis_host = dct_redis.get("REDIS_MASTER_SERVICE_HOST")
+        redis_port = dct_redis.get("REDIS_MASTER_SERVICE_PORT")
+        redis_password = dct_redis.get("REDIS_PASSWORD")
+        # redis_master_port = dct_redis.get("REDIS_MASTER_PORT")
+      else:
+        self.P("Setting up simple Redis with configuration:\n{}".format(safe_jsonify(dct_redis)))
+        redis_host = os.getenv("REDIS_SERVICE_HOST")
+        redis_port = int(os.getenv("REDIS_SERVICE_PORT", 6379))
+        redis_password = os.getenv("REDIS_PASSWORD", None)
+      self.__redis = redis.Redis(
+        host=redis_host, port=redis_port, 
+        password=redis_password, decode_responses=True,
+      )
+      self.__has_redis = True
+      return
     self.__has_redis = False
     return
     
@@ -47,8 +72,13 @@ class AppHandler:
     result = self.__local_count
     if self.__has_redis:
       # get the value from redis
-      pass
+      result = int(self.__redis.get("cluster_count") or 0)
     return result
+  
+  def inc_cluster_count(self):
+    if self.__has_redis:
+      self.__redis.incr("cluster_count")
+    return
   
   
   def handle_request(self, path):

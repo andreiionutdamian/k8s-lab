@@ -1,7 +1,13 @@
 #!/bin/bash
 source ../utils.sh
+# Name of the deployment
+DEPLOYMENT_NAME="basic-test-py"
 
-kubectl apply -f deploy_nodeport.yaml
+# Namespace where the deployment is located
+# Update this if your deployment is not in the default namespace
+NAMESPACE="basic-ns12"
+
+kubectl apply -f deploy_with_ingress.yaml
 
 get_ready_replicas() {
     kubectl get deployment "$DEPLOYMENT_NAME" -n "$NAMESPACE" -o jsonpath='{.status.readyReplicas}'

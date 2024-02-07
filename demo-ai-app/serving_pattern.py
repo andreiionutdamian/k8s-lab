@@ -45,20 +45,25 @@ async def on_shutdown():
   engine.shutdown()
   return
 
+# string request
+@router.get("/predict/text")
+async def predict_text(text: str):
+  return {"message": f"Received text: {text}"}
+
 # json request
 class Item(BaseModel):
   field1: str
   field2: str
   field3: str
 
-@app.post("/predict2")
-async def predict2(item: Item):
+@router.post("/predict/data")
+async def predict_data(item: Item):
   return {"message": f"Received JSON body: {item}"}
   
   
 # image request
-@app.post("/predict3")
-async def predict3(image: UploadFile = File(...)):
+@router.post("/predict/image")
+async def predict_image(image: UploadFile = File(...)):
   contents = await image.read()
   # Process the image data
   return {"message": "Image received"}  

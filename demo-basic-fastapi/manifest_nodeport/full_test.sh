@@ -1,4 +1,5 @@
 #!/bin/bash
+source ../utils.sh
 
 MACHINE_IP="192.168.1.55"
 

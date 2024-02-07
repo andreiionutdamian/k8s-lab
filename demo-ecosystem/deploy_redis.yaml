@@ -1,0 +1,73 @@
+#secret for redis
+apiVersion: v1
+kind: Secret
+metadata:
+  name: redis-secret
+  namespace: demo-ecosystem
+type: Opaque
+data:
+  redis-password: cmVkaXNwYXNzd29yZA==
+---
+#config for redis
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: demo-ecosystem
+data:
+  redis.conf: |
+    maxmemory 256mb
+    maxmemory-policy allkeys-lru
+---
+#redis deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: demo-ecosystem
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:alpine
+        command: ["redis-server", "/conf/redis.conf", "--requirepass", "$(REDIS_PASSWORD)"]
+        ports:
+        - containerPort: 6379
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis-secret
+              key: redis-password
+        volumeMounts:
+        - name: config
+          mountPath: /conf
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: redis-config
+          items:
+          - key: redis.conf
+            path: redis.conf
+---
+#redis service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: demo-ecosystem
+spec:
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: redis

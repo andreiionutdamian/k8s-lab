@@ -1,0 +1,119 @@
+#pv for Postgres
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pg-pv-nfs
+  namespace: demo-ecosystem
+spec:
+  capacity:
+    storage: 3Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
+  nfs:
+    path: "/srv/nfs/k8s"
+    server: 192.168.1.56
+    readOnly: false
+---
+#pvc for Postgres
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pg-pvc
+  namespace: demo-ecosystem
+spec:
+  storageClassName: nfs
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 3Gi
+  volumeName: pg-pv-nfs
+---
+#secret for pg
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pg-secret
+  namespace: demo-ecosystem
+type: Opaque
+data:
+  POSTGRES_PASSWORD: cGdwYXNzd29yZA==
+---
+#configs for pg
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pg-config
+  namespace: demo-ecosystem
+  labels:
+    app: postgres
+data:
+  POSTGRES_DB: postgresdb
+  POSTGRES_USER: pguser
+---
+# pg deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: demo-ecosystem
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:latest
+        imagePullPolicy: "IfNotPresent"
+        ports:
+        - containerPort: 5432
+        envFrom:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pg-secret
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: pg-config
+              key: POSTGRES_DB
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: pg-config
+              key: POSTGRES_USER
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          subPath: pg
+          readOnly: false
+          name: pg-storage
+      volumes:
+      - name: pg-storage
+        persistentVolumeClaim:
+          claimName: pg-pvc
+---
+#pg service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: demo-ecosystem
+  labels:
+    app: postgres
+spec:
+  type: NodePort
+  ports:
+   - port: 5432
+  selector:
+   app: postgres

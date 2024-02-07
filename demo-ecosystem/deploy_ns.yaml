@@ -1,0 +1,5 @@
+#ecosistem ns
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo-ecosystem

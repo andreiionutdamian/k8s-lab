@@ -6,7 +6,7 @@ from datetime import datetime
 
 from app_utils import safe_jsonify
 
-__VER__ = '0.2.3'
+__VER__ = '0.2.5'
 
 
 class AppPaths:
@@ -76,22 +76,36 @@ class AppHandler:
     
   def _pack_result(self, message):
     return {"result": message}
+
+  def _inc_cluster_count(self):
+    if self.__has_redis:
+      self.__redis.incr("cluster_count")
+    return
   
   def get_cluster_count(self):
     result = self.__local_count
     if self.__has_redis:
       # get the value from redis
-      result = int(self.__redis.get("cluster_count") or 0)
+      result = self.__redis.get("cluster_count")
     return result
   
-  def inc_cluster_count(self):
+  
+  def get_data(self):
+    if not self.__has_redis:
+      return {}
+    return self.__redis.hgetall("data")
+  
+  
+  def process_data(self):
+    self.__local_count += 1
     if self.__has_redis:
-      self.__redis.incr("cluster_count")
+      self._inc_cluster_count()
+      self.__redis.hset("data", self.str_local_id, self.__local_count)
     return
   
   
   def handle_request(self, path):
-    self.__local_count += 1
+    self.process_data()
     if path in self.__avail_paths:
       func_name = '_handle_' + self.__path_to_func[path]
       msg = getattr(self, func_name)()
@@ -115,6 +129,7 @@ class AppHandler:
       ),
       'local_count' : self.__local_count,
       'cluster_count' : self.get_cluster_count(),
+      'cluster_data' : self.get_data(),
     }    
     return dct_result
   

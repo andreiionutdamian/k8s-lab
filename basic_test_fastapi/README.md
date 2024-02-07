@@ -21,10 +21,5 @@ kubectl apply -f secrets.yaml
 Finally you can run the full tests by changing to either `nodeport_examples` or `production_like` dirs and run the following command:
 
 ```bash
-./test_nodeport.sh
-```
-
-or 
-```bash
-./test_with_ingress.sh
+./full_test.sh
 ```

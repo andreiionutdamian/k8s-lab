@@ -15,6 +15,8 @@ NAMESPACE="basic-ns11"
 # Interval in seconds between checks
 CHECK_INTERVAL=5
 
+COUNT=5
+
 
 log_with_color() {
     local text="$1"
@@ -79,6 +81,12 @@ done
 
 for i in $(seq 1 $COUNT); do
   curl -L "http://$MACHINE_IP:30050"
+  echo " "
+done
+
+for i in $(seq 1 $COUNT); do
+  curl -L "http://$MACHINE_IP:30050/some_route"
+  echo " "
 done
 
 log_with_color "Test completed." green

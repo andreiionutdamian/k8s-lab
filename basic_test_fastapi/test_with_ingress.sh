@@ -1,5 +1,7 @@
 #!/bin/bash
 
+MACHINE_IP="192.168.1.55"
+
 # manifest filename
 MANIFEST_FILENAME="deploy_with_ingress.yaml"
 
@@ -12,6 +14,8 @@ NAMESPACE="basic-ns12"
 
 # Interval in seconds between checks
 CHECK_INTERVAL=5
+
+COUNT=5
 
 
 log_with_color() {
@@ -76,7 +80,13 @@ while true; do
 done
 
 for i in $(seq 1 $COUNT); do
-  curl -L http://localhost:30050
+  curl -L "http://$MACHINE_IP:30050"
+  echo " "
+done
+
+for i in $(seq 1 $COUNT); do
+  curl -L "http://$MACHINE_IP:30050/some_route"
+  echo " "
 done
 
 log_with_color "Test completed." green

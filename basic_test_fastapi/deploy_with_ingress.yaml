@@ -48,6 +48,8 @@ kind: Ingress
 metadata:
   name: basic-test-py-ingress
   namespace: basic-ns12
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
   - http:

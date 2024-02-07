@@ -1,5 +1,7 @@
 #!/bin/bash
 
+MACHINE_IP="192.168.1.55"
+
 # manifest filename
 MANIFEST_FILENAME="deploy_nodeport.yaml"
 
@@ -76,7 +78,7 @@ while true; do
 done
 
 for i in $(seq 1 $COUNT); do
-  curl -L http://localhost:30050
+  curl -L "http://$MACHINE_IP:30050"
 done
 
 log_with_color "Test completed." green

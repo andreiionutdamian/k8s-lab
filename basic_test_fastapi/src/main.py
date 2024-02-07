@@ -15,7 +15,7 @@ PATH_1 = "/"
 @router1.get(PATH_1)
 async def root():
   msg = f"Handler '{PATH_1}', Worker HOSTNAME: '{hostname}', ID: '{str_local_id}'\n"
-  return {"message": "Root path handler"}
+  return {"message": msg}
 
 # note: this is a catch-all route, so it should be the last route in the router
 @router1.get("/{full_path:path}", include_in_schema=False)

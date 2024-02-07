@@ -1,6 +1,33 @@
+import json
+import numpy as np
+
 from datetime import datetime
 from kubernetes import client, config
 
+
+class NPJson(json.JSONEncoder):
+  """
+  Used to help jsonify numpy arrays or lists that contain numpy data types.
+  """
+  def default(self, obj):
+      if isinstance(obj, np.integer):
+          return int(obj)
+      elif isinstance(obj, np.floating):
+          return float(obj)
+      elif isinstance(obj, np.ndarray):
+          return obj.tolist()
+      elif isinstance(obj, np.ndarray):
+          return obj.tolist()
+      elif isinstance(obj, datetime):
+          return obj.strftime("%Y-%m-%d %H:%M:%S")
+      else:
+          return super(NPJson, self).default(obj)
+        
+def safe_jsonify(obj, **kwargs):
+  """
+  Safely jsonify an object, including numpy arrays or lists that contain numpy data types.
+  """
+  return json.dumps(obj, cls=NPJson, **kwargs)
 
 class KubeMonitor:
   def __init__(self, log=None):
@@ -17,6 +44,7 @@ class KubeMonitor:
     # no try-except here. let the caller handle the exception or fail if it occurs
     config.load_kube_config()    
     self.__v1 = client.CoreV1Api()  
+    self.P("KubeMonitor initialized")
     return
     
 
@@ -37,12 +65,25 @@ class KubeMonitor:
       return None
     return ret.items
   
+  def __get_elapsed(self, start_time):
+    """
+    Get the elapsed time since the specified start time.
+    """
+    return (datetime.now(start_time.tzinfo) - start_time).total_seconds()
+  
+  def __get_pod_transition_time(self, pod_info):
+    """
+    Get the elapsed time since the pod transitioned to its current phase.
+    """
+    start_time = pod_info.status.conditions[-1].last_transition_time
+    transition_time = self.__get_elapsed(start_time)
+    return transition_time
+  
 
   def _check_pod_health(self, pod):
     try:
       # Fetch the specified pod      
       health_status = {"status": "Success", "messages": []}
-
       # Determine if the pod is in a loading or initializing state
       if pod.status.phase in ["Pending"]:
         initializing_status = False
@@ -62,10 +103,15 @@ class KubeMonitor:
           health_status["status"] = "Loading"
           health_status["messages"].append("Pod is pending, waiting for resources or other conditions.")
 
+        if self.__get_pod_transition_time(pod) > 300:
+          health_status["status"] = "Warning"
+          health_status["messages"].append(f"Pod has been pending for more than 5 minutes.")
+        #end if transition time          
+      #end if pod is pending
       elif pod.status.phase not in ["Running", "Succeeded"]:
         health_status["status"] = "Critical"
         health_status["messages"].append(f"Pod is in {pod.status.phase} phase.")
-
+      # end if pod is not running or succeeded
       # Check container statuses if pod phase is Running
       if pod.status.phase == "Running":
         health_status["containers"] = {}
@@ -80,7 +126,7 @@ class KubeMonitor:
             health_status["messages"].append(f"Container {container_status.name} restarted {container_status.restart_count} times.")
           # now compute running time for this pod containers                   
           run_info = container_status.state.running                  
-          running_time = (datetime.now(run_info.started_at.tzinfo) - run_info.started_at).total_seconds()
+          running_time = self.__get_elapsed(run_info.started_at)
           hours, rem = divmod(running_time, 3600)
           minutes, seconds = divmod(rem, 60)
           # format elapsed time as a string        

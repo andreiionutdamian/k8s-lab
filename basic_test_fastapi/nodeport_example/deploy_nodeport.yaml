@@ -20,7 +20,7 @@ spec:
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: redis-secret
+              name: basic-test-app-secrets
               key: redis-password
         args: ["--requirepass", "$(REDIS_PASSWORD)"]        
         ports:
@@ -72,7 +72,7 @@ spec:
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: redis-secret
+              name: basic-test-app-secrets
               key: redis-password
 ---
 apiVersion: v1

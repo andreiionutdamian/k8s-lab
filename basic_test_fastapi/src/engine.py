@@ -6,12 +6,12 @@ from datetime import datetime
 
 from app_utils import safe_jsonify
 
-__VER__ = '0.2.5'
+__VER__ = '0.3.0'
 
 
 class AppPaths:
   PATH_ROOT = {"PATH": "/", "FUNC": "root"}
-  PATH_STAT = {"PATH": "/stat", "FUNC": "stat"  }
+  PATH_STAT = {"PATH": "/stats", "FUNC": "stats"  }
 
 class AppHandler:
   def __init__(self):
@@ -108,24 +108,24 @@ class AppHandler:
     self.process_data()
     if path in self.__avail_paths:
       func_name = '_handle_' + self.__path_to_func[path]
-      msg = getattr(self, func_name)()
+      msg = getattr(self, func_name)(path=path)
     else:
       msg = self.__handle_generic(path)
     result = self._pack_result(msg)
     return result
     
 
-  def _handle_root(self):
+  def _handle_root(self, **kwargs):
     msg = "Handler '{}', Local/Global: {}/{}, HOSTNAME: '{}', ID: '{}'".format(
-      AppPaths.PATH_ROOT, self.__local_count, self.get_cluster_count(),
+      kwargs['path'], self.__local_count, self.get_cluster_count(),
       self.hostname, self.str_local_id
     )    
     return msg
   
-  def _handle_stat(self):
+  def _handle_stat(self, **kwargs):
     dct_result = {
       'info' : "Handler '{}', Worker HOSTNAME: '{}', ID: '{}'".format(
-        AppPaths.PATH_STAT, self.hostname, self.str_local_id
+        kwargs['path'], self.hostname, self.str_local_id
       ),
       'local_count' : self.__local_count,
       'cluster_count' : self.get_cluster_count(),
@@ -134,7 +134,7 @@ class AppHandler:
     return dct_result
   
   
-  def __handle_generic(self, path):
+  def __handle_generic(self, path, **kwargs):
     msg = "Generic handler '{}', Local/Global: {}/{}, HOSTNAME: '{}', ID: '{}'".format(
       path, self.__local_count, self.get_cluster_count(),
       self.hostname, self.str_local_id

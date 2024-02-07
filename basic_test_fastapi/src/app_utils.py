@@ -20,8 +20,8 @@ class NPJson(json.JSONEncoder):
       else:
           return super(NPJson, self).default(obj)
         
-def safe_jsonify(obj, **kwargs):
+def safe_jsonify(obj, indent=2, **kwargs):
   """
   Safely jsonify an object, including numpy arrays or lists that contain numpy data types.
   """
-  return json.dumps(obj, cls=NPJson, **kwargs)
+  return json.dumps(obj, cls=NPJson, indent=indent, **kwargs)

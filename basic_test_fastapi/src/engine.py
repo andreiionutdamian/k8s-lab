@@ -6,12 +6,12 @@ from datetime import datetime
 
 from app_utils import safe_jsonify
 
-__VER__ = '0.1.2'
+__VER__ = '0.2.1'
 
 
 class AppPaths:
-  PATH_ROOT = "/"
-  PATH_STAT = "/stats"
+  PATH_ROOT = {"PATH": "/", "FUNC": "root"}
+  PATH_STAT = {"PATH": "/stat", "FUNC": "stat"  }
 
 class AppHandler:
   def __init__(self):
@@ -28,6 +28,8 @@ class AppHandler:
     return
   
   def __setup(self):
+    self.__avail_paths = [v['PATH'] for k, v in vars(AppPaths).items() if k.startswith("PATH_")]
+    self.__path_to_func = {v['PATH']: v['FUNC'] for k, v in vars(AppPaths).items() if k.startswith("PATH_")}
     self.str_local_id = "test_" + str(uuid4())[:5]
     self.__local_count = 0
     self.__has_redis = False
@@ -61,6 +63,8 @@ class AppHandler:
         password=redis_password, decode_responses=True,
       )
       self.__has_redis = True
+      self.P("Connected to Redis at {}:{}".format(redis_host, redis_port))
+      self.P("Redis info:\n {}".format(safe_jsonify(self.__redis.info())))
       return
     self.__has_redis = False
     return
@@ -83,24 +87,23 @@ class AppHandler:
   
   def handle_request(self, path):
     self.__local_count += 1
-    if path == AppPaths.PATH_ROOT:
-      msg = self.handle_root()
-    elif path == AppPaths.PATH_STAT:
-      msg = self.handle_stat()
+    if path in self.__avail_paths:
+      func_name = '_handle_' + self.__path_to_func[path]
+      msg = getattr(self, func_name)()
     else:
-      msg = self.handle_generic(path)
+      msg = self.__handle_generic(path)
     result = self._pack_result(msg)
     return result
     
 
-  def handle_root(self):
+  def _handle_root(self):
     msg = "Handler '{}', Local/Global: {}/{}, HOSTNAME: '{}', ID: '{}'".format(
       AppPaths.PATH_ROOT, self.__local_count, self.get_cluster_count(),
       self.hostname, self.str_local_id
     )    
     return msg
   
-  def handle_stat(self):
+  def _handle_stat(self):
     dct_result = {
       'info' : "Handler '{}', Worker HOSTNAME: '{}', ID: '{}'".format(
         AppPaths.PATH_STAT, self.hostname, self.str_local_id
@@ -111,7 +114,7 @@ class AppHandler:
     return dct_result
   
   
-  def handle_generic(self, path):
+  def __handle_generic(self, path):
     msg = "Generic handler '{}', Local/Global: {}/{}, HOSTNAME: '{}', ID: '{}'".format(
       path, self.__local_count, self.get_cluster_count(),
       self.hostname, self.str_local_id

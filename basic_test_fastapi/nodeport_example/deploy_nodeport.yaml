@@ -65,15 +65,15 @@ spec:
         ports:
         - containerPort: 5050
           protocol: TCP
-        #enviroment variables
-        # env:
-        # - name: PORT
-        #   value: "5050"
-        # - name: REDIS_PASSWORD
-        #   valueFrom:
-        #     secretKeyRef:
-        #       name: redis-secret
-        #       key: redis-password
+        # enviroment variables
+        env:
+        - name: PORT
+          value: "5050"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis-secret
+              key: redis-password
 ---
 apiVersion: v1
 kind: Service

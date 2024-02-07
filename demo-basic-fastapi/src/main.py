@@ -8,13 +8,15 @@ engine = AppHandler()
 app = FastAPI()
 router1 = APIRouter()
 
-@router1.get(AppPaths.PATH_ROOT['PATH'])
+ROUTE1 = AppPaths.PATH_ROOT['PATH']
+@router1.get(ROUTE1)
 async def root():
-  return engine.handle_request(AppPaths.PATH_ROOT['PATH'])
+  return engine.handle_request(ROUTE1)
 
-@router1.get(AppPaths.PATH_STAT['PATH'])
+ROUTE2 = AppPaths.PATH_STAT['PATH']
+@router1.get(ROUTE2)
 async def stat():
-  return engine.handle_request(AppPaths.PATH_STAT['PATH'])
+  return engine.handle_request(ROUTE2)
 
 # note: this is a catch-all route, so it should be the last route in the router
 @router1.get("/{full_path:path}", include_in_schema=False)

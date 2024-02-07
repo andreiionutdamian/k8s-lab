@@ -3,7 +3,7 @@ name: Basic Node.js test container
 on: 
   push:
     paths:
-      - 'basic-test-nodejs/**'  # Specify path to your directory
+      - 'demo-basic-nodejs/**'  # Specify path to your directory
 
 jobs:
   build-and-push-nodejs-test-image:
@@ -24,6 +24,6 @@ jobs:
 
       - name: Build and Push
         run: |
-          cd basic-test-nodejs
+          cd demo-basic-nodejs/
           chmod +x build.sh  # Ensure the script is executable
           ./build.sh        

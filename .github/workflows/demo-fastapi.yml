@@ -3,7 +3,7 @@ name: Basic FastAPI Test container
 on: 
   push:
     paths:
-      - 'basic_test_fastapi/**'  # Specify path to your directory
+      - 'demo-basic-fastapi/**'  # Specify path to your directory
 
 jobs:
   build-and-push-py-test-image:
@@ -24,6 +24,6 @@ jobs:
 
       - name: Build and Push
         run: |
-          cd basic_test_fastapi
+          cd demo-basic-fastapi/
           chmod +x build.sh  # Ensure the script is executable
           ./build.sh        

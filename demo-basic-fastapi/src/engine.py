@@ -9,7 +9,7 @@ from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
 from mixins.monitor_mixin import _MonitorMixin
 
-__VER__ = '0.4.9'
+__VER__ = '0.5.0'
 
 
 class AppPaths:
@@ -85,7 +85,7 @@ class AppHandler(
     self.__local_count += 1
     if self._has_redis:
       self.redis_inc("cluster_count")
-      self.redis_sethash("data", self.str_local_id, self.__local_count)
+      self.redis_sethash("data", self.hostname, self.__local_count)
     if self._has_postgres:
       str_data = "Data from {}:{}".format(self.str_local_id, self.__local_count)
       self.postgres_insert_data("requests", hostname=self.hostname, data=str_data)
@@ -95,7 +95,22 @@ class AppHandler(
     if self._has_redis:
       return self.redis_get("cluster_count")
     return 0
+  
+  
+  def get_db_requests(self):
+    if self._has_postgres:
+      rows = self.postgres_get_count("requests")
+      return rows[0][0]
+    return 0
 
+  def get_db_stats(self):
+    result = {}
+    if self._has_postgres:
+      rows = self.postgres_group_count("requests", "hostname")
+      dct_res = {k:v for k, v in rows}
+      dct_res["total"] = sum(dct_res.values())
+      result = dct_res
+    return result
   
   def _pack_result(self, message, path=None, parameter=None):
     return {
@@ -106,7 +121,7 @@ class AppHandler(
       "postgres" : self._has_postgres,
     }  
   
-  
+   
   
   def handle_request(self, path, parameter=None):
     self._process_data(param=parameter)

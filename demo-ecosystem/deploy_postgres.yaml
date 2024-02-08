@@ -77,7 +77,7 @@ spec:
         imagePullPolicy: "IfNotPresent"
         ports:
         - containerPort: 5432
-        envFrom:
+        env:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:

@@ -2,6 +2,13 @@ import os
 import redis
 from app_utils import safe_jsonify
 
+INFO_KEYS = [
+  "redis_version",  
+  "redis_mode",
+  "connected_clients",
+  "used_memory_human", 
+  "pubsub_channels",
+]
 class _RedisMixin:
   def __init__(self, *args, **kwargs):
     self.__redis = None
@@ -40,6 +47,10 @@ class _RedisMixin:
       )
       self._has_redis = True
       self.P("Connected to Redis at {}:{}".format(redis_host, redis_port))
+      self.__redis_info = {
+        k : v for k, v in self.__redis.info().items() 
+        if k in INFO_KEYS
+      } 
       self.P("Redis info:\n {}".format(safe_jsonify(self.__redis.info())))
     return
   

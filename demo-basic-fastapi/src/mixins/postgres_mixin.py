@@ -28,30 +28,33 @@ class _PostgresMixin:
     if len(dct_pg) > 0:
       self.P("Setting up Postgres with configuration:\n{}".format(safe_jsonify(dct_pg)))
       postgres_host = dct_pg.get("POSTGRES_SERVICE_HOST")
-      postgres_port = dct_pg.get("POSTGRES_SERVICE_PORT", 5432)
+      postgres_port = dct_pg.get("POSTGRES_SERVICE_PORT")
       postgres_user = dct_pg.get("POSTGRES_USER")
       postgres_password = dct_pg.get("POSTGRES_PASSWORD")
       postgres_db = dct_pg.get("POSTGRES_DB")
-      self.P("Connecting to Postgres at {}:{} with user: {}".format(
-        postgres_host, postgres_port, postgres_user
-      ))
-      self.__pg = psycopg2.connect(
-        host=postgres_host, port=postgres_port,
-        user=postgres_user, password=postgres_password,
-        dbname=postgres_db,
-      )
-      pg_server_info = self.__pg.get_dsn_parameters()
-      self.P("Connected to Postgres at {}:{} with user: {} to database: {}".format(
-        pg_server_info['host'], pg_server_info['port'], 
-        pg_server_info['user'], pg_server_info['dbname'],
-      ))
-      self.__maybe_create_tables()
-      # now we get the tables from the database
-      with self.__pg.cursor() as cur:
-        cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
-        rows = cur.fetchall()
-        self.P("Tables in the database: {}".format(rows))
-      self._has_postgres = True
+      if postgres_host is None or postgres_port is None or postgres_user is None or postgres_password is None or postgres_db is None:
+        self.P("Incomplete Postgres configuration. Skipping Postgres setup.")
+      else:
+        self.P("Connecting to Postgres at {}:{} with user: {}".format(
+          postgres_host, postgres_port, postgres_user
+        ))
+        self.__pg = psycopg2.connect(
+          host=postgres_host, port=postgres_port,
+          user=postgres_user, password=postgres_password,
+          dbname=postgres_db,
+        )
+        pg_server_info = self.__pg.get_dsn_parameters()
+        self.P("Connected to Postgres at {}:{} with user: {} to database: {}".format(
+          pg_server_info['host'], pg_server_info['port'], 
+          pg_server_info['user'], pg_server_info['dbname'],
+        ))
+        self.__maybe_create_tables()
+        # now we get the tables from the database
+        with self.__pg.cursor() as cur:
+          cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
+          rows = cur.fetchall()
+          self.P("Tables in the database: {}".format(rows))
+        self._has_postgres = True
     return  
   
   

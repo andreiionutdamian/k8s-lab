@@ -8,6 +8,12 @@ engine = AppHandler()
 app = FastAPI()
 router1 = APIRouter()
 
+@app.on_event("startup")
+async def startup_event():
+  print("Starting up {}...".format(engine.__class__.__name__))
+  engine.setup()
+  return
+
 ROUTE1 = AppPaths.PATH_ROOT['PATH']
 @router1.get(ROUTE1)
 # async def root(data: str = Query(...)): # this makes the `data` parameter mandatory

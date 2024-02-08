@@ -8,7 +8,7 @@ from app_utils import safe_jsonify, get_packages
 from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
 
-__VER__ = '0.4.2'
+__VER__ = '0.4.3'
 
 
 class AppPaths:
@@ -21,7 +21,8 @@ class AppHandler(
   ):
   def __init__(self):
     self.log = None
-    self.__setup()
+    self.debug = os.environ.get("DEBUG", "0") in ['1', 'true', 'True', 'yes', 'Yes', 'y', 'Y', 'TRUE', 'YES']
+    self.setup()
     return
   
   
@@ -49,7 +50,7 @@ class AppHandler(
     return
   
   
-  def __setup(self):
+  def setup(self):
     self.__avail_paths = [v['PATH'] for k, v in vars(AppPaths).items() if k.startswith("PATH_")]
     self.__path_to_func = {v['PATH']: v['FUNC'] for k, v in vars(AppPaths).items() if k.startswith("PATH_")}
     self.__check_handlers()
@@ -65,7 +66,8 @@ class AppHandler(
     self.__packs = get_packages()
     self.P("Packages:\n{}".format("\n".join(self.__packs)))
     dct_env = dict(os.environ)
-    self.P("Environement:\n{}".format(safe_jsonify(dct_env, indent=2)))
+    if self.debug:
+      self.P("Environement:\n{}".format(safe_jsonify(dct_env, indent=2)))
     self._maybe_setup_redis()
     self._maybe_setup_postgres()
     return

@@ -2,4 +2,4 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: demo-ecosystem
+  name: demo-ai-app

@@ -3,7 +3,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: pg-pv-nfs
-  namespace: demo-ecosystem
+  namespace: demo-ai-app
 spec:
   capacity:
     storage: 3Gi
@@ -21,7 +21,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: pg-pvc
-  namespace: demo-ecosystem
+  namespace: demo-ai-app
 spec:
   storageClassName: nfs
   accessModes:
@@ -31,34 +31,12 @@ spec:
       storage: 3Gi
   volumeName: pg-pv-nfs
 ---
-#secret for pg
-apiVersion: v1
-kind: Secret
-metadata:
-  name: pg-secret
-  namespace: demo-ecosystem
-type: Opaque
-data:
-  POSTGRES_PASSWORD: cGdwYXNzd29yZA==
----
-#configs for pg
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: pg-config
-  namespace: demo-ecosystem
-  labels:
-    app: postgres
-data:
-  POSTGRES_DB: postgresdb
-  POSTGRES_USER: pguser
----
 # pg deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
-  namespace: demo-ecosystem
+  namespace: demo-ai-app
 spec:
   replicas: 1
   selector:
@@ -81,25 +59,25 @@ spec:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: pg-secret
-              key: POSTGRES_PASSWORD
+              name: demo-ai-app-secrets
+              key: postgres-password
         - name: POSTGRES_DB
           valueFrom:
             configMapKeyRef:
-              name: pg-config
+              name: demo-ai-app-config
               key: POSTGRES_DB
         - name: POSTGRES_USER
           valueFrom:
             configMapKeyRef:
-              name: pg-config
+              name: demo-ai-app-config
               key: POSTGRES_USER
         volumeMounts:
         - mountPath: /var/lib/postgresql/data
           subPath: pg
           readOnly: false
-          name: pg-storage
+          name: pg-volume
       volumes:
-      - name: pg-storage
+      - name: pg-volume
         persistentVolumeClaim:
           claimName: pg-pvc
 ---
@@ -108,7 +86,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres
-  namespace: demo-ecosystem
+  namespace: demo-ai-app
   labels:
     app: postgres
 spec:

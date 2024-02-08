@@ -1,0 +1,13 @@
+---
+#configs for pg
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo-ai-app-config
+  namespace: demo-ai-app
+data:
+  POSTGRES_DB: postgresdb
+  POSTGRES_USER: pguser
+  redis.conf: |
+    maxmemory 256mb
+    maxmemory-policy allkeys-lru  

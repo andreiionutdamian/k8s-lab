@@ -2,4 +2,4 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: demo-ai-app
+  name: demo-ai-app-ns

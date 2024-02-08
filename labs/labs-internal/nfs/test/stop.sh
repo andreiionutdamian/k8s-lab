@@ -7,7 +7,7 @@ echo "Cleaning up the NFS mount point..."
 
 # Define the NFS mount point and NFS server
 MOUNT_POINT="/mnt/nfs"
-NFS_SERVER="192.168.1.56:/srv/nfs/k8s"
+NFS_SERVER="192.168.1.56:/srv/nfs/k8s/simple-nfs-test"
 NFS_FILES="testfile.txt"
 
 # Function to check and create the NFS mount folder

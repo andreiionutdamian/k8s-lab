@@ -3,7 +3,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: pg-pv-nfs
-  namespace: demo-ai-app
+  namespace: demo-ai-app-ns
 spec:
   capacity:
     storage: 3Gi
@@ -21,7 +21,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: pg-pvc
-  namespace: demo-ai-app
+  namespace: demo-ai-app-ns
 spec:
   storageClassName: nfs
   accessModes:
@@ -36,7 +36,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
-  namespace: demo-ai-app
+  namespace: demo-ai-app-ns
 spec:
   replicas: 1
   selector:
@@ -65,12 +65,12 @@ spec:
           valueFrom:
             configMapKeyRef:
               name: demo-ai-app-config
-              key: POSTGRES_DB
+              key: postgres-db
         - name: POSTGRES_USER
           valueFrom:
             configMapKeyRef:
               name: demo-ai-app-config
-              key: POSTGRES_USER
+              key: postgres-user
         volumeMounts:
         - mountPath: /var/lib/postgresql/data
           subPath: pg
@@ -86,9 +86,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres
-  namespace: demo-ai-app
-  labels:
-    app: postgres
+  namespace: demo-ai-app-ns
 spec:
   type: NodePort
   ports:

@@ -9,7 +9,7 @@ spec:
     - ReadWriteMany
   nfs:
     server: 192.168.1.56  # Înlocuiți cu IP-ul sau hostname-ul serverului NFS
-    path: "/srv/nfs/k8s"
+    path: "/srv/nfs/k8s/simple-nfs-test"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

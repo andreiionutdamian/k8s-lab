@@ -8,9 +8,8 @@ class _RedisMixin:
     return
   
 ### Redis
-   
-
-  def __maybe_setup_redis(self):
+  
+  def _maybe_setup_redis(self):
     self._has_redis = False
     dct_redis = {k : v for k, v in os.environ.items() if k.startswith("REDIS_")}
     if len(dct_redis) > 0:

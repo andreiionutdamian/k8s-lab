@@ -59,6 +59,10 @@ class _PostgresMixin:
         self.__pg.commit()
     return
   
+  def postgres_insert(self, table_name : str, **kwargs):
+    return self.postgres_insert_data(table_name, **kwargs)
+  
+  
   def postgres_select_data(self, table_name : str, **kwargs):
     # select from table_name based on the kwargs filter
     result = None
@@ -72,6 +76,10 @@ class _PostgresMixin:
         result = rows
     return result
   
+  def postgres_select(self, table_name : str, **kwargs):
+    return self.postgres_select_data(table_name, **kwargs)
+  
+  
   def postgres_select_counts(self, table_name : str, group_by : str):
     result = None
     if self._has_postgres:
@@ -81,6 +89,10 @@ class _PostgresMixin:
         rows = cur.fetchall()
         result = rows
     return result
+  
+  
+  def postgres_count_group(self, table_name : str, group_by : str):
+    return self.postgres_select_counts(table_name, group_by)
   
   
   def postgres_get_count(self, table_name : str):

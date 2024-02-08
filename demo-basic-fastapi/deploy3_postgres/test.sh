@@ -1,4 +1,4 @@
-ADDR_PORT="192.168.1.55:30050"
+ADDR_PORT="192.168.1.54/pg_test"
 
 for i in $(seq 1 10); do
     curl -L $ADDR_PORT

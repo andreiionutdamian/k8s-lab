@@ -5,4 +5,4 @@ for i in $(seq 1 10); do
     echo " "
 done
 
-curl -s $ADDR_PORT/basic_test/stats | jq .
+curl -s $ADDR_PORT/stats | jq .

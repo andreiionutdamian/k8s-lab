@@ -3,7 +3,7 @@
 MACHINE_IP="192.168.1.55"
 
 # manifest filename
-MANIFEST_FILENAME="deploy_postgres.yaml"
+MANIFEST_FILENAME="deploy.yaml"
 
 # Name of the deployment
 DEPLOYMENT_NAME="basic-test-py"

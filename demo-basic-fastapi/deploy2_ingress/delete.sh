@@ -4,7 +4,7 @@ source ../utils.sh
 
 APP_NAME="basic-test-py"
 NAMESPACE="basic-ns12"
-kubectl delete -f deploy_with_ingress.yaml
+kubectl delete -f deploy.yaml
 
 # Wait for the pods to be deleted
 while true; do 

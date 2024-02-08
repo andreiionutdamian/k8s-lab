@@ -35,8 +35,10 @@ class _PostgresMixin:
       if postgres_host is None or postgres_port is None or postgres_user is None or postgres_password is None or postgres_db is None:
         self.P("Incomplete Postgres configuration. Skipping Postgres setup.")
       else:
-        self.P("Connecting to Postgres at {}:{} with user: {}".format(
-          postgres_host, postgres_port, postgres_user
+        hidden_password = postgres_password[:2] + "*" * (len(postgres_password) - 4) + postgres_password[-2:]
+        self.P("Connecting to Postgres at {}:{} on db '{}' with user: `{}`, pass: {}".format(
+          postgres_host, postgres_port, postgres_db, 
+          postgres_user, hidden_password,
         ))
         self.__pg = psycopg2.connect(
           host=postgres_host, port=postgres_port,

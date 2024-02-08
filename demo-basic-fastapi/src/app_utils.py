@@ -42,3 +42,13 @@ def safe_jsonify(obj, indent=2, **kwargs):
   Safely jsonify an object, including numpy arrays or lists that contain numpy data types.
   """
   return json.dumps(obj, cls=NPJson, indent=indent, **kwargs)
+
+def boxed_print(msg):
+  msg_len = len(msg)
+  line1 = "#" * 80
+  line2 = "#" + " " * 78 + "#"
+  line3 = "#" + (78 // 2 - msg_len // 2) * " " + msg + (78 // 2 - msg_len // 2 -1) * " " + "#"
+  line4 = "#" + " " * 78 + "#"
+  line5 = "#" * 80
+  print("\n".join([line1, line2, line3, line4, line5]), flush=True)
+  return  

@@ -148,7 +148,7 @@ spec:
     - ReadWriteMany
   nfs:
     server: 192.168.1.56  
-    path: "/srv/nfs/k8s/demo-ai-app"
+    path: "/srv/nfs/k8s/demo-ai-app/postgres-data"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

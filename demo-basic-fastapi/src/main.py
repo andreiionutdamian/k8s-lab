@@ -3,6 +3,8 @@ from uuid import uuid4
 from fastapi import FastAPI, APIRouter, Query
 from engine import AppHandler, AppPaths
 
+from app_utils import boxed_print
+
 
 engine = AppHandler()
 app = FastAPI()
@@ -10,7 +12,9 @@ router1 = APIRouter()
 
 @app.on_event("startup")
 async def startup_event():
-  print("Starting up {}...".format(engine.__class__.__name__))
+  # rectangle-print Starting up the app
+  msg = "Starting up {}".format(engine.__class__.__name__)
+  boxed_print(msg)
   engine.setup()
   return
 

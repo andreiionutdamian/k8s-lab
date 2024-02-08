@@ -51,7 +51,7 @@ class _RedisMixin:
         k : v for k, v in self.__redis.info().items() 
         if k in INFO_KEYS
       } 
-      self.P("Redis info:\n {}".format(safe_jsonify(self.__redis.info())))
+      self.P("Redis info:\n {}".format(safe_jsonify(self.__redis_info)))
     return
   
   

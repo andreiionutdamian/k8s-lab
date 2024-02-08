@@ -53,10 +53,8 @@ class _PostgresMixin:
           self._has_postgres = True
           self.__maybe_create_tables()
           # now we get the tables from the database
-          with self.__pg.cursor() as cur:
-            cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
-            rows = cur.fetchall()
-            self.P("Tables in the database: {}".format(rows))
+          tables = self.postgres_get_tables()
+          self.P("Tables in the database: {}".format(tables))
           #end with cursor check tables
         #end if posgres env vars
       except Exception as e:
@@ -129,6 +127,19 @@ class _PostgresMixin:
           result = rows
       except Exception as exc:
         self.P("Error in postgres_get_count: {}".format(exc))
+        raise ValueError("Postgres issue")
+    return result
+  
+  def postgres_get_tables(self): 
+    result = None
+    if self._has_postgres:
+      try:
+        with self.__pg.cursor() as cur:
+          cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
+          rows = cur.fetchall()
+          result = [x[0] for x in rows]
+      except Exception as exc:
+        self.P("Error in postgres_get_tables: {}".format(exc))
         raise ValueError("Postgres issue")
     return result
 

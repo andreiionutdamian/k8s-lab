@@ -100,7 +100,7 @@ class _RedisMixin:
     result = None
     if self._has_redis:
       try:
-        result = self.__redis.hget(hashname)
+        result = self.__redis.hgetall(hashname)
       except Exception as ex:
         self.P("Failed to get hash {}: {}".format(hashname, ex))
         raise ValueError("Redis issue")

@@ -91,6 +91,10 @@ class AppHandler(
       self.postgres_insert_data("requests", hostname=self.hostname, data=str_data)
     return
   
+  def get_cluster_count(self):
+    if self._has_redis:
+      return self.redis_get("cluster_count")
+    return 0
 
   
   def _pack_result(self, message, path=None, parameter=None):

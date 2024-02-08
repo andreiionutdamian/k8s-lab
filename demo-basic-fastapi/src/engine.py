@@ -8,7 +8,7 @@ from app_utils import safe_jsonify, get_packages
 from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
 
-__VER__ = '0.4.4'
+__VER__ = '0.4.7'
 
 
 class AppPaths:

@@ -24,61 +24,84 @@ class _RedisMixin:
     self._has_redis = False
     dct_redis = self.__get_redis_config()
     if len(dct_redis) > 0:
-      if "REDIS_MASTER_SERVICE_HOST" in dct_redis:
-        # this is a redis master/slave setup
-        self.P("Setting up Redis with master/slave configuration:\n{}".format(safe_jsonify(dct_redis)))
-        redis_host = dct_redis.get("REDIS_MASTER_SERVICE_HOST")
-        redis_port = dct_redis.get("REDIS_MASTER_SERVICE_PORT")
-        redis_password = dct_redis.get("REDIS_PASSWORD")
-        # redis_master_port = dct_redis.get("REDIS_MASTER_PORT")
-      else:
-        self.P("Setting up simple Redis with configuration:\n{}".format(safe_jsonify(dct_redis)))
-        redis_host = dct_redis.get("REDIS_SERVICE_HOST")
-        redis_port = dct_redis.get("REDIS_SERVICE_PORT", 6379)
-        redis_password = dct_redis.get("REDIS_PASSWORD", None)
-      hidden_password = redis_password[:2] + "*" * (len(redis_password) - 4) + redis_password[-2:] if redis_password is not None else None
-      self.P("Connecting to Redis at {}:{} with password: {}".format(
-        redis_host, redis_port, hidden_password
-      ))
-      self.__redis = redis.Redis(
-        host=redis_host, port=redis_port, 
-        password=redis_password, 
-        decode_responses=True,
-      )
-      self._has_redis = True
-      self.P("Connected to Redis at {}:{}".format(redis_host, redis_port))
-      self.__redis_info = {
-        k : v for k, v in self.__redis.info().items() 
-        if k in INFO_KEYS
-      } 
-      self.P("Redis info:\n {}".format(safe_jsonify(self.__redis_info)))
+      try:
+        if "REDIS_MASTER_SERVICE_HOST" in dct_redis:
+          # this is a redis master/slave setup
+          self.P("Setting up Redis with master/slave configuration:\n{}".format(safe_jsonify(dct_redis)))
+          redis_host = dct_redis.get("REDIS_MASTER_SERVICE_HOST")
+          redis_port = dct_redis.get("REDIS_MASTER_SERVICE_PORT")
+          redis_password = dct_redis.get("REDIS_PASSWORD")
+          # redis_master_port = dct_redis.get("REDIS_MASTER_PORT")
+        else:
+          self.P("Setting up simple Redis with configuration:\n{}".format(safe_jsonify(dct_redis)))
+          redis_host = dct_redis.get("REDIS_SERVICE_HOST")
+          redis_port = dct_redis.get("REDIS_SERVICE_PORT", 6379)
+          redis_password = dct_redis.get("REDIS_PASSWORD", None)
+        hidden_password = redis_password[:2] + "*" * (len(redis_password) - 4) + redis_password[-2:] if redis_password is not None else None
+        self.P("Connecting to Redis at {}:{} with password: {}".format(
+          redis_host, redis_port, hidden_password
+        ))
+        self.__redis = redis.Redis(
+          host=redis_host, port=redis_port, 
+          password=redis_password, 
+          decode_responses=True,
+        )
+        self.P("Connected to Redis at {}:{}".format(redis_host, redis_port))
+        self.__redis_info = {
+          k : v for k, v in self.__redis.info().items() 
+          if k in INFO_KEYS
+        } 
+        self.P("Redis info:\n {}".format(safe_jsonify(self.__redis_info)))
+        self._has_redis = True
+      except Exception as ex:
+        self.P("Failed to connect to Redis: {}".format(ex))
     return
   
   
   def redis_inc(self, key : str, amount : int = 1):
     if self._has_redis:
-      self.__redis.incr(key, amount)
+      try:
+        self.__redis.incr(key, amount)
+      except Exception as ex:
+        self.P("Failed to increment key {} by {}: {}".format(key, amount, ex))
+        raise ValueError("Redis issue")
     return
   
   
   def redis_set(self, key : str, value):
     if self._has_redis:
-      self.__redis.set(key, value)
+      try:
+        self.__redis.set(key, value)
+      except Exception as ex:
+        self.P("Failed to set key {} to {}: {}".format(key, value, ex))
+        raise ValueError("Redis issue")
     return
   
   def redis_sethash(self, hashname : str, key : str, value):
     if self._has_redis:
-      self.__redis.hset(hashname, key, value)
+      try:
+        self.__redis.hset(hashname, key, value)
+      except Exception as ex:
+        self.P("Failed to set hash {} key {} to {}: {}".format(hashname, key, value, ex))
+        raise ValueError("Redis issue")
     return  
   
   def redis_get(self, key : str):
     result = None
     if self._has_redis:
-      result = self.__redis.get(key)
+      try:
+        result = self.__redis.get(key)  
+      except Exception as ex:
+        self.P("Failed to get key {}: {}".format(key, ex))
+        raise ValueError("Redis issue")
     return result
   
   def redis_gethash(self, hashname : str):
     result = None
     if self._has_redis:
-      result = self.__redis.hget(hashname)
+      try:
+        result = self.__redis.hget(hashname)
+      except Exception as ex:
+        self.P("Failed to get hash {}: {}".format(hashname, ex))
+        raise ValueError("Redis issue")
     return result

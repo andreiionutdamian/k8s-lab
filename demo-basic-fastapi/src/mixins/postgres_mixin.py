@@ -59,7 +59,7 @@ class _PostgresMixin:
             self.P("Tables in the database: {}".format(rows))
           self._has_postgres = True
       except Exception as e:
-        self.P("Error in _maybe_setup_postgres: {}".format(e))
+        self.P("Error in _maybe_setup_postgres: {}".format(e))    
     return  
   
   
@@ -74,7 +74,8 @@ class _PostgresMixin:
             cur.execute(str_sql, values)
             self.__pg.commit()
       except Exception as e:
-        self.P("Error in postgres_insert_data: {}".format(e))        
+        self.P("Error in postgres_insert_data: {}".format(e))     
+        raise ValueError("Postgres issue")   
     return
 
   
@@ -97,29 +98,37 @@ class _PostgresMixin:
           result = rows
       except Exception as e:
         self.P("Error in postgres_select_data: {}".format(e))
-        result
+        raise ValueError("Postgres issue")
     return result
 
 
   def postgres_select_counts(self, table_name : str, group_by : str):
     result = None
     if self._has_postgres:
-      str_sql = f"SELECT {group_by}, COUNT(*) FROM {table_name} GROUP BY {group_by};"
-      with self.__pg.cursor() as cur:
-        cur.execute(str_sql)
-        rows = cur.fetchall()
-        result = rows
+      try:
+        str_sql = f"SELECT {group_by}, COUNT(*) FROM {table_name} GROUP BY {group_by};"
+        with self.__pg.cursor() as cur:
+          cur.execute(str_sql)
+          rows = cur.fetchall()
+          result = rows
+      except:
+        self.P("Error in postgres_select_counts: {}".format(e))
+        raise ValueError("Postgres issue")
     return result
     
   
   def postgres_get_count(self, table_name : str):
     result = None
     if self._has_postgres:
-      str_sql = f"SELECT COUNT(*) FROM {table_name};"
-      with self.__pg.cursor() as cur:
-        cur.execute(str_sql)
-        rows = cur.fetchall()
-        result = rows
+      try:
+        str_sql = f"SELECT COUNT(*) FROM {table_name};"
+        with self.__pg.cursor() as cur:
+          cur.execute(str_sql)
+          rows = cur.fetchall()
+          result = rows
+      except Exception as e:
+        self.P("Error in postgres_get_count: {}".format(e))
+        raise ValueError("Postgres issue")
     return result
 
   

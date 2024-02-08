@@ -8,7 +8,7 @@ from app_utils import safe_jsonify, get_packages
 from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
 
-__VER__ = '0.4.0'
+__VER__ = '0.4.2'
 
 
 class AppPaths:
@@ -16,9 +16,9 @@ class AppPaths:
   PATH_STAT = {"PATH": "/stats", "FUNC": "stats"  }
 
 class AppHandler(
-  _PostgresMixin, 
-  _RedisMixin
-):
+    _PostgresMixin, 
+    _RedisMixin,
+  ):
   def __init__(self):
     self.log = None
     self.__setup()

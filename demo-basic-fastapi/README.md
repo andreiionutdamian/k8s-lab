@@ -10,7 +10,11 @@ kubectl apply -f ns.yaml
 
 ## Secrets
 
-Copy `.secret.yaml` to `secrets.yaml` and fill in the base64 encoded values. Then apply the secrets to the cluster with the following command:
+Copy `.secret.yaml` to `secrets.yaml` and fill in the base64 encoded values using:
+```bash
+echo -n "Some password or some other secret" | base64
+```
+Then apply the secrets to the cluster with the following command:
 
 ```bash
 kubectl apply -f secrets.yaml

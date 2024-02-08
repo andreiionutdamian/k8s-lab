@@ -7,11 +7,15 @@ class _RedisMixin:
     self.__redis = None
     return
   
-### Redis
   
+  def __get_redis_config(self):
+    dct_redis = {k : v for k, v in os.environ.items() if k.startswith("REDIS_")}
+    return dct_redis
+  
+    
   def _maybe_setup_redis(self):
     self._has_redis = False
-    dct_redis = {k : v for k, v in os.environ.items() if k.startswith("REDIS_")}
+    dct_redis = self.__get_redis_config()
     if len(dct_redis) > 0:
       if "REDIS_MASTER_SERVICE_HOST" in dct_redis:
         # this is a redis master/slave setup

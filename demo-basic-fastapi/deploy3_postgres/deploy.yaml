@@ -80,6 +80,21 @@ spec:
             secretKeyRef:
               name: basic-test-app-secrets
               key: redis-password
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: basic-test-app-secrets
+              key: postgres-password
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: basic-test-app-secrets
+              key: postgres-user
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: basic-test-app-secrets
+              key: postgres-db
 ---
 apiVersion: v1
 kind: Service

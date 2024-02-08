@@ -17,10 +17,13 @@ class _PostgresMixin:
         self.__pg.commit()
         
     return
-    
+  
+  def __get_postgres_config(self):
+    dct_pg = {k : v for k, v in os.environ.items() if k.startswith("POSTGRES_")}
+    return dct_pg
   
   def _maybe_setup_postgres(self):
-    dct_pg = {k : v for k, v in os.environ.items() if k.startswith("POSTGRES_")}
+    dct_pg = self.__get_postgres_config()
     self._has_postgres = False
     if len(dct_pg) > 0:
       self.P("Setting up Postgres with configuration:\n{}".format(safe_jsonify(dct_pg)))
@@ -28,12 +31,14 @@ class _PostgresMixin:
       postgres_port = dct_pg.get("POSTGRES_SERVICE_PORT", 5432)
       postgres_user = dct_pg.get("POSTGRES_USER")
       postgres_password = dct_pg.get("POSTGRES_PASSWORD")
+      postgres_db = dct_pg.get("POSTGRES_DB")
       self.P("Connecting to Postgres at {}:{} with user: {}".format(
         postgres_host, postgres_port, postgres_user
       ))
       self.__pg = psycopg2.connect(
         host=postgres_host, port=postgres_port,
-        user=postgres_user, password=postgres_password
+        user=postgres_user, password=postgres_password,
+        dbname=postgres_db,
       )
       pg_server_info = self.__pg.get_dsn_parameters()
       self.P("Connected to Postgres at {}:{} with user: {} to database: {}".format(

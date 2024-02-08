@@ -1,32 +1,16 @@
-#!/bin/bash
+source ../utils.sh
 
-MACHINE_IP="192.168.1.55"
-
-# manifest filename
-MANIFEST_FILENAME="deploy_nodeport.yaml"
-
-# Name of the deployment
 DEPLOYMENT_NAME="basic-test-py"
+NAMESPACE="basic-ns12"
 
-# Namespace where the deployment is located
-# Update this if your deployment is not in the default namespace
-NAMESPACE="basic-ns11"
+kubectl apply -f deploy_postgres.yaml
 
-# Interval in seconds between checks
-CHECK_INTERVAL=5
-
-COUNT=5
-
-
-kubectl apply -f $MANIFEST_FILENAME
-
-# Function to get the deployment's ready replicas
 get_ready_replicas() {
     kubectl get deployment "$DEPLOYMENT_NAME" -n "$NAMESPACE" -o jsonpath='{.status.readyReplicas}'
 }
 
 # Wait until all pods are ready
-log_with_color "Waiting for pods of deployment '$DEPLOYMENT_NAME' in namespace '$NAMESPACE' to become ready..." blue
+log_with_color "Waiting for pods of deployment '$DEPLOYMENT_NAME' in namespace '$NAMESPACE' to become ready..." yellow
 while true; do
     READY_REPLICAS=$(get_ready_replicas)
     
@@ -46,18 +30,3 @@ while true; do
     
     sleep "$CHECK_INTERVAL"
 done
-
-for i in $(seq 1 $COUNT); do
-  curl -L "http://$MACHINE_IP:30050"
-  echo " "
-done
-
-for i in $(seq 1 $COUNT); do
-  curl -L "http://$MACHINE_IP:30050/some_route"
-  echo " "
-done
-
-log_with_color "Test completed." green
-log_with_color "Deleting deployment $MANIFEST_FILENAME..." blue
-kubectl delete -f $MANIFEST_FILENAME
-log_with_color "Deployment deleted." green

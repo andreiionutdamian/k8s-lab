@@ -1,6 +1,9 @@
 #!/bin/bash
 source ../utils.sh
 
+DEPLOYMENT_NAME="basic-test-py"
+NAMESPACE="basic-ns12"
+
 kubectl apply -f deploy_nodeport.yaml
 
 get_ready_replicas() {

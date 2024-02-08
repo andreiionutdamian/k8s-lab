@@ -4,7 +4,7 @@ source ../utils.sh
 
 APP_NAME="basic-test-py"
 NAMESPACE="basic-postgres"
-kubectl delete -f deploy_nodeport.yaml
+kubectl delete -f deploy_postgres.yaml
 
 # Wait for the pods to be deleted
 while true; do 

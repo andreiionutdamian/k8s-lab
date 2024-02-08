@@ -16,7 +16,7 @@ async def root(parameter: str = Query(...)):
 ROUTE2 = AppPaths.PATH_STAT['PATH']
 @router1.get(ROUTE2)
 async def stat(parameter: str = Query(...)):
-  return engine.handle_request(ROUTE2, parameter=parameter))
+  return engine.handle_request(ROUTE2, parameter=parameter)
 
 # note: this is a catch-all route, so it should be the last route in the router
 @router1.get("/{full_path:path}", include_in_schema=False)

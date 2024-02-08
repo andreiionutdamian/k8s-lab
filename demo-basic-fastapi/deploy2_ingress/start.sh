@@ -1,4 +1,10 @@
-kubectl apply -f deploy_nodeport.yaml
+#!/bin/bash
+source ../utils.sh
+
+DEPLOYMENT_NAME="basic-test-py"
+NAMESPACE="basic-ns12"
+
+kubectl apply -f deploy_with_ingress.yaml
 
 get_ready_replicas() {
     kubectl get deployment "$DEPLOYMENT_NAME" -n "$NAMESPACE" -o jsonpath='{.status.readyReplicas}'

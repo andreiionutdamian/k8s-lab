@@ -7,8 +7,9 @@ from datetime import datetime
 from app_utils import safe_jsonify, get_packages
 from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
+from mixins.monitor_mixin import _MonitorMixin
 
-__VER__ = '0.4.7'
+__VER__ = '0.4.8'
 
 
 class AppPaths:
@@ -18,13 +19,13 @@ class AppPaths:
 class AppHandler(
     _PostgresMixin, 
     _RedisMixin,
+    _MonitorMixin,
   ):
   def __init__(self):
     self.log = None
     self.debug = os.environ.get("DEBUG", "0") in ['1', 'true', 'True', 'yes', 'Yes', 'y', 'Y', 'TRUE', 'YES']
     return
-  
-  
+    
   def P(self, s, **kwargs):
     if vars(self).get('log') is not None :
       self.log.P(s, **kwargs)
@@ -69,6 +70,14 @@ class AppHandler(
       self.P("Environement:\n{}".format(safe_jsonify(dct_env, indent=2)))
     self._maybe_setup_redis()
     self._maybe_setup_postgres()
+    
+    self.init_monitor()
+    return
+  
+  def shutdown(self):
+    self.P("Shutting down {}...".format(self.__class__.__name__))
+    self.stop_monitor()
+    self.P("Shutdown complete.")
     return
   
   

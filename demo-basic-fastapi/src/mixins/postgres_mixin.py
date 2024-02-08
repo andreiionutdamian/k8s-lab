@@ -14,8 +14,7 @@ class _PostgresMixin:
     if self._has_postgres:
       with self.__pg.cursor() as cur:
         cur.execute("CREATE TABLE IF NOT EXISTS requests (id SERIAL PRIMARY KEY, hostname varchar(200), data varchar(255));")
-        self.__pg.commit()
-        
+        self.__pg.commit()        
     return
   
   def __get_postgres_config(self):
@@ -51,13 +50,15 @@ class _PostgresMixin:
             pg_server_info['host'], pg_server_info['port'], 
             pg_server_info['user'], pg_server_info['dbname'],
           ))
+          self._has_postgres = True
           self.__maybe_create_tables()
           # now we get the tables from the database
           with self.__pg.cursor() as cur:
             cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
             rows = cur.fetchall()
             self.P("Tables in the database: {}".format(rows))
-          self._has_postgres = True
+          #end with cursor check tables
+        #end if posgres env vars
       except Exception as e:
         self.P("Error in _maybe_setup_postgres: {}".format(e))    
     return  
@@ -71,10 +72,10 @@ class _PostgresMixin:
         values = tuple(kwargs.values())
         str_sql = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
         with self.__pg.cursor() as cur:
-            cur.execute(str_sql, values)
-            self.__pg.commit()
-      except Exception as e:
-        self.P("Error in postgres_insert_data: {}".format(e))     
+          cur.execute(str_sql, values)
+          self.__pg.commit()
+      except Exception as exc:
+        self.P("Error in postgres_insert_data: {}".format(exc))     
         raise ValueError("Postgres issue")   
     return
 
@@ -96,8 +97,8 @@ class _PostgresMixin:
           cur.execute(str_sql, parameters)
           rows = cur.fetchall()
           result = rows
-      except Exception as e:
-        self.P("Error in postgres_select_data: {}".format(e))
+      except Exception as exc:
+        self.P("Error in postgres_select_data: {}".format(exc))
         raise ValueError("Postgres issue")
     return result
 
@@ -111,8 +112,8 @@ class _PostgresMixin:
           cur.execute(str_sql)
           rows = cur.fetchall()
           result = rows
-      except:
-        self.P("Error in postgres_select_counts: {}".format(e))
+      except Exception as exc:
+        self.P("Error in postgres_select_counts: {}".format(exc))
         raise ValueError("Postgres issue")
     return result
     
@@ -126,8 +127,8 @@ class _PostgresMixin:
           cur.execute(str_sql)
           rows = cur.fetchall()
           result = rows
-      except Exception as e:
-        self.P("Error in postgres_get_count: {}".format(e))
+      except Exception as exc:
+        self.P("Error in postgres_get_count: {}".format(exc))
         raise ValueError("Postgres issue")
     return result
 

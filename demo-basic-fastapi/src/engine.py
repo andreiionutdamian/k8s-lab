@@ -9,7 +9,7 @@ from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
 from mixins.monitor_mixin import _MonitorMixin
 
-__VER__ = '0.4.8'
+__VER__ = '0.4.9'
 
 
 class AppPaths:

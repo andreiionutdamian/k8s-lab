@@ -5,6 +5,7 @@ from time import sleep
 
 class _MonitorMixin:
   def __init__(self, **kwargs):
+    super(_MonitorMixin, self).__init__(**kwargs)
     self.__done = False
     self.__started = False
     self.__resolution = os.environ.get("MONITOR_RESOLUTION", 0.25)

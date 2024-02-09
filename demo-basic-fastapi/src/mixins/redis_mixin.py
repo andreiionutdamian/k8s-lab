@@ -11,6 +11,7 @@ INFO_KEYS = [
 ]
 class _RedisMixin:
   def __init__(self, *args, **kwargs):
+    super(_RedisMixin, self).__init__(*args, **kwargs)
     self.__redis = None
     self.__connects = 0
     self.__config = self.__get_redis_config()  

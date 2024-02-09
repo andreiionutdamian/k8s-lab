@@ -11,7 +11,7 @@ from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
 from mixins.monitor_mixin import _MonitorMixin
 
-__VER__ = '0.5.3'
+__VER__ = '0.5.4'
 
 
 class AppPaths:
@@ -23,8 +23,8 @@ class AppHandler(
     _RedisMixin,
     _MonitorMixin,
   ):
-  def __init__(self):
-    super(AppHandler, self).__init__()
+  def __init__(self, *args, **kwargs):
+    super(AppHandler, self).__init__(*args, **kwargs)
     self.log = None
     self.__print_lock = Lock()
     self.debug = os.environ.get("DEBUG", "0") in ['1', 'true', 'True', 'yes', 'Yes', 'y', 'Y', 'TRUE', 'YES']

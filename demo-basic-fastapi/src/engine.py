@@ -11,7 +11,7 @@ from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
 from mixins.monitor_mixin import _MonitorMixin
 
-__VER__ = '0.5.0'
+__VER__ = '0.5.2'
 
 
 class AppPaths:

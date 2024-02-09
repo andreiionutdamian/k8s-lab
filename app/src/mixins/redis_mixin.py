@@ -22,6 +22,7 @@ class _RedisMixin:
     dct_redis = {k : v for k, v in os.environ.items() if k.startswith("REDIS_")}
     return dct_redis
   
+  
   @property
   def redis_config_available(self):
     return len(self.__config) > 0
@@ -87,32 +88,35 @@ class _RedisMixin:
   
   
   def redis_inc(self, key : str, amount : int = 1):
+    result = False
     if self._has_redis:
       try:
         self.__redis.incr(key, amount)
+        result = True    
       except Exception as ex:
         self.P("Failed to increment key {} by {}: {}".format(key, amount, ex))
-        raise ValueError("Redis issue")
-    return
+    return result
   
   
-  def redis_set(self, key : str, value):
+  def redis_set(self, key : str, value):    
+    result = False
     if self._has_redis:
       try:
         self.__redis.set(key, value)
+        result = True
       except Exception as ex:
         self.P("Failed to set key {} to {}: {}".format(key, value, ex))
-        raise ValueError("Redis issue")
-    return
+    return result
   
   def redis_sethash(self, hashname : str, key : str, value):
+    result = False
     if self._has_redis:
       try:
         self.__redis.hset(hashname, key, value)
+        result = True
       except Exception as ex:
         self.P("Failed to set hash {} key {} to {}: {}".format(hashname, key, value, ex))
-        raise ValueError("Redis issue")
-    return  
+    return result
   
   def redis_get(self, key : str):
     result = None
@@ -125,7 +129,7 @@ class _RedisMixin:
     return result
   
   def redis_gethash(self, hashname : str):
-    result = None
+    result = {}
     if self._has_redis:
       try:
         result = self.__redis.hgetall(hashname)

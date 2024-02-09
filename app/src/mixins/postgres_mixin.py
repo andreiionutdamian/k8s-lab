@@ -11,14 +11,7 @@ class _PostgresMixin:
     self.__config = self.__get_postgres_config()
     return
     
-  
-  def __maybe_create_tables(self):
-    if self._has_postgres:
-      with self.__pg.cursor() as cur:
-        cur.execute("CREATE TABLE IF NOT EXISTS requests (id SERIAL PRIMARY KEY, hostname varchar(200), data varchar(255));")
-        self.__pg.commit()        
-    return
-  
+    
   def __get_postgres_config(self):
     dct_pg = {k : v for k, v in os.environ.items() if k.startswith("POSTGRES_")}
     return dct_pg
@@ -70,7 +63,7 @@ class _PostgresMixin:
             pg_server_info['user'], pg_server_info['dbname'],
           ))
           self._has_postgres = True
-          self.__maybe_create_tables()
+          self.postgres_maybe_create_tables()
           # now we get the tables from the database
           tables = self.postgres_get_tables()
           self.P("Tables in the database: {}".format(tables))

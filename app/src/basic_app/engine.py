@@ -68,6 +68,14 @@ class AppHandler(
       self.postgres_insert_data("requests", hostname=self.hostname, data=str_data)
     return
   
+  def postgres_maybe_create_tables(self):
+    if self._has_postgres:
+      with self.__pg.cursor() as cur:
+        cur.execute("CREATE TABLE IF NOT EXISTS requests (id SERIAL PRIMARY KEY, hostname varchar(200), data varchar(255));")
+        self.__pg.commit()        
+    return
+  
+  
   def get_redis_count(self):
     if self._has_redis:
       return self.redis_get("cluster_count")

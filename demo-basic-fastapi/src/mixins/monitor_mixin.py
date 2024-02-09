@@ -10,6 +10,9 @@ class _MonitorMixin:
     self.__resolution = os.environ.get("MONITOR_RESOLUTION", 0.25)
     return
   
+  @property
+  def is_started(self):
+    return self.__started 
   
   def init_monitor(self):
     pass
@@ -24,7 +27,7 @@ class _MonitorMixin:
     self.__done = False
     self.monitor_thread = Thread(target=self.monitor_loop, daemon=True)
     self.monitor_thread.start()
-    return
+    return  
   
   
   def monitor_callback(self):
@@ -33,9 +36,11 @@ class _MonitorMixin:
   
   def monitor_loop(self):  
     self.P("Initializing monitor loop with resolution: {}...".format(self.__resolution))
+    self.__started = True
     while not self.__done:
       sleep(1 / self.__resolution)
       self.monitor_callback()
     return
+    
     
     

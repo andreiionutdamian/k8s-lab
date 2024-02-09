@@ -4,6 +4,8 @@ import redis
 from uuid import uuid4
 from datetime import datetime
 
+from threading import Lock
+
 from app_utils import safe_jsonify, get_packages
 from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
@@ -23,6 +25,7 @@ class AppHandler(
   ):
   def __init__(self):
     self.log = None
+    self.__print_lock = Lock()
     self.debug = os.environ.get("DEBUG", "0") in ['1', 'true', 'True', 'yes', 'Yes', 'y', 'Y', 'TRUE', 'YES']
     return
     
@@ -30,8 +33,10 @@ class AppHandler(
     if vars(self).get('log') is not None :
       self.log.P(s, **kwargs)
     else:
+      self.__print_lock.acquire()
       str_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
       print('[APH][{}]'.format(str_date) + s, flush=True, **kwargs)
+      self.__print_lock.release() 
     return
   
   
@@ -68,10 +73,15 @@ class AppHandler(
     dct_env = dict(os.environ)
     if self.debug:
       self.P("Environement:\n{}".format(safe_jsonify(dct_env, indent=2)))
-    self._maybe_setup_redis()
-    self._maybe_setup_postgres()
+    self.redis_maybe_connect()
+    self.postgres_maybe_connect()
     
     self.init_monitor()
+    return
+  
+  def monitor_callback(self):
+    self.redis_maybe_connect()
+    self.postgres_maybe_connect()
     return
   
   def shutdown(self):

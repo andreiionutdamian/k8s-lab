@@ -6,6 +6,8 @@ kind: Deployment
 metadata:
   name: redis
   namespace: basic-postgres
+  labels: # this is not mandatory but it is a good practice
+    app: redis
 spec:
   replicas: 1
   selector:
@@ -47,6 +49,99 @@ spec:
   selector:
     app: redis
 ---
+
+#########################
+###       Postgres    ###
+#########################
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pg-nfs-pv
+  namespace: basic-postgres
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 192.168.1.56  
+    path: "/srv/nfs/k8s/pg_storage/basic-test-py-simple"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pg-nfs-pvc
+  namespace: basic-postgres
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+  volumeName: pg-nfs-pv
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: basic-postgres
+  labels: # this is not mandatory but it is a good practice
+    app: postgres
+spec:
+  serviceName: "postgres"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:13
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: basic-test-app-secrets
+              key: postgres-password
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: basic-test-app-secrets
+              key: postgres-user
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: basic-test-app-secrets
+              key: postgres-db
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: pg-nfs-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: basic-postgres
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: postgres
+---    
+
+
 #########################
 ###       App         ###
 #########################
@@ -55,6 +150,8 @@ kind: Deployment
 metadata:
   name: basic-test-py
   namespace: basic-postgres
+  labels: # this is not mandatory but it is a good practice
+    app: basic-test-py
 spec:
   replicas: 4
   selector:
@@ -132,90 +229,3 @@ spec:
             name: basic-test-py-svc
             port:
               number: 5050
-#########################
-###       Postgres    ###
-#########################
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: pg-nfs-pv
-  namespace: basic-postgres
-spec:
-  capacity:
-    storage: 5Gi
-  accessModes:
-    - ReadWriteMany
-  nfs:
-    server: 192.168.1.56  
-    path: "/srv/nfs/k8s/pg_storage/basic-test-py-simple"
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: pg-nfs-pvc
-  namespace: basic-postgres
-spec:
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 2Gi
-  volumeName: pg-nfs-pv
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: postgres
-  namespace: basic-postgres
-spec:
-  serviceName: "postgres"
-  replicas: 1
-  selector:
-    matchLabels:
-      app: postgres
-  template:
-    metadata:
-      labels:
-        app: postgres
-    spec:
-      containers:
-      - name: postgres
-        image: postgres:13
-        env:
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: basic-test-app-secrets
-              key: postgres-password
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: basic-test-app-secrets
-              key: postgres-user
-        - name: POSTGRES_DB
-          valueFrom:
-            secretKeyRef:
-              name: basic-test-app-secrets
-              key: postgres-db
-        ports:
-        - containerPort: 5432
-        volumeMounts:
-        - name: postgres-storage
-          mountPath: /var/lib/postgresql/data
-      volumes:
-      - name: postgres-storage
-        persistentVolumeClaim:
-          claimName: pg-nfs-pvc
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgres
-  namespace: basic-postgres
-spec:
-  ports:
-  - port: 5432
-    targetPort: 5432
-  selector:
-    app: postgres

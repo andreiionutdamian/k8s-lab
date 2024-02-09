@@ -12,6 +12,8 @@ INFO_KEYS = [
 class _RedisMixin:
   def __init__(self, *args, **kwargs):
     self.__redis = None
+    self.__connects = 0
+    self.__config = self.__get_redis_config()  
     return
   
   
@@ -19,12 +21,17 @@ class _RedisMixin:
     dct_redis = {k : v for k, v in os.environ.items() if k.startswith("REDIS_")}
     return dct_redis
   
+  @property
+  def redis_config_available(self):
+    return len(self.__config) > 0
+    
     
   def _maybe_setup_redis(self):
     self._has_redis = False
-    dct_redis = self.__get_redis_config()
-    if len(dct_redis) > 0:
+    self.__connects += 1
+    if self.redis_config_available:
       try:
+        dct_redis = self.__config
         if "REDIS_MASTER_SERVICE_HOST" in dct_redis:
           # this is a redis master/slave setup
           self.P("Setting up Redis with master/slave configuration:\n{}".format(safe_jsonify(dct_redis)))
@@ -35,8 +42,10 @@ class _RedisMixin:
         else:
           self.P("Setting up simple Redis with configuration:\n{}".format(safe_jsonify(dct_redis)))
           redis_host = dct_redis.get("REDIS_SERVICE_HOST")
-          redis_port = dct_redis.get("REDIS_SERVICE_PORT", 6379)
-          redis_password = dct_redis.get("REDIS_PASSWORD", None)
+          redis_port = dct_redis.get("REDIS_SERVICE_PORT")
+          redis_password = dct_redis.get("REDIS_PASSWORD")
+        if redis_host is not None:
+          self.__config_available = True
         hidden_password = redis_password[:2] + "*" * (len(redis_password) - 4) + redis_password[-2:] if redis_password is not None else None
         self.P("Connecting to Redis at {}:{} with password: {}".format(
           redis_host, redis_port, hidden_password
@@ -55,6 +64,15 @@ class _RedisMixin:
         self._has_redis = True
       except Exception as ex:
         self.P("Failed to connect to Redis: {}".format(ex))
+    return
+  
+  def redis_maybe_connect(self):
+    if not self._has_redis and self.redis_config_available:
+      if self.__connects == 0:
+        self.P("Initial connection attempt to Redis...")
+      else:
+        self.P("Reconnect attempt {} to Redis...".format(self.__connects))
+      self._maybe_setup_redis()
     return
   
   

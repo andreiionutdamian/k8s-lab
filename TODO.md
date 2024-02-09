@@ -1,2 +1,0 @@
- - [ ] finish PostgreSQL manifest
- - [ ] add on-the-fly connection to sql

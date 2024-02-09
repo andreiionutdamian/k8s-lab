@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: redis
   namespace: basic-ns11
+  labels: # this is not mandatory but it is a good practice
+    app: redis
 spec:
   replicas: 1
   selector:
@@ -49,6 +51,8 @@ kind: Deployment
 metadata:
   name: basic-test-py
   namespace: basic-ns11
+  labels: # this is not mandatory but it is a good practice
+    app: basic-test-py
 spec:
   replicas: 4
   selector:

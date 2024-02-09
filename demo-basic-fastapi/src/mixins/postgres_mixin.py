@@ -6,6 +6,8 @@ from app_utils import safe_jsonify
 class _PostgresMixin:
   def __init__(self, *args, **kwargs):
     self.__pg = None
+    self.__connects = 0
+    self.__config = self.__get_postgres_config()
     return
   
 # PostgreSQL
@@ -21,11 +23,16 @@ class _PostgresMixin:
     dct_pg = {k : v for k, v in os.environ.items() if k.startswith("POSTGRES_")}
     return dct_pg
   
+  @property
+  def postgres_config_available(self):
+    return len(self.__config) > 0
+  
   def _maybe_setup_postgres(self):
-    dct_pg = self.__get_postgres_config()
     self._has_postgres = False
-    if len(dct_pg) > 0:
+    self.__connects += 1
+    if self.postgres_config_available:
       try:
+        dct_pg = self.__config
         self.P("Setting up Postgres with configuration:\n{}".format(safe_jsonify(dct_pg)))
         postgres_host = dct_pg.get("POSTGRES_SERVICE_HOST")
         postgres_port = dct_pg.get("POSTGRES_SERVICE_PORT")
@@ -35,6 +42,7 @@ class _PostgresMixin:
         if postgres_host is None or postgres_port is None or postgres_user is None or postgres_password is None or postgres_db is None:
           self.P("Incomplete Postgres configuration. Skipping Postgres setup.")
         else:
+          self.__config_available = True
           hidden_password = postgres_password[:2] + "*" * (len(postgres_password) - 4) + postgres_password[-2:]
           self.P("Connecting to Postgres at {}:{} on db '{}' with user: `{}`, pass: {}".format(
             postgres_host, postgres_port, postgres_db, 
@@ -60,6 +68,16 @@ class _PostgresMixin:
       except Exception as e:
         self.P("Error in _maybe_setup_postgres: {}".format(e))    
     return  
+  
+  
+  def postgres_maybe_connect(self):
+    if not self._has_postgres and self.postgres_config_available:
+      if self.__connects == 0:
+        self.P("First time connecting attempt to Postgres...")
+      else:
+        self.P("Connecting attempt {} to Postgres...".format(self.__connects))
+      self._maybe_setup_postgres()
+    return
   
   
   def postgres_insert_data(self, table_name: str, **kwargs):

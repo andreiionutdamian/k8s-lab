@@ -7,7 +7,7 @@ class _MonitorMixin:
   def __init__(self, **kwargs):
     self.__done = False
     self.__started = False
-    self.__resolution = os.environ.get("MONITOR_RESOLUTION", 1)
+    self.__resolution = os.environ.get("MONITOR_RESOLUTION", 0.25)
     return
   
   
@@ -27,9 +27,15 @@ class _MonitorMixin:
     return
   
   
-  def monitor_loop(self):    
+  def monitor_callback(self):
+    raise NotImplementedError("monitor_callback() must be implemented by the subclass")
+  
+  
+  def monitor_loop(self):  
+    self.P("Initializing monitor loop with resolution: {}...".format(self.__resolution))
     while not self.__done:
       sleep(1 / self.__resolution)
+      self.monitor_callback()
     return
     
     

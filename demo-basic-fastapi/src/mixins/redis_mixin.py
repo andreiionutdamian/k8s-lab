@@ -25,6 +25,15 @@ class _RedisMixin:
   @property
   def redis_config_available(self):
     return len(self.__config) > 0
+  
+  
+  @property
+  def redis_alive(self):
+    alive = False
+    if self._has_redis:      
+      # self.redis_maybe_connect()
+      alive = self._has_redis
+    return alive
     
     
   def _maybe_setup_redis(self):

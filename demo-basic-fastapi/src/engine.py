@@ -11,7 +11,7 @@ from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
 from mixins.monitor_mixin import _MonitorMixin
 
-__VER__ = '0.5.4'
+__VER__ = '0.5.5'
 
 
 class AppPaths:
@@ -62,8 +62,6 @@ class AppHandler(
     self.__check_handlers()
     self.str_local_id = "test_" + str(uuid4())[:5]
     self.__local_count = 0
-    self._has_redis = False
-    self._has_postgres = False
     self.hostname = os.environ.get("HOSTNAME", "unknown")    
     self.P("Initializing {} v{} ID: {}, HOSTNAME: {}...".format(
       self.__class__.__name__, __VER__,
@@ -94,29 +92,38 @@ class AppHandler(
   
   def _process_data(self, param=None, **kwargs):
     self.__local_count += 1
-    if self._has_redis:
+    if self.redis_alive:
       self.redis_inc("cluster_count")
       self.redis_sethash("data", self.hostname, self.__local_count)
-    if self._has_postgres:
+    if self.postgres_alive:
       str_data = "Data from {}:{}".format(self.str_local_id, self.__local_count)
       self.postgres_insert_data("requests", hostname=self.hostname, data=str_data)
     return
   
-  def get_cluster_count(self):
+  def get_redis_count(self):
     if self._has_redis:
       return self.redis_get("cluster_count")
     return 0
   
   
+  def get_redis_stats(self):
+    result = {}
+    if self._has_redis:
+      dct_res = self.redis_gethash("data")
+      dct_res["total"] = sum(dct_res.values())
+      result = dct_res
+    return result
+  
+  
   def get_db_requests(self):
-    if self._has_postgres:
+    if self.postgres_alive:
       rows = self.postgres_get_count("requests")
       return rows[0][0]
     return 0
 
   def get_db_stats(self):
     result = {}
-    if self._has_postgres:
+    if self.postgres_alive:
       rows = self.postgres_group_count("requests", "hostname")
       dct_res = {k:v for k, v in rows}
       dct_res["total"] = sum(dct_res.values())
@@ -128,8 +135,8 @@ class AppHandler(
       "result": message,
       "path": path,
       "parameter": parameter,
-      "redis": self._has_redis,
-      "postgres" : self._has_postgres,
+      "redis": self.redis_alive,
+      "postgres" : self.postgres_alive,
     }  
   
    
@@ -147,7 +154,7 @@ class AppHandler(
 
   def _handle_root(self, **kwargs):
     msg = "'{}', Local/Global: {}/{}, HOSTNAME: '{}', ID: '{}'".format(
-      kwargs['path'], self.__local_count, self.get_cluster_count(),
+      kwargs['path'], self.__local_count, self.get_redis_count(),
       self.hostname, self.str_local_id
     )    
     return msg
@@ -158,17 +165,17 @@ class AppHandler(
         kwargs['path'], self.hostname, self.str_local_id
       ),
       'local_requests' : self.__local_count,
-      'recent_requests' : self.redis_get("cluster_count"),
-      'recent_stats' : self.redis_gethash("data"),
-      'db_requests' : self.postgres_get_count("requests"),
-      'db_stats' : self.postgres_select_counts("requests", "hostname"),     
+      'recent_requests' : self.get_redis_count(),
+      'recent_stats' : self.get_redis_stats(),
+      'db_requests' : self.get_db_requests(),
+      'db_stats' : self.get_db_stats(),     
     }    
     return dct_result
   
   
   def __handle_generic(self, path, **kwargs):
     msg = "Generic '{}', Local/Global: {}/{}, HOSTNAME: '{}', ID: '{}'".format(
-      path, self.__local_count, self.get_cluster_count(),
+      path, self.__local_count, self.get_redis_count(),
       self.hostname, self.str_local_id
     )  
     return msg

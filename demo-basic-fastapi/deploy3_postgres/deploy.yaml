@@ -90,8 +90,8 @@ metadata:
     app: postgres
 spec:
   serviceName: "postgres"
-  strategy:
-    type: Recreate
+  # updateStrategy:
+  #   type: RollingUpdate
   replicas: 1
   selector:
     matchLabels:

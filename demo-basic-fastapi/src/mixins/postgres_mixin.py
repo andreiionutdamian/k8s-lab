@@ -10,9 +10,8 @@ class _PostgresMixin:
     self.__connects = 0
     self.__config = self.__get_postgres_config()
     return
-  
-# PostgreSQL
     
+  
   def __maybe_create_tables(self):
     if self._has_postgres:
       with self.__pg.cursor() as cur:
@@ -23,10 +22,21 @@ class _PostgresMixin:
   def __get_postgres_config(self):
     dct_pg = {k : v for k, v in os.environ.items() if k.startswith("POSTGRES_")}
     return dct_pg
+
+
+  @property
+  def postgres_alive(self):
+    alive = False
+    if self._has_postgres:
+      self.postgres_maybe_reconnect()
+      alive = self._has_postgres
+    return alive
+
   
   @property
   def postgres_config_available(self):
     return len(self.__config) > 0
+
   
   def _maybe_setup_postgres(self):
     self._has_postgres = False
@@ -80,10 +90,31 @@ class _PostgresMixin:
       self._maybe_setup_postgres()
     return
   
+  def is_connection_still_alive(self):
+    result = False
+    try:
+      # Use a simple query to check the connection
+      with self.__pg.cursor() as cur:
+        cur.execute("SELECT 1")
+      result = True
+    except Exception as exc:
+      self.P("Connection to Postgres is dead. Reconnecting is required...")
+      self._has_postgres = False
+    return result
+  
+  
+  def postgres_maybe_reconnect(self):
+    if self._has_postgres:
+      if not self.is_connection_still_alive():
+        self.postgres_maybe_connect()
+    return
+  
+  
   
   def postgres_insert_data(self, table_name: str, **kwargs):
     if self._has_postgres:
       try:
+        self.postgres_maybe_reconnect()
         columns = ', '.join(kwargs.keys())
         placeholders = ', '.join(['%s'] * len(kwargs))
         values = tuple(kwargs.values())
@@ -101,6 +132,7 @@ class _PostgresMixin:
     result = None
     if self._has_postgres:
       try:
+        self.postgres_maybe_reconnect()
         str_sql = f"SELECT * FROM {table_name}"
         parameters = []
         if kwargs:
@@ -124,6 +156,7 @@ class _PostgresMixin:
     result = None
     if self._has_postgres:
       try:
+        self.postgres_maybe_reconnect()
         str_sql = f"SELECT {group_by}, COUNT(*) FROM {table_name} GROUP BY {group_by};"
         with self.__pg.cursor() as cur:
           cur.execute(str_sql)
@@ -139,6 +172,7 @@ class _PostgresMixin:
     result = None
     if self._has_postgres:
       try:
+        self.postgres_maybe_reconnect()
         str_sql = f"SELECT COUNT(*) FROM {table_name};"
         with self.__pg.cursor() as cur:
           cur.execute(str_sql)
@@ -153,6 +187,7 @@ class _PostgresMixin:
     result = None
     if self._has_postgres:
       try:
+        self.postgres_maybe_reconnect()
         with self.__pg.cursor() as cur:
           cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
           rows = cur.fetchall()

@@ -1,3 +1,4 @@
+```python
 from time import sleep
 from fastapi import FastAPI, APIRouter, Request, File, UploadFile
 from threading import Thread
@@ -89,3 +90,4 @@ async def predict_universal(request: Request):
     return {"message": f"Received plain text body: {text_body.decode()}"}
 
 app.include_router(router)
+```

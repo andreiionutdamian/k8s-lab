@@ -1,4 +1,4 @@
-source utils.sh
+source ./utils.sh
 log_with_color "Deleting all resources in namespace basic-ns11" "green"
 ./deploy1_nodeport/delete.sh
 log_with_color "Deleting all resources in namespace basic-ns12" "green"

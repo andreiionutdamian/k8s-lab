@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: emqx-statefulset
+  namespace: demo-nodejs-emqx
+  labels:
+    app: emqx
+spec:
+  serviceName: emqx-headless
+  updateStrategy:
+    type: RollingUpdate
+  replicas: 3
+  selector:
+    matchLabels:
+      app: emqx
+  template:
+    metadata:
+      labels:
+        app: emqx
+    spec:
+      serviceAccountName: emqx
+      containers:
+        - name: emqx
+          image: emqx/emqx:v4.1-rc.1
+          ports:
+            - name: mqtt
+              containerPort: 1883
+            - name: mqttssl
+              containerPort: 8883
+            - name: mgmt
+              containerPort: 8081
+            - name: ws
+              containerPort: 8083
+            - name: wss
+              containerPort: 8084
+            - name: dashboard
+              containerPort: 18083
+          envFrom:
+            - configMapRef:
+                name: emqx-config

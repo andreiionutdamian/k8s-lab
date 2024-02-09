@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: emqx
+  namespace: emqx-namespace
+spec:
+  serviceName: "emqx-headless"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: emqx
+  template:
+    metadata:
+      labels:
+        app: emqx
+    spec:
+      serviceAccountName: emqx-account
+      containers:
+        - name: emqx
+          image: emqx/emqx:5.0.0 # Ensure this is the correct version
+          ports:
+            - containerPort: 1883
+              name: mqtt
+            - containerPort: 8081
+              name: dashboard
+          env:
+            - name: EMQX_NAME
+              value: "emqx"
+            - name: EMQX_CLUSTER_DISCOVERY
+              value: "dns"
+            - name: EMQX_CLUSTER_DNS_NAME
+              value: "emqx-headless.emqx-namespace.svc.cluster.local" # Adjust based on your setup
+            - name: EMQX_NODE__COOKIE
+              value: "your_secure_cookie_value_here"

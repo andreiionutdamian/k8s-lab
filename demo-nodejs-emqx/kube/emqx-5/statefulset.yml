@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: emqx
+  namespace: emqx-5
+spec:
+  serviceName: "emqx-headless"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: emqx
+  template:
+    metadata:
+      labels:
+        app: emqx
+    spec:
+      containers:
+        - name: emqx
+          image: emqx/emqx:latest
+          ports:
+            - containerPort: 1883
+          env:
+            - name: EMQX_NAME
+              value: "emqx"
+            - name: EMQX_NODE__COOKIE
+              value: "emqx-secret"
+            - name: EMQX_CLUSTER__DISCOVERY_STRATEGY
+              value: "static"
+            - name: EMQX_CLUSTER__STATIC__SEEDS
+              value: "emqx@emqx-0.emqx-headless.emqx-5.svc.cluster.local,emqx@emqx-1.emqx-headless.emqx-5.svc.cluster.local,emqx@emqx-2.emqx-headless.emqx-5.svc.cluster.local"

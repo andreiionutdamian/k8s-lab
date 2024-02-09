@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: emqx-headless
+  namespace: emqx-namespace
+spec:
+  ports:
+    - port: 1883
+      name: mqtt
+    - port: 8081
+      name: dashboard
+  clusterIP: None
+  selector:
+    app: emqx

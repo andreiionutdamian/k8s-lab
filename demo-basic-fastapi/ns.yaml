@@ -12,5 +12,10 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: basic-postgres
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: basic-clusters  
 
 

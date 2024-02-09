@@ -135,7 +135,7 @@ class AppHandler(
     
 
   def _handle_root(self, **kwargs):
-    msg = "Handler '{}', Local/Global: {}/{}, HOSTNAME: '{}', ID: '{}'".format(
+    msg = "'{}', Local/Global: {}/{}, HOSTNAME: '{}', ID: '{}'".format(
       kwargs['path'], self.__local_count, self.get_cluster_count(),
       self.hostname, self.str_local_id
     )    
@@ -143,7 +143,7 @@ class AppHandler(
   
   def _handle_stats(self, **kwargs):
     dct_result = {
-      'info' : "Handler '{}', Worker HOSTNAME: '{}', ID: '{}'".format(
+      'info' : "'{}', HOSTNAME: '{}', ID: '{}'".format(
         kwargs['path'], self.hostname, self.str_local_id
       ),
       'local_requests' : self.__local_count,
@@ -155,9 +155,9 @@ class AppHandler(
     return dct_result
   
   
-  def __handle_generic(self, path, parameter=None, **kwargs):
-    msg = "Generic handler '{}', Param='{}', Local/Global: {}/{}, HOSTNAME: '{}', ID: '{}'".format(
-      path, parameter, self.__local_count, self.get_cluster_count(),
+  def __handle_generic(self, path, **kwargs):
+    msg = "Generic '{}', Local/Global: {}/{}, HOSTNAME: '{}', ID: '{}'".format(
+      path, self.__local_count, self.get_cluster_count(),
       self.hostname, self.str_local_id
     )  
     return msg

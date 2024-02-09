@@ -148,7 +148,7 @@ spec:
     - ReadWriteMany
   nfs:
     server: 192.168.1.56  
-    path: "/srv/nfs/k8s/pg_storage/basic-test-py-simple"
+    path: "/srv/nfs/k8s/pg_storage/basic-test-py"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

@@ -12,7 +12,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: nfs
   nfs:
-    path: "/srv/nfs/k8s"
+    path: "/srv/nfs/k8s/pg_storage/demo-ai-app"
     server: 192.168.1.56
     readOnly: false
 ---

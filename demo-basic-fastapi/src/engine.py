@@ -77,7 +77,7 @@ class AppHandler(
     self.redis_maybe_connect()
     self.postgres_maybe_connect()
     
-    self.init_monitor()
+    self.start_monitor()
     return
   
   def monitor_callback(self):

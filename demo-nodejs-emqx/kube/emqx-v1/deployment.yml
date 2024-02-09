@@ -1,34 +1,4 @@
 apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: emqx-account
-  namespace: emqx-v1
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: emqx-role
-  namespace: emqx-v1
-rules:
-  - apiGroups: [""]
-    resources: ["endpoints"]
-    verbs: ["get", "watch", "list"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: emqx-role-binding
-  namespace: emqx-v1
-subjects:
-  - kind: ServiceAccount
-    name: emqx-account
-    namespace: default
-roleRef:
-  kind: Role
-  name: emqx-role
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: emqx-nfs-pv
@@ -41,7 +11,6 @@ spec:
   nfs:
     server: 192.168.1.56
     path: "/srv/nfs/k8s/emqx_storage"
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -73,26 +42,78 @@ spec:
         app: emqx
     spec:
       serviceAccountName: emqx-account
+      initContainers:
+      - name: init-emqx-node-name
+        image: busybox
+        command: ['sh', '-c', 'echo -n "export EMQX_NODE__NAME=emqx@$POD_IP; echo \"var: $EMQX_NODE__NAME\"" > /app-config/emqx-env.sh && chmod +x /app-config/emqx-env.sh']
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        volumeMounts:
+        - name: emqx-node-name
+          mountPath: /app-config
       containers:
-        - name: emqx
-          image: emqx/emqx:5.0
-          ports:
-            - containerPort: 1883
-              name: mqtt
-            - containerPort: 18083
-              name: dashboard
-          env:
-            - name: EMQX_NAME
-              value: emqx
-            - name: EMQX_CLUSTER__DISCOVERY
-              value: k8s
-            - name: EMQX_CLUSTER__K8S__APISERVER
-              value: "https://kubernetes.default.svc:443"
-            - name: EMQX_CLUSTER__K8S__SERVICE_NAME
-              value: emqx-headless
-            - name: EMQX_CLUSTER__K8S__NAMESPACE
-              value: default
-            - name: EMQX_CLUSTER__K8S__ADDRESS_TYPE
-              value: ip
-            - name: EMQX_CLUSTER__K8S__APP_NAME
-              value: emqx
+      - name: emqx
+        image: emqx/emqx:5.0.0
+        command: ["/bin/sh", "-c", "cat /app-config/emqx-env.sh && /app-config/emqx-env.sh && emqx foreground"]
+        ports:
+        - containerPort: 1883
+          name: mqtt
+        - containerPort: 18083
+          name: dashboard
+        env:
+        - name: EMQX_NAME
+          value: emqx
+        - name: EMQX_CLUSTER__K8S__APISERVER
+          value: "https://kubernetes.default.svc.cluster.local:443"
+          # value: "https://kubernetes.default.svc:443"
+        - name: EMQX_CLUSTER__K8S__SERVICE_NAME
+          value: emqx-headless
+        - name: EMQX_CLUSTER__K8S__NAMESPACE
+          value: emqx-v1
+        - name: EMQX_CLUSTER__K8S__ADDRESS_TYPE
+          value: ip
+
+        volumeMounts:
+        - name: emqx-node-name
+          mountPath: /app-config
+      volumes:
+      - name: emqx-node-name
+        emptyDir: {}                 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emqx-headless
+  labels:
+    app: emqx
+  namespace: emqx-v1
+spec:
+  ports:
+  - port: 4369  # For EPMD (Erlang Port Mapper Daemon)
+    name: epmd
+  - port: 18083  # For EMQX Dashboard
+    name: dashboard
+  clusterIP: None
+  selector:
+    app: emqx
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emqx-external
+  namespace: emqx-v1
+spec:
+  type: NodePort  # Use LoadBalancer if in cloud environment that supports it
+  ports:
+  - port: 1883
+    targetPort: 1883
+    name: mqtt
+  - port: 18083
+    targetPort: 18083
+    name: dashboard
+  selector:
+    app: emqx

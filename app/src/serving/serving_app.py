@@ -1,7 +1,23 @@
+from mixins.base_mixin import _BaseMixin
+from mixins.postgres_mixin import _PostgresMixin
+from mixins.redis_mixin import _RedisMixin
 
-class ServingApp:
+class ServingApp(
+  _BaseMixin,
+  _PostgresMixin,
+  _RedisMixin,
+  ):
+  
   def __init__(self, **kwargs):
     super(ServingApp, self).__init__(**kwargs)
+
+    self.log = None
+    return
+  
+  def setup(self):
+    super(ServingApp, self).setup()
+    
+    # setup serving
     self.models = {
       'text' : None,
       'json' : None,
@@ -9,7 +25,7 @@ class ServingApp:
     }
     return
   
-  def setup_models(self):
+  def maybe_setup_models(self):
     # get models from Redis if available
     return
   

@@ -4,15 +4,13 @@ import redis
 from uuid import uuid4
 from datetime import datetime
 
-from threading import Lock
 
 from app_utils import safe_jsonify, get_packages
 from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
-from mixins.monitor_mixin import _MonitorMixin
+from app.src.mixins.base_mixin import _MonitorMixin
 
-__VER__ = '0.5.5'
-
+from version import __VER__
 
 class AppPaths:
   PATH_ROOT = {"PATH": "/", "FUNC": "root"}
@@ -26,20 +24,9 @@ class AppHandler(
   def __init__(self, *args, **kwargs):
     super(AppHandler, self).__init__(*args, **kwargs)
     self.log = None
-    self.__print_lock = Lock()
     self.debug = os.environ.get("DEBUG", "0") in ['1', 'true', 'True', 'yes', 'Yes', 'y', 'Y', 'TRUE', 'YES']
     return
-    
-  def P(self, s, **kwargs):
-    if vars(self).get('log') is not None :
-      self.log.P(s, **kwargs)
-    else:
-      self.__print_lock.acquire()
-      str_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-      print('[APH][{}]'.format(str_date) + s, flush=True, **kwargs)
-      self.__print_lock.release() 
-    return
-  
+ 
   
   def __check_handlers(self):
     requested_funcs = ["_handle_" + x for x in self.__path_to_func.values()]
@@ -57,38 +44,19 @@ class AppHandler(
   
   
   def setup(self):
+    super(AppHandler, self).setup()
+
     self.__avail_paths = [v['PATH'] for k, v in vars(AppPaths).items() if k.startswith("PATH_")]
     self.__path_to_func = {v['PATH']: v['FUNC'] for k, v in vars(AppPaths).items() if k.startswith("PATH_")}
     self.__check_handlers()
-    self.str_local_id = "test_" + str(uuid4())[:5]
-    self.__local_count = 0
-    self.hostname = os.environ.get("HOSTNAME", "unknown")    
-    self.P("Initializing {} v{} ID: {}, HOSTNAME: {}...".format(
-      self.__class__.__name__, __VER__,
-      self.str_local_id, self.hostname
-    ))
-    self.__packs = get_packages()
-    self.P("Packages:\n{}".format("\n".join(self.__packs)))
-    dct_env = dict(os.environ)
-    if self.debug:
-      self.P("Environement:\n{}".format(safe_jsonify(dct_env, indent=2)))
-    self.redis_maybe_connect()
-    self.postgres_maybe_connect()
-    
-    self.start_monitor()
+    self.__local_count = 0    
     return
   
   def monitor_callback(self):
     self.redis_maybe_connect()
     self.postgres_maybe_connect()
     return
-  
-  def shutdown(self):
-    self.P("Shutting down {}...".format(self.__class__.__name__))
-    self.stop_monitor()
-    self.P("Shutdown complete.")
-    return
-  
+    
   
   def _process_data(self, param=None, **kwargs):
     self.__local_count += 1

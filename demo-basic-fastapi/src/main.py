@@ -22,6 +22,7 @@ else:
   eng = AppHandler()
 # end if select engine
 
+
 ####################
 ## Serving routes ##
 ####################
@@ -120,5 +121,4 @@ elif app_type.lower() == 'monitor':
   app.include_router(router_monitor)  
 else:
   app.include_router(router_basic_app)
-
-
+# end if select router for app type

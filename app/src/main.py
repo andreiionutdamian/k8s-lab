@@ -1,4 +1,10 @@
 import os
+
+if True:
+  from app_utils import get_packages, safe_jsonify
+  print(safe_jsonify(get_packages()))
+#endif
+
 from fastapi import FastAPI, APIRouter, Request, File, UploadFile
 from pydantic import BaseModel
 from app_utils import boxed_print

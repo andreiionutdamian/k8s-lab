@@ -1,9 +1,10 @@
 import os
 
 if True:
-  from app_utils import get_packages, safe_jsonify
-  print(safe_jsonify(get_packages()))
+  from app_utils import show_inventory
+  show_inventory()
 #endif
+
 
 from fastapi import FastAPI, APIRouter, File, UploadFile
 from pydantic import BaseModel

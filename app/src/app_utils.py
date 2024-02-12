@@ -1,6 +1,8 @@
 import json
+import os
 import numpy as np
 import pkg_resources
+import sys
 
 from datetime import datetime
 
@@ -18,6 +20,45 @@ def get_packages(monitored_packages=None):
     ]
   packs = sorted(packs)
   return packs
+
+def list_subfolders_files(path='.'):
+  """
+  Generate lists of all subfolders and files from the specified path.
+
+  Parameters
+  ----------
+  path : str, optional
+    The directory path to start the search from. Defaults to the current directory.
+
+  Returns
+  -------
+  tuple of list
+    A tuple containing two lists: the first list includes all subfolders,
+    and the second list includes all files found in the directory and its subdirectories.
+  """
+  subfolders = []
+  files = []
+
+  for dirpath, dirnames, filenames in os.walk(path):
+    # Append relative path of subdirectories and files to the respective lists
+    for dirname in dirnames:
+      subfolders.append(os.path.join(dirpath, dirname))
+    for filename in filenames:
+      files.append(os.path.join(dirpath, filename))
+
+  return subfolders, files
+  
+
+def show_inventory():
+  packs = get_packages()
+  print("Python version: {}".format(sys.version))
+  print("Installed packages:")
+  packs = "\n".join(["  " + x for x in packs])
+  print("\n".join(packs))
+  _, files = list_subfolders_files()
+  files = ["  " + x for x in files]
+  print("App files:\n{}".format("\n".join(files)))
+  return
 
 class NPJson(json.JSONEncoder):
   """

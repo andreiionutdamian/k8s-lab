@@ -8,7 +8,8 @@ from datetime import datetime
 from app_utils import safe_jsonify, get_packages
 from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
-from app.src.mixins.base_mixin import _MonitorMixin
+
+from mixins.base_mixin import _MonitorMixin
 
 from version import __VER__
 

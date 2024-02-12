@@ -39,7 +39,7 @@ class _PostgresMixin(object):
       dct_tables = self.postgres_get_tables()
       for table in dct_tables:
         fields = dct_tables[table]
-        self.P("Creating postgres: {} with fields {}".format(table, fields))
+        self.P("Creating postgres table '{}' with fields {}".format(table, fields))
         query = "CREATE TABLE IF NOT EXISTS {} ({});".format(table, fields)
         with self.__pg.cursor() as cur:
           cur.execute(query)

@@ -85,7 +85,7 @@ class AppHandler(
   
   def get_redis_stats(self):
     dct_res = self.redis_gethash("data")
-    dct_res["total"] = sum(dct_res.values())
+    #dct_res["total"] = sum(dct_res.values())
     result = dct_res
     return result
   

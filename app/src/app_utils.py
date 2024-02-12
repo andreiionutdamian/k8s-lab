@@ -6,6 +6,8 @@ import sys
 
 from datetime import datetime
 
+from version import __VER__
+
 def get_packages(monitored_packages=None):
   packs = [x for x in pkg_resources.working_set]
   maxlen = max([len(x.key) for x in packs]) + 1
@@ -51,6 +53,7 @@ def list_subfolders_files(path='.'):
 
 def show_inventory():
   packs = get_packages()
+  print(f"App v{__VER__}")
   print("Python version: {}".format(sys.version))
   print("Installed packages:")
   str_packs = "\n".join(["  " + x for x in packs])

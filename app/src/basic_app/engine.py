@@ -9,7 +9,7 @@ from app_utils import safe_jsonify, get_packages
 from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
 
-from mixins.base_mixin import _MonitorMixin
+from mixins.base_mixin import _BaseMixin
 
 from version import __VER__
 
@@ -20,7 +20,7 @@ class AppPaths:
 class AppHandler(
     _PostgresMixin, 
     _RedisMixin,
-    _MonitorMixin,
+    _BaseMixin,
   ):
   def __init__(self, *args, **kwargs):
     super(AppHandler, self).__init__(*args, **kwargs)

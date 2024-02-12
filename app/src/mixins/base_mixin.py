@@ -16,6 +16,7 @@ class _BaseMixin:
     self._packs = None
     self.__print_lock = Lock()
     self.__resolution = os.environ.get("MONITOR_RESOLUTION", 0.25)
+    self.P("Base functions initialized.")
     return
   
   

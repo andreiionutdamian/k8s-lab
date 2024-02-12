@@ -19,10 +19,11 @@ class AppPaths:
   PATH_STAT = {"PATH": "/stats", "FUNC": "stats"  }
 
 class AppHandler(
-    _BaseMixin,
     _PostgresMixin, 
     _RedisMixin,
     _KubeMixin,
+    # base always last
+    _BaseMixin,
   ):
   def __init__(self, *args, **kwargs):
     super(AppHandler, self).__init__(*args, **kwargs)

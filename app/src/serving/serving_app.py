@@ -3,9 +3,10 @@ from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
 
 class ServingApp(
-  _BaseMixin,
   _PostgresMixin,
   _RedisMixin,
+
+  _BaseMixin,
   ):
   
   def __init__(self, **kwargs):

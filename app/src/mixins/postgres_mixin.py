@@ -9,6 +9,7 @@ class _PostgresMixin:
     self.__pg = None
     self.__connects = 0
     self.__config = self.__get_postgres_config()
+    self._has_postgres = False
     return
     
     
@@ -29,6 +30,19 @@ class _PostgresMixin:
   @property
   def postgres_config_available(self):
     return len(self.__config) > 0
+  
+  
+  def __maybe_create_tables(self):
+    if self._has_postgres and hasattr(self, "postgres_get_tables"):
+      dct_tables = self.postgres_get_tables()
+      for table in dct_tables:
+        fields = dct_tables[table]
+        self.P("Creating postgres: {} with fields {}".format(table, fields))
+        query = "CREATE TABLE IF NOT EXISTS {} ({});".format(table, fields)
+        with self.__pg.cursor() as cur:
+          cur.execute(query)
+          self.__pg.commit()        
+    return
 
   
   def _maybe_setup_postgres(self):
@@ -63,7 +77,7 @@ class _PostgresMixin:
             pg_server_info['user'], pg_server_info['dbname'],
           ))
           self._has_postgres = True
-          self.postgres_maybe_create_tables()
+          self.__maybe_create_tables()
           # now we get the tables from the database
           tables = self.postgres_get_tables()
           self.P("Tables in the database: {}".format(tables))
@@ -170,7 +184,7 @@ class _PostgresMixin:
         with self.__pg.cursor() as cur:
           cur.execute(str_sql)
           rows = cur.fetchall()
-          result = rows
+          result = rows[0][0]
       except Exception as exc:
         self.P("Error in postgres_get_count: {}".format(exc))
         raise ValueError("Postgres issue")

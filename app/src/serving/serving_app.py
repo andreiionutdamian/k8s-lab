@@ -24,13 +24,16 @@ class ServingApp(
     }
     return
   
-  def postgres_maybe_create_tables(self):
-    if self._has_postgres:
-      with self.__pg.cursor() as cur:
-        # cur.execute("CREATE TABLE IF NOT EXISTS requests (id SERIAL PRIMARY KEY, hostname varchar(200), data varchar(255));")
-        self.__pg.commit()        
+  def monitor_callback(self):
+    super(ServingApp, self).monitor_callback()
     return
-    
+  
+  def postgres_get_tables(self):
+    tables ={
+      "predicts" : "id SERIAL PRIMARY KEY, hostname varchar(200), result varchar(255)"
+    }
+    return tables
+
   
   def __load_model(self, model_type: str, model_name: str):
     # load models 
@@ -51,9 +54,9 @@ class ServingApp(
     return
   
   def save_state_to_db(self, result):
-    to_save = str(result)
+    to_save = str(result)[:255]
     # save result to Postgres
-    self.postgres_insert_data("requests", result=to_save)
+    self.postgres_insert_data("predicts", result=to_save)
     return
   
   def get_model(self, model_type: str):
@@ -69,7 +72,8 @@ class ServingApp(
     if model is None:
       prediction = "No model available"
     else:
-      prediction = "Predict with model: '{}' on text {}".format(model, text)
+      prediction = "Predict with text-input model: '{}' on text {}".format(model, text)
+    self.save_state_to_db(result=prediction)
     return prediction
   
   
@@ -78,7 +82,8 @@ class ServingApp(
     if model is None:
       prediction = "No model available"
     else:
-      prediction = "Predict with model: '{}' on data {}".format(model, data)
+      prediction = "Predict with struct model: '{}' on data {}".format(model, data)
+    self.save_state_to_db(result=prediction)
     return prediction
   
   
@@ -87,5 +92,6 @@ class ServingApp(
     if model is None:
       prediction = "No model available"
     else:
-      prediction = "Predict with model: '{}' on image {}".format(model, len(image))
+      prediction = "Predict with image model: '{}' on image {}".format(model, len(image))
+    self.save_state_to_db(result=prediction)
     return prediction

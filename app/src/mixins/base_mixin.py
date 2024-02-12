@@ -43,11 +43,14 @@ class _BaseMixin:
       self.__class__.__name__, __VER__,
       self.str_local_id, self.hostname
     ))
-    self._packs = get_packages()
-    self.P("Packages:\n{}".format("\n".join(self._packs)))
+    
+    if False: # in main.py already True ?
+      self._packs = get_packages()
+      self.P("Packages:\n{}".format("\n".join(self._packs)))
+      
     if self.debug:
       dct_env = dict(os.environ)
-      self.P("Environement:\n{}".format(safe_jsonify(dct_env, indent=2)))
+      self.P("Environment:\n{}".format(safe_jsonify(dct_env, indent=2)))
       
     self.redis_maybe_connect()
     self.postgres_maybe_connect()
@@ -82,7 +85,11 @@ class _BaseMixin:
 
 
   def monitor_callback(self):
-    raise NotImplementedError("monitor_callback() must be implemented by the subclass")
+    if hasattr(self, "redis_maybe_connect"):
+      self.redis_maybe_connect()
+    if hasattr(self, "postgres_maybe_connect"):
+      self.postgres_maybe_connect()
+    return
   
   
   def monitor_loop(self):  

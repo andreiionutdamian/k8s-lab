@@ -15,6 +15,7 @@ class _RedisMixin:
     self.__redis = None
     self.__connects = 0
     self.__config = self.__get_redis_config()  
+    self._has_redis = False
     return
   
   

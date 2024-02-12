@@ -54,8 +54,7 @@ class AppHandler(
     return
   
   def monitor_callback(self):
-    self.redis_maybe_connect()
-    self.postgres_maybe_connect()
+    super(AppHandler, self).monitor_callback()
     return
     
   
@@ -69,34 +68,30 @@ class AppHandler(
       self.postgres_insert_data("requests", hostname=self.hostname, data=str_data)
     return
   
-  def postgres_maybe_create_tables(self):
-    if self._has_postgres:
-      with self.__pg.cursor() as cur:
-        cur.execute("CREATE TABLE IF NOT EXISTS requests (id SERIAL PRIMARY KEY, hostname varchar(200), data varchar(255));")
-        self.__pg.commit()        
-    return
+  
+  def postgres_get_tables(self):
+    tables ={
+      "requests" : "id SERIAL PRIMARY KEY, hostname varchar(200), data varchar(255)"
+    }
+    return tables
   
   
   def get_redis_count(self):
-    if self._has_redis:
-      return self.redis_get("cluster_count")
-    return 0
+    return self.redis_get("cluster_count")
   
   
   def get_redis_stats(self):
-    result = {}
-    if self._has_redis:
-      dct_res = self.redis_gethash("data")
-      dct_res["total"] = sum(dct_res.values())
-      result = dct_res
+    dct_res = self.redis_gethash("data")
+    dct_res["total"] = sum(dct_res.values())
+    result = dct_res
     return result
   
   
   def get_db_requests(self):
+    result = 0
     if self.postgres_alive:
-      rows = self.postgres_get_count("requests")
-      return rows[0][0]
-    return 0
+      result = self.postgres_get_count("requests")
+    return result
 
   def get_db_stats(self):
     result = {}

@@ -7,9 +7,10 @@ except:
   KUBE_AVAIL = False
   
   
-class _KubeMixin:
-  def __init__(self, *args, **kwargs):
-    super(_KubeMixin, self).__init__(self, *args, **kwargs)
+class _KubeMixin(object):
+  def __init__(self):
+    super(_KubeMixin, self).__init__()
+    
     self._has_kube = KUBE_AVAIL
     if KUBE_AVAIL:
       self.__setup_kube()

@@ -3,9 +3,10 @@ import psycopg2
 
 from app_utils import safe_jsonify
 
-class _PostgresMixin:
-  def __init__(self, *args, **kwargs):
-    super(_PostgresMixin, self).__init__(*args, **kwargs)
+class _PostgresMixin(object):
+  def __init__(self):
+    super(_PostgresMixin, self).__init__()
+    
     self.__pg = None
     self.__connects = 0
     self.__config = self.__get_postgres_config()

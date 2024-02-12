@@ -10,7 +10,7 @@ class ServingApp(
   ):
   
   def __init__(self, **kwargs):
-    super(ServingApp, self).__init__(**kwargs)
+    super(ServingApp, self).__init__()
 
     self.log = None
     return

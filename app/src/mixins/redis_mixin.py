@@ -9,9 +9,9 @@ INFO_KEYS = [
   "used_memory_human", 
   "pubsub_channels",
 ]
-class _RedisMixin:
-  def __init__(self, *args, **kwargs):
-    super(_RedisMixin, self).__init__(*args, **kwargs)
+class _RedisMixin(object):
+  def __init__(self):
+    super(_RedisMixin, self).__init__()
     self.__redis = None
     self.__connects = 0
     self.__config = self.__get_redis_config()  

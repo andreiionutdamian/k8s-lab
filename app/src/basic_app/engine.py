@@ -26,7 +26,7 @@ class AppHandler(
     _BaseMixin,
   ):
   def __init__(self, *args, **kwargs):
-    super(AppHandler, self).__init__(*args, **kwargs)
+    super(AppHandler, self).__init__()
     self.log = None
     self.debug = os.environ.get("DEBUG", "0") in ['1', 'true', 'True', 'yes', 'Yes', 'y', 'Y', 'TRUE', 'YES']
     return

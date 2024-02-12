@@ -1,6 +1,98 @@
 #########################
+###       App         ###
+#########################
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: basic-test-py
+  namespace: basic-clusters
+  labels: # this is not mandatory but it is a good practice
+    run: basic-test-py
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      run: basic-test-py
+  template:
+    metadata:
+      labels:
+        run: basic-test-py
+    spec:
+      containers:
+      - name: test-py-container
+        image: aidamian/basic_test_fastapi        
+        ports:
+        - containerPort: 5050
+          protocol: TCP
+        # enviroment variables
+        env:
+        - name: PORT
+          value: "5050"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: basic-test-app-secrets
+              key: redis-password
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: basic-test-app-secrets
+              key: postgres-password
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: basic-test-app-secrets
+              key: postgres-user
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: basic-test-app-secrets
+              key: postgres-db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: basic-test-py-svc
+  namespace: basic-clusters
+spec:
+  type: ClusterIP
+  selector:
+    run: basic-test-py
+  ports:
+    - protocol: TCP
+      port: 5050
+      targetPort: 5050      
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: basic-test-py-ingress
+  namespace: basic-clusters
+  annotations:
+    # next part is a bit tricky, but it works
+    # if rewrite-target is used simply with / then
+    # the path no matter how long will be rewritten to /
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2 
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /cluster_test(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: basic-test-py-svc
+            port:
+              number: 5050
+---
+
+
+#########################
 ###       Redis       ###
 #########################
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -98,97 +190,13 @@ spec:
   selector:
     app: redis-slave
 ---
-#########################
-###       App         ###
-#########################
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: basic-test-py
-  namespace: basic-clusters
-  labels: # this is not mandatory but it is a good practice
-    run: basic-test-py
-spec:
-  replicas: 4
-  selector:
-    matchLabels:
-      run: basic-test-py
-  template:
-    metadata:
-      labels:
-        run: basic-test-py
-    spec:
-      containers:
-      - name: test-py-container
-        image: aidamian/basic_test_fastapi        
-        ports:
-        - containerPort: 5050
-          protocol: TCP
-        # enviroment variables
-        env:
-        - name: PORT
-          value: "5050"
-        - name: REDIS_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: basic-test-app-secrets
-              key: redis-password
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: basic-test-app-secrets
-              key: postgres-password
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: basic-test-app-secrets
-              key: postgres-user
-        - name: POSTGRES_DB
-          valueFrom:
-            secretKeyRef:
-              name: basic-test-app-secrets
-              key: postgres-db
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: basic-test-py-svc
-  namespace: basic-clusters
-spec:
-  type: ClusterIP
-  selector:
-    run: basic-test-py
-  ports:
-    - protocol: TCP
-      port: 5050
-      targetPort: 5050      
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: basic-test-py-ingress
-  namespace: basic-clusters
-  annotations:
-    # next part is a bit tricky, but it works
-    # if rewrite-target is used simply with / then
-    # the path no matter how long will be rewritten to /
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2 
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /pg_test(/|$)(.*)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: basic-test-py-svc
-            port:
-              number: 5050
+
+
+
 #########################
 ###       Postgres    ###
 #########################
----
+
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -207,7 +215,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: pg-nfs-pvc
-  namespace: basic-postgres
+  namespace: basic-clusters
 spec:
   accessModes:
     - ReadWriteMany

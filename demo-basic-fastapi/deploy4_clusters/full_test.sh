@@ -10,7 +10,7 @@ DEPLOYMENT_NAME="basic-test-py"
 
 # Namespace where the deployment is located
 # Update this if your deployment is not in the default namespace
-NAMESPACE="basic-postgres"
+NAMESPACE="basic-clusters"
 
 # Interval in seconds between checks
 CHECK_INTERVAL=5

@@ -1,1 +1,1 @@
-kubectl get all -n basic-postgres
+kubectl get all -n basic-clusters

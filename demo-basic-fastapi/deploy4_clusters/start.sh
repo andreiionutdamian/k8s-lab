@@ -1,7 +1,7 @@
 source ../utils.sh
 
 DEPLOYMENT_NAME="basic-test-py"
-NAMESPACE="basic-postgres"
+NAMESPACE="basic-clusters"
 CHECK_INTERVAL=5
 
 kubectl apply -f deploy.yaml

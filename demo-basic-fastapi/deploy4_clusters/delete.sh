@@ -3,7 +3,7 @@
 source ../utils.sh
 
 APP_NAME="basic-test-py"
-NAMESPACE="basic-postgres"
+NAMESPACE="basic-clusters"
 kubectl delete -f deploy.yaml
 
 # Wait for the pods to be deleted

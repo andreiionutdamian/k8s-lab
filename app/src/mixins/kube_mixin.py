@@ -19,18 +19,18 @@ class _KubeMixin(object):
     return
   
   def __handle_exception(self, exc):
-    error_message = f"Exception when calling Kubernetes API:\n"
-    error_message += f"  Reason: {exc.reason}\n"
-    error_message += f"  Status: {exc.status}\n"
+    error_message = f"Exception when calling Kubernetes API."
+    error_message += f" Reason: {exc.reason},"
+    error_message += f" Status: {exc.status},"
     
     # Attempting to parse the body as JSON to extract detailed API response
     if exc.body:
       try:
         body = json.loads(exc.body)
         message = body.get("message")
-        error_message += f"  Message: {message}\n"
+        error_message += f"  Message: {message}"
       except json.JSONDecodeError:
-        error_message += f"  Raw Body: {exc.body}\n"
+        error_message += f"  Raw Body: {exc.body}"
       #end try
     #end if  
     self.P(error_message)    

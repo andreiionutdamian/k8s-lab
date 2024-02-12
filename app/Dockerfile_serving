@@ -1,0 +1,13 @@
+FROM aidamian/base_fastapi:py3.10.13-slim
+WORKDIR /test_app
+
+ADD src/mixins ./mixins/
+ADD src/app_utils.py ./app_utils.py
+
+ADD src/serving/ ./serving/
+ADD src/main_serving.py ./main.py
+
+ENV PORT=5050
+EXPOSE $PORT
+# ENV PYTHONPATH="/test_app"
+CMD uvicorn main:app --host 0.0.0.0 --port $PORT

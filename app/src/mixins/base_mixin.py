@@ -9,8 +9,8 @@ from uuid import uuid4
 from version import __VER__
 
 class _BaseMixin:
-  def __init__(self, **kwargs):
-    super(_BaseMixin, self).__init__(**kwargs)
+  def __init__(self, *args, **kwargs):
+    super(_BaseMixin, self).__init__(*args, **kwargs)
     self.__done = False
     self.__started = False
     self._packs = None

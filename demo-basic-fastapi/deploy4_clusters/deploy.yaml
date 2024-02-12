@@ -200,7 +200,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pg-nfs-pv
+  name: pg-cl-nfs-pv
   namespace: basic-clusters
 spec:
   capacity:
@@ -214,7 +214,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pg-nfs-pvc
+  name: pg-cl-nfs-pvc
   namespace: basic-clusters
 spec:
   accessModes:
@@ -222,7 +222,7 @@ spec:
   resources:
     requests:
       storage: 2Gi
-  volumeName: pg-nfs-pv
+  volumeName: pg-cl-nfs-pv
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -267,7 +267,7 @@ spec:
       volumes:
       - name: postgres-storage
         persistentVolumeClaim:
-          claimName: pg-nfs-pvc
+          claimName: pg-cl-nfs-pvc
 ---
 apiVersion: v1
 kind: Service

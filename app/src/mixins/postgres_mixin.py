@@ -10,6 +10,7 @@ class _PostgresMixin:
     self.__connects = 0
     self.__config = self.__get_postgres_config()
     self._has_postgres = False
+    self.P("Postgres init-config done: {} keys".format(len(self.__config)))
     return
     
     

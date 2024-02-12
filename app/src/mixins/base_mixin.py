@@ -31,7 +31,7 @@ class _BaseMixin:
       self.__print_lock.acquire()
       str_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
       prefix = self.__class__.__name__[:4].upper()
-      print('[{}][{}]'.format(prefix, str_date) + s, flush=True, **kwargs)
+      print('[{}][{}] '.format(prefix, str_date) + s, flush=True, **kwargs)
       self.__print_lock.release() 
     return  
 
@@ -39,7 +39,7 @@ class _BaseMixin:
   def setup(self):
     self.str_local_id = "test_" + str(uuid4())[:5]
     self.hostname = os.environ.get("HOSTNAME", "unknown")    
-    self.P("Initializing {} v{} ID: {}, HOSTNAME: {}...".format(
+    self.P("Initializing {} <{}> v{} on {}".format(
       self.__class__.__name__, __VER__,
       self.str_local_id, self.hostname
     ))

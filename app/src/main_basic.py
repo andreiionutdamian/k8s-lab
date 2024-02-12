@@ -30,7 +30,7 @@ async def root(data: str = None):
 @router_basic_app.get("/stats")
 async def stat(data: str = None):
   print("Received request for stat with params: ", data)
-  return eng.handle_request("/", parameter=data)
+  return eng.handle_request("/stats", parameter=data)
 
 # note: this is a catch-all route, so it should be the last route in the router
 @router_basic_app.get("/{full_path:path}", include_in_schema=False)

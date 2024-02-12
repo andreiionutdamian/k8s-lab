@@ -32,6 +32,7 @@ def safe_jsonify(obj, **kwargs):
 class KubeMonitor:
   def __init__(self, log=None):
     self.log = log
+    self.in_cluster = False
     self.__initialize()
     return
     
@@ -41,11 +42,38 @@ class KubeMonitor:
     print(s, flush=True, **kwargs)
     
   def __initialize(self):
-    # no try-except here. let the caller handle the exception or fail if it occurs
-    config.load_kube_config()    
-    self.__v1 = client.CoreV1Api()  
+    self.P("Initializing {}...".format(self.__class__.__name__))
+    try:
+      # Try to load in-cluster config first
+      config.load_incluster_config()
+      self.in_cluster = True
+      self.P("Running inside a Kubernetes cluster.")
+    except config.ConfigException:
+      # Fall back to kubeconfig (outside of cluster)
+      config.load_kube_config()
+      self.P("Running outside a Kubernetes cluster.")
+    #end try
+    self.__v1 = client.CoreV1Api()
     self.P("KubeMonitor initialized")
     return
+  
+  def get_current_namespace(self):
+    """
+    Get the current namespace where this code is running.
+    
+    Returns
+    -------
+    str
+        The current namespace.
+    """
+    result = "default"
+    if self.in_cluster:
+      try:
+        with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace", "r") as f:
+          result = f.read().strip()
+      except IOError:
+        self.P("Could not read namespace, defaulting to 'default'")
+    return result
     
 
   def list_pods(self):

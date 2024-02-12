@@ -8,6 +8,7 @@ from datetime import datetime
 from app_utils import safe_jsonify, get_packages
 from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
+from mixins.kube_mixin import _KubeMixin
 
 from mixins.base_mixin import _BaseMixin
 
@@ -18,9 +19,10 @@ class AppPaths:
   PATH_STAT = {"PATH": "/stats", "FUNC": "stats"  }
 
 class AppHandler(
+    _BaseMixin,
     _PostgresMixin, 
     _RedisMixin,
-    _BaseMixin,
+    _KubeMixin,
   ):
   def __init__(self, *args, **kwargs):
     super(AppHandler, self).__init__(*args, **kwargs)

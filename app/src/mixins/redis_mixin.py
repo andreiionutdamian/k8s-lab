@@ -16,6 +16,7 @@ class _RedisMixin:
     self.__connects = 0
     self.__config = self.__get_redis_config()  
     self._has_redis = False
+    self.P("Redis init-config done: {} keys".format(len(self.__config)))
     return
   
   

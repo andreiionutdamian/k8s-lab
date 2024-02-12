@@ -57,6 +57,23 @@ class KubeMonitor:
     self.P("KubeMonitor initialized")
     return
   
+  def __handle_exception(self, exc):
+    error_message = f"Exception when calling Kubernetes API: {exc}\n"
+    error_message += f"  Reason: {exc.reason}\n"
+    error_message += f"  Status: {exc.status}\n"
+    error_message += f"  Headers: {exc.headers}\n"
+    
+    # Attempting to parse the body as JSON to extract detailed API response
+    if exc.body:
+        try:
+            body = json.loads(exc.body)
+            error_message += f"  Body: {json.dumps(body, indent=2)}\n"
+        except json.JSONDecodeError:
+            error_message += f"  Raw Body: {exc.body}\n"
+    
+    self.P(error_message)    
+    return  
+  
   def get_current_namespace(self):
     """
     Get the current namespace where this code is running.

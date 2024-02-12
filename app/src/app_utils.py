@@ -53,11 +53,11 @@ def show_inventory():
   packs = get_packages()
   print("Python version: {}".format(sys.version))
   print("Installed packages:")
-  packs = "\n".join(["  " + x for x in packs])
-  print("\n".join(packs))
+  str_packs = "\n".join(["  " + x for x in packs])
+  print(str_packs)
   _, files = list_subfolders_files()
-  files = ["  " + x for x in files]
-  print("App files:\n{}".format("\n".join(files)))
+  str_files = "\n".join(["  " + x for x in files])
+  print("App files:\n{}".format(str_files))
   return
 
 class NPJson(json.JSONEncoder):

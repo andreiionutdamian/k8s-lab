@@ -3,6 +3,7 @@ WORKDIR /test_app
 
 ADD src/mixins ./mixins/
 ADD src/app_utils.py ./app_utils.py
+ADD src/version.py ./version.py
 
 ADD src/basic_app/ ./basic_app/
 ADD src/main_basic.py ./main.py

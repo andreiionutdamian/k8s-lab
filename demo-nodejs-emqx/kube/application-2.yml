@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: nodejs-application-2-app
-          image: demo-nodejs-emqx/application:latest
+          image: aixpand/demo-nodejs-emqx:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: APP_TYPE

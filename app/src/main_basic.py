@@ -21,6 +21,7 @@ eng = AppHandler()
 ## Basic App routes ##
 ######################
 
+
 @router_basic_app.get("/")
 # async def root(data: str = Query(...)): # this makes the `data` parameter mandatory
 async def root(data: str = None):

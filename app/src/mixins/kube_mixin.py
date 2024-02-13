@@ -7,9 +7,10 @@ except:
   KUBE_AVAIL = False
   
   
-class _KubeMixin:
-  def __init__(self, *args, **kwargs):
-    super(_KubeMixin, self).__init__(self, *args, **kwargs)
+class _KubeMixin(object):
+  def __init__(self):
+    super(_KubeMixin, self).__init__()
+    
     self._has_kube = KUBE_AVAIL
     if KUBE_AVAIL:
       self.__setup_kube()
@@ -18,19 +19,20 @@ class _KubeMixin:
     return
   
   def __handle_exception(self, exc):
-    error_message = f"Exception when calling Kubernetes API: {exc}\n"
-    error_message += f"  Reason: {exc.reason}\n"
-    error_message += f"  Status: {exc.status}\n"
-    error_message += f"  Headers: {exc.headers}\n"
+    error_message = f"Exception when calling Kubernetes API."
+    error_message += f" Reason: {exc.reason},"
+    error_message += f" Status: {exc.status},"
     
     # Attempting to parse the body as JSON to extract detailed API response
     if exc.body:
-        try:
-            body = json.loads(exc.body)
-            error_message += f"  Body: {json.dumps(body, indent=2)}\n"
-        except json.JSONDecodeError:
-            error_message += f"  Raw Body: {exc.body}\n"
-    
+      try:
+        body = json.loads(exc.body)
+        message = body.get("message")
+        error_message += f"  Message: {message}"
+      except json.JSONDecodeError:
+        error_message += f"  Raw Body: {exc.body}"
+      #end try
+    #end if  
     self.P(error_message)    
     return
   

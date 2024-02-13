@@ -3,9 +3,10 @@ import psycopg2
 
 from app_utils import safe_jsonify
 
-class _PostgresMixin:
-  def __init__(self, *args, **kwargs):
-    super(_PostgresMixin, self).__init__(*args, **kwargs)
+class _PostgresMixin(object):
+  def __init__(self):
+    super(_PostgresMixin, self).__init__()
+    
     self.__pg = None
     self.__connects = 0
     self.__config = self.__get_postgres_config()
@@ -38,7 +39,7 @@ class _PostgresMixin:
       dct_tables = self.postgres_get_tables()
       for table in dct_tables:
         fields = dct_tables[table]
-        self.P("Creating postgres: {} with fields {}".format(table, fields))
+        self.P("Creating postgres table '{}' with fields {}".format(table, fields))
         query = "CREATE TABLE IF NOT EXISTS {} ({});".format(table, fields)
         with self.__pg.cursor() as cur:
           cur.execute(query)

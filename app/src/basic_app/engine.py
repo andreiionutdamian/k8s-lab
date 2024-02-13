@@ -26,7 +26,7 @@ class AppHandler(
     _BaseMixin,
   ):
   def __init__(self, *args, **kwargs):
-    super(AppHandler, self).__init__(*args, **kwargs)
+    super(AppHandler, self).__init__()
     self.log = None
     self.debug = os.environ.get("DEBUG", "0") in ['1', 'true', 'True', 'yes', 'Yes', 'y', 'Y', 'TRUE', 'YES']
     return
@@ -80,12 +80,12 @@ class AppHandler(
   
   
   def get_redis_count(self):
-    return self.redis_get("cluster_count")
+    return int(self.redis_get("cluster_count"))
   
   
   def get_redis_stats(self):
     dct_res = self.redis_gethash("data")
-    dct_res["total"] = sum(dct_res.values())
+    dct_res["total"] = sum([int(x) for x in dct_res.values()])
     result = dct_res
     return result
   

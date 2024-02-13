@@ -12,7 +12,7 @@ class MonitorApp(
   ):
   
   def __init__(self, **kwargs):
-    super(MonitorApp, self).__init__(**kwargs)
+    super(MonitorApp, self).__init__()
     self.log = None
     self.nr_updates = 0
     return  

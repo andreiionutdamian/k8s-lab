@@ -5,7 +5,7 @@ SLEEPS = [1,1,5,1,1]
 
 async def sleeper(time, name):
   print(f"{name} working for {time} seconds")
-  sleep(time)
+  await asyncio.sleep(time)
   return
 
 async def f1():
@@ -41,11 +41,11 @@ async def f3():
   print("calling f3-2-blocking")
   sleep(SLEEPS[1])
   print("calling f3-external-call")
-  await sleeper(5, "f2") #await asyncio.sleep(5) # yields control to another coroutine
+  await sleeper(SLEEPS[2], "f3") #await asyncio.sleep(5) # yields control to another coroutine
   print("calling f3-3-blocking")
-  sleep(SLEEPS[2])
-  print("calling f3-4-blocking")
   sleep(SLEEPS[3])
+  print("calling f3-4-blocking")
+  sleep(SLEEPS[4])
   return "f3-result"
   
 async def main():
@@ -59,5 +59,5 @@ if __name__ == '__main__':
   start_time = time()  
   asyncio.run(main())
   elapsed_time = time() - start_time
-  print('Done in {:.1f}s'.format(elapsed_time))
+  print('Done in {:.1f}s vs {:.1f}s'.format(elapsed_time, 3 * sum(SLEEPS)))
   

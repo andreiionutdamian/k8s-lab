@@ -1,0 +1,29 @@
+apiVersion: apps.emqx.io/v2beta1
+kind: EMQX
+metadata:
+  name: emqx
+spec:
+  image: emqx:5.5
+  config:
+    data: |
+      mqtt.max_packet_size = 10485760
+  coreTemplate:
+    spec:
+      replicas: 2
+      resources:
+        requests:
+          cpu: 250m
+          memory: 512Mi
+  replicantTemplate:
+    spec:
+      replicas: 3
+      resources:
+        requests:
+          cpu: 250m
+          memory: 1Gi
+  listenersServiceTemplate:
+    spec:
+      type: LoadBalancer
+  dashboardServiceTemplate:
+    spec:
+      type: LoadBalancer

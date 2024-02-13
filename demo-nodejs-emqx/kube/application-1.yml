@@ -17,22 +17,27 @@ spec:
     spec:
       containers:
         - name: nodejs-application-1-app
-          image: demo-nodejs-emqx/application-1:latest
+          image: demo-nodejs-emqx/application:latest
           imagePullPolicy: IfNotPresent
           env:
+            - name: APP_TYPE
+              value: "publisher"
             - name: MQTT_HOST
-              value: "emqx-server"
+              valueFrom:
+                secretKeyRef:
+                  name: demo-nodejs-emqx-secrets
+                  key: mqtt_host
             - name: MQTT_PORT
               value: "1883"
             - name: PUBLISH_CADENCE
               value: "1"
-#            - name: MQTT_USER
-#              valueFrom:
-#                secretKeyRef:
-#                  name: demo-nodejs-emqx-secrets
-#                  key: mqtt_user
-#            - name: MQTT_PASS
-#              valueFrom:
-#                secretKeyRef:
-#                  name: demo-nodejs-emqx-secrets
-#                  key: mqtt_pass
+            - name: MQTT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: demo-nodejs-emqx-secrets
+                  key: mqtt_user
+            - name: MQTT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: demo-nodejs-emqx-secrets
+                  key: mqtt_pass

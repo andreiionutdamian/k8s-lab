@@ -1,11 +1,11 @@
 {
-  "name": "application-2",
+  "name": "application-1",
   "version": "1.0.0",
   "description": "",
-  "main": "subscriber.js",
+  "main": "publisher.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node subscriber.js"
+    "start": "node src/app.js"
   },
   "author": "",
   "license": "ISC",

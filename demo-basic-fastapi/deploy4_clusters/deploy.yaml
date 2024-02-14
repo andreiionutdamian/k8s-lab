@@ -133,7 +133,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: redis
+  name: redis-master
   namespace: basic-clusters
 spec:
   ports:
@@ -162,8 +162,9 @@ spec:
     spec:
       containers:
       - name: redis-slave-container
-        image: redis:5.0.5
+        image: redis:alpine
         command: ["/bin/sh"]
+        # --slaveof redis-master 6379 # this must point to the name of the master _service_
         args: ["-c","redis-server --slaveof redis-master 6379 --loglevel debug"]
         ports:
         - name: redis-server
@@ -180,13 +181,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redis-slave
-  namespace: basic-postgres
+  namespace: basic-clusters
   labels:
     app: redis-slave
 spec:
   ports:
   - port: 6379
-    targetPort: redis-server
+    targetPort: 6379
   selector:
     app: redis-slave
 ---
@@ -200,7 +201,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pg-cl-nfs-pv
+  name: pgc-nfs-pv
   namespace: basic-clusters
 spec:
   capacity:
@@ -214,7 +215,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pg-cl-nfs-pvc
+  name: pgc-nfs-pvc
   namespace: basic-clusters
 spec:
   accessModes:
@@ -222,7 +223,7 @@ spec:
   resources:
     requests:
       storage: 2Gi
-  volumeName: pg-cl-nfs-pv
+  volumeName: pgc-nfs-pv
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -267,7 +268,7 @@ spec:
       volumes:
       - name: postgres-storage
         persistentVolumeClaim:
-          claimName: pg-cl-nfs-pvc
+          claimName: pgc-nfs-pvc
 ---
 apiVersion: v1
 kind: Service

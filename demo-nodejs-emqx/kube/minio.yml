@@ -1,0 +1,121 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: minio-pv
+  namespace: demo-nodejs-emqx
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-pvc
+  namespace: demo-nodejs-emqx
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio-deployment
+  namespace: demo-nodejs-emqx
+spec:
+  selector:
+    matchLabels:
+      app: minio
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+        - name: minio
+          image: minio/minio:RELEASE.2023-09-20T22-49-55Z.hotfix.04ec67161
+          args:
+            - server
+            - /data
+            - --console-address
+            - ":9001"  # Specify static console port
+          env:
+            - name: MINIO_ROOT_USER
+              value: "admin"
+            - name: MINIO_ROOT_PASSWORD
+              value: "1qaz2wsx"
+#            - name: MINIO_SERVER_URL
+#              value: "http://minio.k8s.local"  # External access URL
+            - name: MINIO_CONSOLE_PORT
+              value: "9001"  # Static console port
+          ports:
+            - containerPort: 9000
+            - containerPort: 9001  # Expose the static console port
+          volumeMounts:
+            - name: storage
+              mountPath: "/data"
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: minio-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-service
+  namespace: demo-nodejs-emqx
+spec:
+  type: ClusterIP  # Changed to ClusterIP if not exposing MinIO directly
+  ports:
+    - name: minio
+      port: 9000
+      targetPort: 9000
+      protocol: TCP
+    - name: console
+      port: 9001
+      targetPort: 9001
+      protocol: TCP
+  selector:
+    app: minio
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minio-console-ingress
+  namespace: demo-nodejs-emqx
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: minio-console.k8s.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: minio-service
+                port:
+                  number: 9001
+    - host: minio.k8s.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: minio-service
+                port:
+                  number: 9000
+

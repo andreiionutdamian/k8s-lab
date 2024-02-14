@@ -41,3 +41,19 @@ spec:
                 secretKeyRef:
                   name: demo-nodejs-emqx-secrets
                   key: mqtt_pass
+            - name: MINIO_ENDPOINT
+              value: "minio-service.demo-nodejs-emqx.svc.cluster.local"
+            - name: MINIO_PORT
+              value: "9000"
+            - name: MINIO_USE_SSL
+              value: "false"
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: demo-nodejs-emqx-secrets
+                  key: minio_access_key
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: demo-nodejs-emqx-secrets
+                  key: minio_secret_key

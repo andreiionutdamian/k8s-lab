@@ -55,7 +55,7 @@ async def main():
   
 
 if __name__ == '__main__':
-  print('Running asyncio test')
+  print('Running asyncio test...')
   start_time = time()  
   asyncio.run(main())
   elapsed_time = time() - start_time

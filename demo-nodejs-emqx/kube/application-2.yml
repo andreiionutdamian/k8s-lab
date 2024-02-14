@@ -47,6 +47,8 @@ spec:
               value: "9000"
             - name: MINIO_USE_SSL
               value: "false"
+            - name: MINIO_BUCKET
+              value: "demo-nodejs-emqx"
             - name: MINIO_ACCESS_KEY
               valueFrom:
                 secretKeyRef:

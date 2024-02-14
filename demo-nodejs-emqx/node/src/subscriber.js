@@ -1,11 +1,9 @@
 import fs from 'fs';
 import { uploadFileToMinio } from './minioClient.js'; // We will create this next
 
-const topics = ['topic-1', 'topic-2'];
-
 export const subscribeToTopic = (client) => {
 
-    client.subscribe(topic, (err) => {
+    client.subscribe('topic-1', (err) => {
         if (err) {
             console.log('Subscription error:', err);
         }

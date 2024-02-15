@@ -1,0 +1,1 @@
+# Minio deployment on k8s

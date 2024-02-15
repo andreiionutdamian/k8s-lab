@@ -53,13 +53,15 @@ spec:
             - ":9001"  # Specify static console port
           env:
             - name: MINIO_ROOT_USER
-              value: "admin"
+              valueFrom:
+                secretKeyRef:
+                  name: demo-nodejs-emqx-secrets
+                  key: minio_root_user
             - name: MINIO_ROOT_PASSWORD
-              value: "1qaz2wsx"
-#            - name: MINIO_SERVER_URL
-#              value: "http://minio.k8s.local"  # External access URL
-            - name: MINIO_CONSOLE_PORT
-              value: "9001"  # Static console port
+              valueFrom:
+                secretKeyRef:
+                  name: demo-nodejs-emqx-secrets
+                  key: minio_root_pass
           ports:
             - containerPort: 9000
             - containerPort: 9001  # Expose the static console port
@@ -108,6 +110,15 @@ spec:
                 name: minio-service
                 port:
                   number: 9001
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minio-api-ingress
+  namespace: demo-nodejs-emqx
+spec:
+  ingressClassName: nginx
+  rules:
     - host: minio.k8s.local
       http:
         paths:

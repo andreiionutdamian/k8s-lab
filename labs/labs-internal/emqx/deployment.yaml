@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: emqx-deployment
+  name: emqx
   labels:
     app: emqx
 spec:
@@ -18,6 +18,21 @@ spec:
       - name: emqx
         image: emqx/emqx:latest
         ports:
-        - containerPort: 1883 # MQTT protocol
-        - containerPort: 8083 # WS protocol
-        - containerPort: 18083 # Dashboard
+        - containerPort: 1883
+          name: mqtt
+        - containerPort: 18083
+          name: dashboard
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emqx-service
+spec:
+  type: NodePort
+  selector:
+    app: emqx
+  ports:
+  - protocol: TCP
+    port: 1883
+    targetPort: 1883
+    nodePort: 30000  # Optional: Kubernetes chooses a port if not specified

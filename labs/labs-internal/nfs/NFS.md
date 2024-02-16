@@ -53,8 +53,7 @@ On each of your Kubernetes nodes (both master and worker nodes), install the NFS
 
 - On Ubuntu:
   ```
-  sudo apt update
-  sudo apt install nfs-common
+  sudo apt update && sudo apt install nfs-common -y
   ```
 
 ### Step 3: Create a PersistentVolume (PV) in Kubernetes

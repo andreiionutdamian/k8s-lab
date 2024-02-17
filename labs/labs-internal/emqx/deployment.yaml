@@ -22,6 +22,14 @@ spec:
           name: mqtt
         - containerPort: 18083
           name: dashboard
+        resources:
+          requests:
+            memory: "1024Mi"  # 1024Mi = 1GB
+            cpu: "2000m"      # 2000m = 2 cores
+          limits:
+            memory: "2048Mi"  # 2048Mi = 2GB
+            cpu: "3000m"      # 3000m = 3 cores
+
 ---
 apiVersion: v1
 kind: Service
@@ -35,4 +43,4 @@ spec:
   - protocol: TCP
     port: 1883
     targetPort: 1883
-    nodePort: 30000  # Optional: Kubernetes chooses a port if not specified
+    nodePort: 31883  # Optional: Kubernetes chooses a port if not specified

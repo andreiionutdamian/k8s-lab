@@ -33,6 +33,13 @@ spec:
         volumeMounts:
         - name: redis-storage
           mountPath: /data
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          limits:
+            memory: "2048Mi"
+            cpu: "2000m"
       volumes:
       - name: redis-storage
         emptyDir: {}        
@@ -53,7 +60,6 @@ spec:
 #########################
 ###       Postgres    ###
 #########################
----
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -125,6 +131,13 @@ spec:
         volumeMounts:
         - name: postgres-storage
           mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2048Mi"
+            cpu: "2000m"          
       volumes:
       - name: postgres-storage
         persistentVolumeClaim:
@@ -194,6 +207,14 @@ spec:
             secretKeyRef:
               name: basic-test-app-secrets
               key: postgres-db
+
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "2048Mi"
+            cpu: "2000m"
 ---
 apiVersion: v1
 kind: Service

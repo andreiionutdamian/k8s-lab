@@ -7,7 +7,7 @@ import time
 from paho.mqtt import client as mqttc
 from paho.mqtt import __version__ as mqtt_version
 
-__VER__ = '0.0.1'
+__VER__ = '0.1.2'
 
 
 

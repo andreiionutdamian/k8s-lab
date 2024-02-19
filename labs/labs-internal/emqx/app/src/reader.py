@@ -32,10 +32,25 @@ class SimpleListener(BaseMQTT):
 
   def display_stats(self, ):
     """Periodically display message stats."""
+    start = time.time()
     while True:
+      good, bad = 0, 0
+      counter = 0
+      if len(self.messages) == 0:
+        time.sleep(1)
+        start = time.time()
+        continue
       for sender, sum_ in self.messages.items():
-        self.P("----------------------------------------")
-        self.P(f"{sender} -> sum -> {sum_} (id: {self.counters[sender]})")
+        if sum_ == self.counters[sender]:
+          good +=1
+        else:
+          bad += 1
+        counter += self.counters[sender]
+      msg = "Stats: {} senders, {} stable, {} unstable, {:.0f} msgs/sec".format(
+        len(self.messages), 
+        good, bad, 
+        counter/(time.time()-start))
+      self.P(msg)
       time.sleep(10)  # Adjust as necessary
     return
       

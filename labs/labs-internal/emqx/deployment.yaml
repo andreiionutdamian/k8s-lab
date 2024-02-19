@@ -5,6 +5,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: emqx
+  namespace: mqtt-test
   labels:
     app: emqx
 spec:
@@ -37,6 +38,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: mqtt-test
   name: emqx-service
 spec:
   type: NodePort
@@ -56,21 +58,22 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: in-cluster-reader
+  name: basic-mqtt-read
+  namespace: mqtt-test
   labels:
-    app: in-cluster-reader
+    app: basic-mqtt-read
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: in-cluster-reader
+      app: basic-mqtt-read
   template:
     metadata:
       labels:
-        app: in-cluster-reader
+        app: basic-mqtt-read
     spec:
       containers:
-      - name: in-cluster-reader
+      - name: basic-mqtt-read
         image: aidamian/basic_mqtt_listener
         resources:
           requests:

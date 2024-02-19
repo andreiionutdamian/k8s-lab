@@ -1,4 +1,4 @@
-name: Basic FastAPI Test container
+name: Basic EMQX/MQTT Test container
 
 on: 
   push:
@@ -6,7 +6,7 @@ on:
       - 'labs/labs-internal/emqx/in_cluster_reader/**'  # Specify path to your directory
 
 jobs:
-  build-and-push-py-test-image:
+  build-and-push-py-mqtt-test-image:
     runs-on: ubuntu-latest
   
     steps:

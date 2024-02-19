@@ -1,6 +1,7 @@
 import threading
 import random
 import string
+import time
 
 
 from paho.mqtt import client as mqttc
@@ -24,16 +25,22 @@ class Printer:
   
   
 class BaseMQTT:
-  def __init__(self, logger, host, port, topic=None):    
+  def __init__(self, logger, host, port, topic=None, retry=5, retry_delay=5):    
     self.logger = logger
+    self.client = None
     self.P(f"Using paho-mqtt version {mqtt_version}")
     self.host = host
     self.port = port
     self.topic = topic
     self.thread_id = generate_thread_id()
-    self.connected = self.__connect()
-    if not self.connected:
-      raise Exception("Failed to connect to MQTT broker")  
+    for _ in range(retry):
+      connected = self.__connect()
+      if connected:
+        break          
+      time.sleep(retry_delay)
+    if not connected:
+      msg = f"Failed to connect to {self.host}:{self.port} after {retry} attempts"
+      raise ValueError(msg)  
     return  
   
   
@@ -54,6 +61,8 @@ class BaseMQTT:
   
  # Paho MQTT client creation v1 vs v2
   def create_client(self):    
+    if self.client is not None:
+      return
     if mqtt_version.startswith('2'):
       kwargs = dict(
         callback_api_version=mqttc.CallbackAPIVersion.VERSION2,

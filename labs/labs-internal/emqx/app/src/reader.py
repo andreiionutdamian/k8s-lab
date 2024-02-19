@@ -10,8 +10,8 @@ from base import BaseMQTT, Printer
 
 
 # Configuration
-MQTT_HOST = '192.168.1.55' #'emqx-service'
-MQTT_PORT = 31883 #1883
+MQTT_HOST = 'emqx-service'
+MQTT_PORT = 1883
 TOPIC = '/topic_root/subtopic'
 
 

@@ -15,7 +15,6 @@ MQTT_PORT = 1883
 TOPIC = '/topic_root/subtopic'
 
 
-
 class SimpleListener(BaseMQTT):
   def __init__(self, *args, **kwargs):
     super(SimpleListener, self).__init__(*args, **kwargs)

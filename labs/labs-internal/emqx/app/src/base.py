@@ -7,6 +7,10 @@ import time
 from paho.mqtt import client as mqttc
 from paho.mqtt import __version__ as mqtt_version
 
+__VER__ = '0.0.1'
+
+
+
 def generate_thread_id():
   """Generate a unique 5 character thread ID."""
   return ''.join(random.choices(string.ascii_letters + string.digits, k=5))
@@ -28,7 +32,7 @@ class BaseMQTT:
   def __init__(self, logger, host, port, topic=None, retry=5, retry_delay=5):    
     self.logger = logger
     self.client = None
-    self.P(f"Using paho-mqtt version {mqtt_version}")
+    self.P(f"{self.__class__.__name__} v{__VER__} using paho-mqtt version {mqtt_version}")
     self.host = host
     self.port = port
     self.topic = topic

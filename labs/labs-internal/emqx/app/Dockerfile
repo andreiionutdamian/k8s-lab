@@ -4,6 +4,7 @@ WORKDIR /app
 
 RUN pip install paho-mqtt
 
-COPY reader.py .
+ADD src/reader.py .
+ADD src/base.py .
 
 CMD ["python", "reader.py"]

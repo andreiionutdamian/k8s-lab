@@ -3,7 +3,7 @@ name: Basic EMQX/MQTT Test container
 on: 
   push:
     paths:
-      - 'labs/labs-internal/emqx/in_cluster_reader/**'  # Specify path to your directory
+      - 'labs/labs-internal/emqx/app/**'  # Specify path to your directory
 
 jobs:
   build-and-push-py-mqtt-test-image:
@@ -24,6 +24,6 @@ jobs:
 
       - name: Build and Push
         run: |
-          cd labs/labs-internal/emqx/in_cluster_reader/
+          cd labs/labs-internal/emqx/app/
           chmod +x build.sh  # Ensure the script is executable
           ./build.sh        

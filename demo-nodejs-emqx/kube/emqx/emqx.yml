@@ -16,7 +16,7 @@ spec:
           memory: 512Mi
   replicantTemplate:
     spec:
-      replicas: 3
+      replicas: 1
       resources:
         requests:
           cpu: 250m
@@ -26,4 +26,22 @@ spec:
       type: LoadBalancer
   dashboardServiceTemplate:
     spec:
-      type: LoadBalancer
+      type: ClusterIP
+---
+#apiVersion: networking.k8s.io/v1
+#kind: Ingress
+#metadata:
+#  name: emqx-dashboard-ingress
+#spec:
+#  ingressClassName: nginx
+#  rules:
+#    - host: mqtt-dashboard.k8s.local
+#      http:
+#        paths:
+#          - path: /
+#            pathType: Prefix
+#            backend:
+#              service:
+#                name: emqx-dashboard
+#                port:
+#                  number: 18083

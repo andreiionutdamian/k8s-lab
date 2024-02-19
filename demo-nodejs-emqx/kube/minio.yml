@@ -92,41 +92,41 @@ spec:
   selector:
     app: minio
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: minio-console-ingress
-  namespace: demo-nodejs-emqx
-spec:
-  ingressClassName: nginx
-  rules:
-    - host: minio-console.k8s.local
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: minio-service
-                port:
-                  number: 9001
+#apiVersion: networking.k8s.io/v1
+#kind: Ingress
+#metadata:
+#  name: minio-console-ingress
+#  namespace: demo-nodejs-emqx
+#spec:
+#  ingressClassName: nginx
+#  rules:
+#    - host: minio-console.k8s.local
+#      http:
+#        paths:
+#          - path: /
+#            pathType: Prefix
+#            backend:
+#              service:
+#                name: minio-service
+#                port:
+#                  number: 9001
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: minio-api-ingress
-  namespace: demo-nodejs-emqx
-spec:
-  ingressClassName: nginx
-  rules:
-    - host: minio.k8s.local
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: minio-service
-                port:
-                  number: 9000
+#apiVersion: networking.k8s.io/v1
+#kind: Ingress
+#metadata:
+#  name: minio-api-ingress
+#  namespace: demo-nodejs-emqx
+#spec:
+#  ingressClassName: nginx
+#  rules:
+#    - host: minio.k8s.local
+#      http:
+#        paths:
+#          - path: /
+#            pathType: Prefix
+#            backend:
+#              service:
+#                name: minio-service
+#                port:
+#                  number: 9000
 

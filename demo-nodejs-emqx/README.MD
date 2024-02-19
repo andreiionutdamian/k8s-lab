@@ -24,9 +24,10 @@ kubectl apply -f application-2.yml
 - Login with the default credentials `admin:public`
 - Create a new user
 
+for development purposes, you can use the EMQX web interface using the domain name `http://emqx-dashboard.k8s.local`
 ### Configure MinIO storage
 - Login with credentials provided in `secret.yml`
 - Create a new bucket `demo-nodejs-emqx`
 
-For development purposes, you can use the MinIO web interface using the domain name `http://minio-console.k8s.local`
+For development purposes, you can use the MinIO web interface using the domain name `http://minio-console.k8s.local` and the API can be accessed using the domain name `http://minio.k8s.local`
 

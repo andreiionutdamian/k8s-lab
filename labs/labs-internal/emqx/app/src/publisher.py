@@ -24,6 +24,7 @@ class Publisher(BaseMQTT):
 
   def publish_messages(self):
     """Publish messages with a specific structure."""
+    self.P("Starting publisher thread {} ...".format(self.thread_id))
     while True:
       self.count += 1
       payload = json.dumps({
@@ -38,8 +39,8 @@ class Publisher(BaseMQTT):
 
   def run(self):
     """Run the publisher."""
-    thread = threading.Thread(target=self.publish_messages)
-    thread.start()
+    self.thread = threading.Thread(target=self.publish_messages)
+    self.thread.start()
     return
 
 if __name__ == '__main__':

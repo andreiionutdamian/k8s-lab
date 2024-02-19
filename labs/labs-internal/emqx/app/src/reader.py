@@ -34,6 +34,7 @@ class SimpleListener(BaseMQTT):
     """Periodically display message stats."""
     while True:
       for sender, sum_ in self.messages.items():
+        self.P("----------------------------------------")
         self.P(f"{sender} -> sum -> {sum_} (id: {self.counters[sender]})")
       time.sleep(10)  # Adjust as necessary
     return

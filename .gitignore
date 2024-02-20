@@ -1,11 +1,11 @@
+*.py[cod]
+__pycache__
+*.pyc
+
 .env
 _temp
 secrets.yaml
 .idea
 node_modules
 
-*.py[cod]
-
-__pycache__
-*.pyc
 

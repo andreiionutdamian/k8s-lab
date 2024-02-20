@@ -48,13 +48,17 @@ if __name__ == '__main__':
   logger = Printer()
 
   publishers = []
-  for _ in range(THREAD_COUNT):
+  for i in range(THREAD_COUNT):
+    logger.print_message("CREATING PUBLISHER {:>3}/{:>3}".format(i + 1, THREAD_COUNT))
     publisher = Publisher(
       logger=logger,
       host=MQTT_HOST,
       port=MQTT_PORT,
     )
     publishers.append(publisher)
+  
+  for publisher in publishers:
+    logger.print_message("STARTING PUBLISHER {:>3}/{:>3}".format(i + 1, THREAD_COUNT))
     publisher.run()
   
   # Assuming you want to join threads, you need to store and join them correctly

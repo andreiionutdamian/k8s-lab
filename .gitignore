@@ -6,6 +6,6 @@ node_modules
 
 *.py[cod]
 
-__pycache__/
+__pycache__
 *.pyc
 

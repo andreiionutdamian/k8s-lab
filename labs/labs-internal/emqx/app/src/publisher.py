@@ -12,8 +12,7 @@ from base import BaseMQTT, Printer
 MQTT_HOST = '192.168.1.55'
 MQTT_PORT = 31883
 TOPIC = '/topic_root/subtopic'
-THREAD_COUNT = 5  # Number of threads to spawn
-package =  "1" * 1_000_000
+package =  "1" * 300_000 #1_000_000
 
    
 class Publisher(BaseMQTT):
@@ -44,6 +43,8 @@ class Publisher(BaseMQTT):
     return
 
 if __name__ == '__main__':
+  THREAD_COUNT = 500  # Number of threads to spawn
+
   logger = Printer()
 
   publishers = []

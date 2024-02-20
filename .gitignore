@@ -3,3 +3,9 @@ _temp
 secrets.yaml
 .idea
 node_modules
+
+*.py[cod]
+
+__pycache__/
+*.pyc
+

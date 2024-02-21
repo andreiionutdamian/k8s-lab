@@ -20,7 +20,14 @@ if __name__ == '__main__':
   
   nr_pods = len(pods)
   idx = np.random.randint(0, nr_pods)
-  example_pod_name = "basic-test-py-6c8c46ddc-9ts87" # pods[idx].metadata.name
+  example_pod_name = "basic-test" # pods[idx].metadata.name
   print("Checking pod status for pod {}".format(example_pod_name))
   status = km.check_pod_by_name(example_pod_name)
   print(safe_jsonify(status, indent=2))
+
+  example_pod_names = ["nvidia", "calico-node", "emqx"]
+  print("Checking pod status for pods {}".format(example_pod_names))
+  status = km.check_pods_by_names(example_pod_names)
+  print(safe_jsonify(status, indent=2))
+  
+  

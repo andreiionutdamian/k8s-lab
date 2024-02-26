@@ -1,1 +1,0 @@
-# Monitoring K8s via Python

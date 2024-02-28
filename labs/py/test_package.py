@@ -1,3 +1,7 @@
+"""
+-v /etc/kubernetes/admin.conf:/root/.kube/config
+
+"""
 from kmonitor import KubeMonitor, safe_jsonify
 
 if __name__ == '__main__':

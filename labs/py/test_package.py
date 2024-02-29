@@ -7,7 +7,7 @@
 from kmonitor import KubeMonitor, safe_jsonify
 
 if __name__ == '__main__':
-  print("Test version 0.1.2", flush=True)
+  print("Test version 0.1.3", flush=True)
   km = KubeMonitor()
   
   apps = ['emqx', 'nvidia', 'basic-test']

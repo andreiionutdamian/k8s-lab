@@ -3,7 +3,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: pg-pv-nfs
-  namespace: demo-ai-app-ns
+  namespace: hwal
 spec:
   capacity:
     storage: 3Gi
@@ -21,7 +21,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: pg-pvc
-  namespace: demo-ai-app-ns
+  namespace: hwal
 spec:
   storageClassName: nfs
   accessModes:
@@ -36,7 +36,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
-  namespace: demo-ai-app-ns
+  namespace: hwal
 spec:
   replicas: 1
   selector:
@@ -52,6 +52,13 @@ spec:
       containers:
       - name: postgres
         image: postgres:latest
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
         imagePullPolicy: "IfNotPresent"
         ports:
         - containerPort: 5432
@@ -86,7 +93,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres
-  namespace: demo-ai-app-ns
+  namespace: hwal
 spec:
   type: NodePort
   ports:

@@ -34,7 +34,6 @@ class _RedisMixin(object):
   def redis_alive(self):
     alive = False
     if self._has_redis:      
-      # self.redis_maybe_connect()
       alive = self._has_redis
     return alive
     

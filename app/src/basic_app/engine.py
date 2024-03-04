@@ -56,8 +56,8 @@ class AppHandler(
     self.__local_count = 0    
     return
   
-  def monitor_callback(self):
-    super(AppHandler, self).monitor_callback()
+  def appmon_callback(self):
+    super(AppHandler, self).appmon_callback()
     return
     
   

@@ -4,7 +4,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: demo-ai-app-config
-  namespace: demo-ai-app-ns
+  namespace: hwal
 data:
   postgres-db: postgresdb
   postgres-user: pguser

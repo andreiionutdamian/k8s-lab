@@ -15,28 +15,35 @@ class MonitorApp(
     super(MonitorApp, self).__init__()
     self.log = None
     self.nr_updates = 0
+    self.__initialized = False
     return  
   
   def setup(self):
     super(MonitorApp, self).setup()
+    # now maybe add some custom code to initial setup
     return
   
-  def monitor_callback(self):
-    super(MonitorApp, self).monitor_callback()
+  def appmon_callback(self):
+    super(MonitorApp, self).appmon_callback()
+    # now maybe add some custom code for initializations and configurations
+    self.maybe_init_models()
     return
   
     
-  def postgres_get_tables(self):
+  def postgres_get_tables_definitions(self):
     tables ={
-      "models" : "id SERIAL PRIMARY KEY, model_name varchar(200), model_date varchar(250)"
+      "models" : "id SERIAL PRIMARY KEY, model_date varchar(50), model_type varchar(100), model_name varchar(200)"
     }
     return tables
   
   
-  def save_model_update_to_db(self, data: str):
+  def save_model_update_to_db(self, model_type:str, model_name: str):
     # save result to Postgres
     model_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    self.postgres_insert_data("models", model_name=data, model_date=model_date)
+    self.postgres_insert_data(
+      "models", 
+      model_type=model_type, model_name=model_name, model_date=model_date
+    )
     return
   
   
@@ -61,4 +68,16 @@ class MonitorApp(
     }
     return result
   
+  def maybe_init_models(self):
+    """
+    This method will try to initialize Redis models from Postgres db:
+      - run only if not __initialized
+      - run the select from Postgres
+      - if the select return None then we DO NOT have a active connection and return
+      - else:
+        - get the newest model for each model type     
+        - push the models to Redis
+        - set __initialized to True
+    """
+    return  
   

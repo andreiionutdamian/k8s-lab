@@ -1,10 +1,12 @@
 FROM aidamian/base_fastapi:py3.10.13-slim
 WORKDIR /test_app
 
+# basic stuff
 ADD src/mixins ./mixins/
 ADD src/app_utils.py ./app_utils.py
 ADD src/version.py ./version.py
 
+# specific app stuff
 ADD src/monitor ./monitor/
 ADD src/main_monitor.py ./main.py
 

@@ -22,6 +22,12 @@ eng = ServingApp()
 ## Serving routes ##
 ####################
 
+@router_serving.get("/health")
+async def health():
+  result = eng.get_health()
+  return {"result": result}
+
+
 # string request
 @router_serving.get("/predict/text")
 async def predict_text(text: str):

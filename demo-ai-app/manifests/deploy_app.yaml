@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: demo-ai-app-test
-  namespace: demo-ai-app-ns
+  namespace: hwal
 spec:
   replicas: 4
   selector:
@@ -16,6 +16,13 @@ spec:
       containers:
       - name: demo-ai-app-test-container
         image: aidamian/demo-ai-app-test 
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          limits:
+            memory: "1024Mi"
+            cpu: "1000m"
         ports:
         - containerPort: 4040
           protocol: TCP
@@ -28,7 +35,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: demo-ai-app-test-svc
-  namespace: demo-ai-app-ns
+  namespace: hwal
 spec:
   type: ClusterIP
   selector:
@@ -42,14 +49,14 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: demo-ai-app-test-ingress
-  namespace: demo-ai-app-ns
+  namespace: hwal
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
   - http:
       paths:
-      - path: /ai_test
+      - path: /ai_test # 172..../ai_test/health
         pathType: Prefix
         backend:
           service:

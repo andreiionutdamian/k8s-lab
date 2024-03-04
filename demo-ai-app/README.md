@@ -7,9 +7,9 @@ Goal:
 
 
 Setup:
- - Python app (1 replica) deployment downloads model
+ - Python monitor app (1 replica) deployment downloads model (Deployment)
     - uses Redis to announce update
- - Python app (4 replicas) sfs 
+ - Python serving app (4 replicas) StatefulSet 
     - loads models from PV and serves using GPU
     - uses Redis to get models
     - Saves on PostgreSQL request and response
@@ -20,13 +20,13 @@ Setup:
 Steps:
  1. Write 2 scripts
  2. Write all k8s manifests (yamls)
-    2.1. App1:
+    2.1. Monitor:
         - Deployment
         - Service
         - PV
         - PVC
         - Secret
-    2.2. App2:
+    2.2. Serving:
         - SFS
         - Service
         - PV

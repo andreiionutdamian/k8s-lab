@@ -32,14 +32,24 @@ class _PostgresMixin(object):
   @property
   def postgres_config_available(self):
     return len(self.__config) > 0
+
   
+  def postgres_get_tables_definitions(self): 
+    """
+    This method returns a dictionary with table names as keys and the fields as values
+    so that the tables can be created if they do not exist.
+    
+    OBS: This method should be implemented in the class that uses this mixin.
+    """
+    raise NotImplementedError("Method `postgres_get_tables_definitions` not implemented")
+
   
   def __maybe_create_tables(self):
     if self._has_postgres and hasattr(self, "postgres_get_tables"):
       dct_tables = self.postgres_get_tables()
       for table in dct_tables:
         fields = dct_tables[table]
-        self.P("Creating postgres table '{}' with fields {}".format(table, fields))
+        self.P("Maybe creating postgres table '{}' with fields {}".format(table, fields))
         query = "CREATE TABLE IF NOT EXISTS {} ({});".format(table, fields)
         with self.__pg.cursor() as cur:
           cur.execute(query)
@@ -192,20 +202,26 @@ class _PostgresMixin(object):
         raise ValueError("Postgres issue")
     return result
   
-  def postgres_get_tables(self): 
-    result = None
+  
+  def postgres_get_tables(self):
+    result = {}
     if self._has_postgres:
       try:
         self.postgres_maybe_reconnect()
         with self.__pg.cursor() as cur:
           cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
           rows = cur.fetchall()
-          result = [x[0] for x in rows]
+          for row in rows:
+            table_name = row[0]
+            cur.execute(f"SELECT column_name, data_type FROM information_schema.columns WHERE table_name = '{table_name}';")
+            fields = cur.fetchall()
+            result[table_name] = fields
       except Exception as exc:
         self.P("Error in postgres_get_tables: {}".format(exc))
         raise ValueError("Postgres issue")
     return result
-
+  
+  
   
   def postgres_insert(self, table_name : str, **kwargs):
     return self.postgres_insert_data(table_name, **kwargs)

@@ -5,7 +5,7 @@ from mixins.redis_mixin import _RedisMixin
 class ServingApp(
   _PostgresMixin,
   _RedisMixin,
-
+  # TODO: import kube_mixin
   _BaseMixin,
   ):
   
@@ -25,8 +25,14 @@ class ServingApp(
     }
     return
   
-  def monitor_callback(self):
-    super(ServingApp, self).monitor_callback()
+  def __get_k8s_status(self):
+    """
+    This function uses kube_mixin to get some status info from the k8s cluster
+    """
+    return ""
+  
+  def appmon_callback(self):
+    super(ServingApp, self).appmon_callback()
     return
   
   def postgres_get_tables(self):
@@ -96,3 +102,15 @@ class ServingApp(
       prediction = "Predict with image model: '{}' on image {}".format(model, len(image))
     self.save_state_to_db(result=prediction)
     return prediction
+  
+   
+  
+  def get_health(self):
+    result = {
+      "redis": self.redis_alive,
+      "postgres" : self.postgres_alive,
+      "session_model_updates" : self.nr_updates,
+      "lifetime_model_updates" : self.get_model_update_counts(),      
+      "k8s_status" : self.__get_k8s_status(),
+    }
+    return result

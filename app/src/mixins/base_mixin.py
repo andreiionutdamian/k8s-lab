@@ -68,38 +68,39 @@ class _BaseMixin(object):
     return
 
   
-  def config_monitor(self):
+  def config_appmon(self):
     # Override this method to configure the monitor
     return  
   
   
-  def stop_monitor(self):
+  def stop_appmon(self):
     self.__done = True
     return
   
   
-  def start_monitor(self):
+  def start_appmon(self):
     self.config_monitor()
     self.__done = False
-    self.monitor_thread = Thread(target=self.monitor_loop, daemon=True)
-    self.monitor_thread.start()
+    self.appmon_thread = Thread(target=self.appmon_loop, daemon=True)
+    self.appmon_thread.start()
     return  
 
 
-  def monitor_callback(self):
-    if hasattr(self, "redis_maybe_connect"):
-      self.redis_maybe_connect()
-    if hasattr(self, "postgres_maybe_connect"):
-      self.postgres_maybe_connect()
+  def appmon_callback(self):
+    methods = [m for m in dir(self) if m.endswith("_maybe_connect")]
+    for method in methods:
+      self.P(f"*** Running monitor callback: {method}... ***")
+      func = getattr(self, method)
+      func()
     return
   
   
-  def monitor_loop(self):  
+  def appmon_loop(self):  
     self.P("Initializing monitor loop with resolution: {}...".format(self.__resolution))
     self.__started = True
     while not self.__done:
       sleep(1 / self.__resolution)
-      self.monitor_callback()
+      self.appmon_callback()
     return
     
     

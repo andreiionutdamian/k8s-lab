@@ -1,3 +1,4 @@
+kubectl apply -f manifests/storage_stg.yaml
 kubectl apply -f manifests/deploy_postgres.yaml 
 kubectl apply -f manifests/deploy_redis.yaml 
 kubectl apply -f manifests/deploy_app_monitor.yaml

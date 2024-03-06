@@ -93,7 +93,7 @@ class _BaseMixin(object):
     methods = [m for m in dir(self) if m.endswith("_maybe_connect")]
     for method in methods:
       if (self.__appmon_run_count % 5) == 0:
-        self.P(f"*** Running {self.__class__.__name__} v{__VER__} appmon callback: {method}... ***")
+        self.P(f"*** Running {self.__class__.__name__} v{__VER__} appmon callback ({self.__appmon_run_count}): {method}... ***")
       func = getattr(self, method)
       func()
     return

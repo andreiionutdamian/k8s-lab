@@ -1,3 +1,5 @@
+import os
+
 from datetime import datetime
 
 from mixins.base_mixin import _BaseMixin
@@ -16,6 +18,7 @@ class MonitorApp(
     self.log = None
     self.nr_updates = 0
     self.__initialized = False
+    self.debug = os.environ.get("DEBUG", "0") in ['1', 'true', 'True', 'yes', 'Yes', 'y', 'Y', 'TRUE', 'YES']
     return  
   
   def setup(self):

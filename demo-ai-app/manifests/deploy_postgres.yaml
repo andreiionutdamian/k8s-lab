@@ -11,7 +11,7 @@ spec:
   resources:
     requests:
       storage: 3Gi
-  volumeName: pg-pv-nfs
+  volumeName: demo-ai-app-pg-pv-nfs
 ---
 # pg deployment
 apiVersion: apps/v1

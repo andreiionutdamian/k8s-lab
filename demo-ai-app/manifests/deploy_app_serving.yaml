@@ -1,11 +1,12 @@
 
-#pvc for Pmodels
+#pvc for models
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: demo-ai-app-serving-pvc
   namespace: hwal
 spec:
+  storageClassName: nfs
   accessModes:
     - ReadWriteMany
   resources:

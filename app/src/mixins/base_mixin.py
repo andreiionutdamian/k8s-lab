@@ -57,7 +57,7 @@ class _BaseMixin(object):
     self.redis_maybe_connect()
     self.postgres_maybe_connect()
 
-    self.start_monitor()
+    self.start_appmon()
     return
 
 

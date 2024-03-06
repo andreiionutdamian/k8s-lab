@@ -8,6 +8,7 @@ from datetime import datetime
 from uuid import uuid4
 from version import __VER__
 
+
 class _BaseMixin(object):
   def __init__(self):
     super(_BaseMixin, self).__init__()
@@ -16,7 +17,7 @@ class _BaseMixin(object):
     self.__started = False
     self._packs = None
     self.__print_lock = Lock()
-    self.__resolution = os.environ.get("MONITOR_RESOLUTION", 0.25)
+    self.__resolution = os.environ.get("APPMON_RESOLUTION", 0.25)
     self.P("Base functions initialized.")
     return
   
@@ -63,13 +64,13 @@ class _BaseMixin(object):
 
   def shutdown(self):
     self.P("Shutting down {}...".format(self.__class__.__name__))
-    self.stop_monitor()
+    self.stop_appmon()
     self.P("Shutdown complete.")
     return
 
   
   def config_appmon(self):
-    # Override this method to configure the monitor
+    # Override this method to configure the appmon
     return  
   
   
@@ -79,7 +80,7 @@ class _BaseMixin(object):
   
   
   def start_appmon(self):
-    self.config_monitor()
+    self.config_appmon()
     self.__done = False
     self.appmon_thread = Thread(target=self.appmon_loop, daemon=True)
     self.appmon_thread.start()
@@ -89,14 +90,14 @@ class _BaseMixin(object):
   def appmon_callback(self):
     methods = [m for m in dir(self) if m.endswith("_maybe_connect")]
     for method in methods:
-      self.P(f"*** Running monitor callback: {method}... ***")
+      self.P(f"*** Running appmon callback: {method}... ***")
       func = getattr(self, method)
       func()
     return
   
   
   def appmon_loop(self):  
-    self.P("Initializing monitor loop with resolution: {}...".format(self.__resolution))
+    self.P("Initializing appmon loop with resolution: {}...".format(self.__resolution))
     self.__started = True
     while not self.__done:
       sleep(1 / self.__resolution)

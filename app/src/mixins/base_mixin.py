@@ -16,6 +16,7 @@ class _BaseMixin(object):
     self.__done = False
     self.__started = False
     self._packs = None
+    self.__appmon_run_count = 0
     self.__print_lock = Lock()
     self.__resolution = os.environ.get("APPMON_RESOLUTION", 0.25)
     self.P("Base functions initialized.")
@@ -88,9 +89,11 @@ class _BaseMixin(object):
 
 
   def appmon_callback(self):
+    self.__appmon_run_count += 1
     methods = [m for m in dir(self) if m.endswith("_maybe_connect")]
     for method in methods:
-      self.P(f"*** Running appmon callback: {method}... ***")
+      if (self.__appmon_run_count % 5) == 0:
+        self.P(f"*** Running {self.__class__.__name__} v{__VER__} appmon callback: {method}... ***")
       func = getattr(self, method)
       func()
     return

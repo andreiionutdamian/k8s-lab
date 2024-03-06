@@ -33,7 +33,7 @@ class MonitorApp(
     return
   
     
-  def postgres_get_tables_definitions(self):
+  def postgres_get_tables(self):
     tables ={
       "models" : "id SERIAL PRIMARY KEY, model_date varchar(50), model_type varchar(100), model_name varchar(200)"
     }

@@ -47,6 +47,26 @@ spec:
         env:
         - name: PORT
           value: "4040"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: demo-ai-app-secrets
+              key: redis-password
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: demo-ai-app-secrets
+              key: postgres-password
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: demo-ai-app-config
+              key: postgres-db
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: demo-ai-app-config
+              key: postgres-user
         volumeMounts:
         - name: demo-ai-app-storage
           mountPath: /test_app/.cache

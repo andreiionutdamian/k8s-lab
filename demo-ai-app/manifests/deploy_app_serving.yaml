@@ -1,0 +1,106 @@
+#pv for serving app
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: demo-ai-app-serving-pv-nfs
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
+  nfs:
+    path: "/nfs/k8s/ai_app_storage"
+    server: 172.31.255.148
+    readOnly: false
+---
+#pvc for Pmodels
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: demo-ai-app-serving-pvc
+  namespace: hwal
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: demo-ai-app-serving-pv-nfs
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: demo-ai-app-serving
+  namespace: hwal
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      run: demo-ai-app-serving
+  serviceName: demo-ai-app-serving-svc
+  template:
+    metadata:
+      labels:
+        run: demo-ai-app-serving
+    spec:
+      containers:
+      - name: demo-ai-app-serving-container
+        image: aidamian/basic_cluster_serving_test 
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          limits:
+            memory: "1024Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 4040
+          protocol: TCP
+        #enviroment variables
+        env:
+        - name: PORT
+          value: "4040"
+        volumeMounts:
+        - name: demo-ai-app-storage
+          mountPath: /test_app/.cache
+      volumes:
+      - name: demo-ai-app-storage
+        persistentVolumeClaim:
+          claimName: demo-ai-app-serving-pvc  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-ai-app-serving-svc
+  namespace: hwal
+spec:
+  type: ClusterIP
+  selector:
+    run: demo-ai-app-serving
+  ports:
+    - protocol: TCP
+      port: 4040
+      targetPort: 4040
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo-ai-app-serving-ingress
+  namespace: hwal
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /ai_test_serving(/|$)(.*) # 172..../ai_test_serving/health
+        pathType: Prefix
+        backend:
+          service:
+            name: demo-ai-app-serving-svc
+            port:
+              number: 4040
+

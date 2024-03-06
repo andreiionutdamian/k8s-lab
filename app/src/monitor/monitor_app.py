@@ -79,5 +79,33 @@ class MonitorApp(
         - push the models to Redis
         - set __initialized to True
     """
+    if not self.__initialized:
+      # get db models count if available
+      db_count = self.postgres_get_count("models")
+      if db_count is not None and db_count > 0 :
+        # get a count grouped by model_type to get the list of types
+        model_types = self.postgres_group_count("models","model_type")
+
+        #iterate model types
+        for model_type in model_types:
+          models = self.postgres_select_data(models, model_type[0])
+          latest = None
+          # iterate models and get latest
+          for model in models:
+            model_date = model[1]
+            model_name = model[3]
+            if latest is None:
+              latest = model
+            else:
+              if datetime.strptime(model_date,"%Y-%m-%d %H:%M") > datetime.strptime(latest[1],"%Y-%m-%d %H:%M") :
+                latest = model
+              #endif
+            #endif
+          #endfor
+          self.redis_set(model_type[0], latest[3])
+        #endfor
+        self.__initialized = True
+      #endif
+    #endif
     return  
   

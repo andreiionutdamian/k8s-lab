@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: demo-ai-app-test
+  name: demo-ai-app-monitor
   namespace: hwal
 spec:
-  replicas: 4
+  replicas: 1
   selector:
     matchLabels:
-      run: demo-ai-app-test
+      run: demo-ai-app-monitor
   template:
     metadata:
       labels:
-        run: demo-ai-app-test
+        run: demo-ai-app-monitor
     spec:
       containers:
-      - name: demo-ai-app-test-container
-        image: aidamian/demo-ai-app-test 
+      - name: demo-ai-app-monitor-container
+        image: aidamian/basic_cluster_monitor_test 
         resources:
           requests:
             memory: "128Mi"
@@ -24,43 +24,43 @@ spec:
             memory: "1024Mi"
             cpu: "1000m"
         ports:
-        - containerPort: 4040
+        - containerPort: 4041
           protocol: TCP
         #enviroment variables
         env:
         - name: PORT
-          value: "4040"
+          value: "4041"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: demo-ai-app-test-svc
+  name: demo-ai-app-monitor-svc
   namespace: hwal
 spec:
   type: ClusterIP
   selector:
-    run: demo-ai-app-test
+    run: demo-ai-app-monitor
   ports:
     - protocol: TCP
-      port: 4040
-      targetPort: 4040
+      port: 4041
+      targetPort: 4041
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: demo-ai-app-test-ingress
+  name: demo-ai-app-monitor-ingress
   namespace: hwal
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
   - http:
       paths:
-      - path: /ai_test # 172..../ai_test/health
+      - path: /ai_test_monitor(/|$)(.*) # 172..../ai_test_monitor/health
         pathType: Prefix
         backend:
           service:
-            name: demo-ai-app-test-svc
+            name: demo-ai-app-monitor-svc
             port:
-              number: 4040
-
+              number: 4041

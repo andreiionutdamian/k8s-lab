@@ -50,8 +50,8 @@ class _KubeMixin(object):
       self.P("  Running outside a Kubernetes cluster.")
     
     self.__v1 = k8s.client.CoreV1Api()
-    self.P("  K8s helper initialized. Checking namepace pods...")    
-    self._check_namespace()
+    self.P("  K8s helper initialized. Checking namepace pods...")
+    self.get_namespace_info()
     return
   
   def get_current_namespace(self):
@@ -70,15 +70,21 @@ class _KubeMixin(object):
       self.P("Could not read namespace, defaulting to 'default'")
       return "default"  
 
-  def _check_namespace(self):
+  def get_namespace_info(self, verbose=False):
+    result = {}
     # Now you can use the API, for example, list all pods in the current namespace
     v1 = self.__v1
     namespace = self.get_current_namespace()
-    self.P(f"Listing pods in namespace '{namespace}':")
+    result["namespace"] = namespace
+    result["pods"] = []
+    if verbose: 
+      self.P(f"Listing pods in namespace '{namespace}':")
     try:
       ret = v1.list_namespaced_pod(namespace=namespace)
       for i in ret.items:
+        result["pods"].append(i.metadata.name)
+        if verbose:
           self.P(f"  {i.metadata.namespace}/{i.metadata.name}")    
     except ApiException as exc:
       self.__handle_exception(exc)
-    return
+    return result

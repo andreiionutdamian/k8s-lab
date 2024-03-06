@@ -1,11 +1,12 @@
 from mixins.base_mixin import _BaseMixin
 from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
+from mixins.kube_mixin import _KubeMixin
 
 class ServingApp(
   _PostgresMixin,
   _RedisMixin,
-  # TODO: import kube_mixin
+  _KubeMixin,
   _BaseMixin,
   ):
   
@@ -29,7 +30,7 @@ class ServingApp(
     """
     This function uses kube_mixin to get some status info from the k8s cluster
     """
-    return ""
+    return self.get_namespace_info()
   
   def appmon_callback(self):
     super(ServingApp, self).appmon_callback()

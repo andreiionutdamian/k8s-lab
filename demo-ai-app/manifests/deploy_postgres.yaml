@@ -11,7 +11,7 @@ spec:
   resources:
     requests:
       storage: 3Gi
-  volumeName: demo-ai-app-pg-pv-nfs
+  volumeName: ai-app-pg-pv
 ---
 # pg deployment
 apiVersion: apps/v1
@@ -48,17 +48,17 @@ spec:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: demo-ai-app-secrets
+              name: ai-app-sec
               key: postgres-password
         - name: POSTGRES_DB
           valueFrom:
             configMapKeyRef:
-              name: demo-ai-app-config
+              name: ai-app-conf
               key: postgres-db
         - name: POSTGRES_USER
           valueFrom:
             configMapKeyRef:
-              name: demo-ai-app-config
+              name: ai-app-conf
               key: postgres-user
         volumeMounts:
         - mountPath: /var/lib/postgresql/data

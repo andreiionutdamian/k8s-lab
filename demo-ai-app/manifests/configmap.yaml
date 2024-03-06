@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-ai-app-config
+  name: ai-app-conf
   namespace: hwal
 data:
   postgres-db: postgresdb

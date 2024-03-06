@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: demo-ai-app-monitor
+  name: ai-app-mon
   namespace: hwal
 spec:
   replicas: 1
   selector:
     matchLabels:
-      run: demo-ai-app-monitor
+      run: ai-app-mon
   template:
     metadata:
       labels:
-        run: demo-ai-app-monitor
+        run: ai-app-mon
     spec:
       containers:
-      - name: demo-ai-app-monitor-container
+      - name: ai-app-mon-container
         image: aidamian/basic_cluster_monitor_test 
         resources:
           requests:
@@ -33,33 +33,33 @@ spec:
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: demo-ai-app-secrets
+              name: ai-app-sec
               key: redis-password
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: demo-ai-app-secrets
+              name: ai-app-sec
               key: postgres-password
         - name: POSTGRES_DB
           valueFrom:
             configMapKeyRef:
-              name: demo-ai-app-config
+              name: ai-app-conf
               key: postgres-db
         - name: POSTGRES_USER
           valueFrom:
             configMapKeyRef:
-              name: demo-ai-app-config
+              name: ai-app-conf
               key: postgres-user
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: demo-ai-app-monitor-svc
+  name: ai-app-mon-svc
   namespace: hwal
 spec:
   type: ClusterIP
   selector:
-    run: demo-ai-app-monitor
+    run: ai-app-mon
   ports:
     - protocol: TCP
       port: 4041
@@ -68,7 +68,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: demo-ai-app-monitor-ingress
+  name: ai-app-mon-ingress
   namespace: hwal
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
@@ -81,6 +81,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: demo-ai-app-monitor-svc
+            name: ai-app-mon-svc
             port:
               number: 4041

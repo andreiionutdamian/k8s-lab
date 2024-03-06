@@ -28,7 +28,7 @@ spec:
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: demo-ai-app-secrets
+              name: ai-app-sec
               key: redis-password
         command: ["redis-server", "/conf/redis.conf", "--requirepass", "$(REDIS_PASSWORD)"]
         ports:
@@ -43,7 +43,7 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: demo-ai-app-config
+          name: ai-app-conf
           items:
           - key: redis.conf
             path: redis.conf

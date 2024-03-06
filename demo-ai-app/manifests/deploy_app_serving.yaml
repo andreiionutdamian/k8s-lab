@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: demo-ai-app-serving-pvc
+  name: serve-pvc
   namespace: hwal
 spec:
   storageClassName: nfs
@@ -12,26 +12,26 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  volumeName: demo-ai-app-serving-pv-nfs
+  volumeName: ai-app-serve-pv
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: demo-ai-app-serving
+  name: ai-app-serve
   namespace: hwal
 spec:
   replicas: 4
   selector:
     matchLabels:
-      run: demo-ai-app-serving
-  serviceName: demo-ai-app-serving-svc
+      run: ai-app-serve
+  serviceName: ai-app-serve-svc
   template:
     metadata:
       labels:
-        run: demo-ai-app-serving
+        run: ai-app-serve
     spec:
       containers:
-      - name: demo-ai-app-serving-container
+      - name: ai-app-serve-container
         image: aidamian/basic_cluster_serving_test 
         resources:
           requests:
@@ -50,40 +50,40 @@ spec:
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: demo-ai-app-secrets
+              name: ai-app-sec
               key: redis-password
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: demo-ai-app-secrets
+              name: ai-app-sec
               key: postgres-password
         - name: POSTGRES_DB
           valueFrom:
             configMapKeyRef:
-              name: demo-ai-app-config
+              name: ai-app-conf
               key: postgres-db
         - name: POSTGRES_USER
           valueFrom:
             configMapKeyRef:
-              name: demo-ai-app-config
+              name: ai-app-conf
               key: postgres-user
         volumeMounts:
-        - name: demo-ai-app-storage
+        - name: ai-app-storage
           mountPath: /test_app/.cache
       volumes:
-      - name: demo-ai-app-storage
+      - name: ai-app-storage
         persistentVolumeClaim:
-          claimName: demo-ai-app-serving-pvc  
+          claimName: serve-pvc  
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: demo-ai-app-serving-svc
+  name: ai-app-serve-svc
   namespace: hwal
 spec:
   type: ClusterIP
   selector:
-    run: demo-ai-app-serving
+    run: ai-app-serve
   ports:
     - protocol: TCP
       port: 4040
@@ -92,7 +92,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: demo-ai-app-serving-ingress
+  name: ai-app-serve-ingress
   namespace: hwal
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
@@ -105,7 +105,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: demo-ai-app-serving-svc
+            name: ai-app-serve-svc
             port:
               number: 4040
 

@@ -1,0 +1,1 @@
+kubectl logs demo-ai-app-serving-0 -n hwal

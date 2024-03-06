@@ -1,21 +1,3 @@
-#pv for Postgres
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: pg-pv-nfs
-  namespace: hwal
-spec:
-  capacity:
-    storage: 3Gi
-  accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: nfs
-  nfs:
-    path: "/srv/nfs/k8s/pg_storage/demo-ai-app"
-    server: 192.168.1.56
-    readOnly: false
----
 #pvc for Postgres
 apiVersion: v1
 kind: PersistentVolumeClaim

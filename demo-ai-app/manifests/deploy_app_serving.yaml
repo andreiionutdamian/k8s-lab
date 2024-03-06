@@ -1,20 +1,4 @@
-#pv for serving app
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: demo-ai-app-serving-pv-nfs
-spec:
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: nfs
-  nfs:
-    path: "/nfs/k8s/ai_app_storage"
-    server: 172.31.255.148
-    readOnly: false
----
+
 #pvc for Pmodels
 apiVersion: v1
 kind: PersistentVolumeClaim

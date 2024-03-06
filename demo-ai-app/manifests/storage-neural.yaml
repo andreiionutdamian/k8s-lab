@@ -1,0 +1,34 @@
+#pv for serving app
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: demo-ai-app-serving-pv-nfs
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
+  nfs:
+    path: "/srv/nfs/k8s/demo-ai-app-serving"
+    server: 192.168.1.56
+    readOnly: false
+---
+#pv for Postgres
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: demo-ai-app-pg-pv-nfs
+  namespace: hwal
+spec:
+  capacity:
+    storage: 3Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
+  nfs:
+    path: "/srv/nfs/k8s/pg_storage/demo-ai-app"
+    server: 192.168.1.56
+    readOnly: false

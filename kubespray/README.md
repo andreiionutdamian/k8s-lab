@@ -86,7 +86,8 @@ all:
       ip: 172.31.255.147
       access_ip: 172.31.255.147
   children:
-    kube_control_plane:
+    # here are the groups of hosts
+    kube_control_plane:    
       hosts:
         k8s-m1:
         k8s-m2:

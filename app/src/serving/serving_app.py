@@ -16,7 +16,6 @@ class ServingApp(
     super(ServingApp, self).__init__()
 
     self.log = None
-    self.debug = os.environ.get("DEBUG", "0") in ['1', 'true', 'True', 'yes', 'Yes', 'y', 'Y', 'TRUE', 'YES']
     return
   
   def setup(self):

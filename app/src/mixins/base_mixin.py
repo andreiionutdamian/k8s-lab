@@ -12,6 +12,8 @@ from version import __VER__
 class _BaseMixin(object):
   def __init__(self):
     super(_BaseMixin, self).__init__()
+
+    self.debug = os.environ.get("DEBUG", "0") in ['1', 'true', 'True', 'yes', 'Yes', 'y', 'Y', 'TRUE', 'YES']
     
     self.__done = False
     self.__started = False
@@ -92,7 +94,7 @@ class _BaseMixin(object):
     self.__appmon_run_count += 1
     methods = [m for m in dir(self) if m.endswith("_maybe_connect")]
     for method in methods:
-      if (self.__appmon_run_count % 5) == 0:
+      if (self.__appmon_run_count % 100) == 0:
         self.P(f"*** Running {self.__class__.__name__} v{__VER__} appmon callback ({self.__appmon_run_count}): {method}... ***")
       func = getattr(self, method)
       func()

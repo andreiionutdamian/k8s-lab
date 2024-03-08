@@ -45,8 +45,21 @@ class _PostgresMixin(object):
 
   
   def __maybe_create_tables(self):
-    if self._has_postgres and hasattr(self, "postgres_get_tables"):
-      dct_tables = self.postgres_get_tables()
+    # first get methods for table definition:
+    SIGNATURE_PREFIXES = ['postgres_get_table', 'postgres_get_ddl']
+    props = dir(self)
+    ddl_func = None
+    methods = []
+    for prop in props:
+      for prefix in SIGNATURE_PREFIXES:
+        if prop.startswith(prefix):
+          methods.append(prop)
+    if len(methods) > 1:
+      raise ValueError("Multiple methods found for table definition: {}".format(methods))
+    elif len(methods) == 1:
+      ddl_func = getattr(self, methods[0])
+    if self._has_postgres and ddl_func is not None:      
+      dct_tables = ddl_func()
       for table in dct_tables:
         fields = dct_tables[table]
         self.P("Maybe creating postgres table '{}' with fields {}".format(table, fields))

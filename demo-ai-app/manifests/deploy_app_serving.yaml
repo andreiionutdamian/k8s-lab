@@ -30,6 +30,7 @@ spec:
       labels:
         run: ai-app-serve
     spec:
+      serviceAccountName: kmonitor-sa
       containers:
       - name: ai-app-serve-container
         image: aidamian/basic_cluster_serving_test 

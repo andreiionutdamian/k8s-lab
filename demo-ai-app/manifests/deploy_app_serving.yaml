@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: serve-pvc
+  name: ai-app-serve-pvc
   namespace: hwal
 spec:
   storageClassName: nfs
@@ -73,7 +73,7 @@ spec:
       volumes:
       - name: ai-app-storage
         persistentVolumeClaim:
-          claimName: serve-pvc  
+          claimName: ai-app-serve-pvc  
 ---
 apiVersion: v1
 kind: Service

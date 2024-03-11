@@ -14,7 +14,7 @@ class ServingApp(
   
   def __init__(self, **kwargs):
     super(ServingApp, self).__init__()
-
+    self.no_predictions = 0
     self.log = None
     return
   
@@ -83,6 +83,7 @@ class ServingApp(
       prediction = "No model available"
     else:
       prediction = "Predict with text-input model: '{}' on text {}".format(model, text)
+      self.no_predictions += 1
     self.save_state_to_db(result=prediction)
     return prediction
   
@@ -93,6 +94,7 @@ class ServingApp(
       prediction = "No model available"
     else:
       prediction = "Predict with struct model: '{}' on data {}".format(model, data)
+      self.no_predictions += 1
     self.save_state_to_db(result=prediction)
     return prediction
   
@@ -103,6 +105,7 @@ class ServingApp(
       prediction = "No model available"
     else:
       prediction = "Predict with image model: '{}' on image {}".format(model, len(image))
+      self.no_predictions += 1
     self.save_state_to_db(result=prediction)
     return prediction
   
@@ -112,8 +115,9 @@ class ServingApp(
     result = {
       "redis": self.redis_alive,
       "postgres" : self.postgres_alive,
-      "session_model_updates" : self.nr_updates,
-      "lifetime_model_updates" : self.get_model_update_counts(),      
+  #    "session_model_updates" : self.nr_updates,
+  #    "lifetime_model_updates" : self.get_model_update_counts(), 
+      "predictions": self.no_predictions,  
       "k8s_status" : self.__get_k8s_status(),
     }
     return result

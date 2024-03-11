@@ -34,7 +34,7 @@ class _PostgresMixin(object):
     return len(self.__config) > 0
 
   
-  def postgres_get_tables_definitions(self): 
+  def postgres_get_tables(self): 
     """
     This method returns a dictionary with table names as keys and the fields as values
     so that the tables can be created if they do not exist.
@@ -46,7 +46,7 @@ class _PostgresMixin(object):
   
   def __maybe_create_tables(self):
     # first get methods for table definition:
-    SIGNATURE_PREFIXES = ['postgres_get_table', 'postgres_get_ddl']
+    SIGNATURE_PREFIXES = ['postgres_get_tables', 'postgres_get_ddl']
     props = dir(self)
     ddl_func = None
     methods = []

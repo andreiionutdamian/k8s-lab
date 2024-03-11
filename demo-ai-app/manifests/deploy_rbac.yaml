@@ -1,0 +1,30 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kmonitor-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "nodes"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kmonitor-sa
+  namespace: hwal
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kmonitor-rb
+subjects:
+- kind: ServiceAccount
+  name: kmonitor-sa
+  namespace: hwal
+roleRef:
+  kind: ClusterRole
+  name: kmonitor-role
+  apiGroup: rbac.authorization.k8s.io

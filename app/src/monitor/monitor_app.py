@@ -62,7 +62,7 @@ class MonitorApp(
     result = self.redis_sethash("models", model_type, model)
     msg = f"Model <{model_type}:{model}> set." if result else "Failed to set model"
     if result:
-      self.save_model_update_to_db(model)
+      self.save_model_update_to_db(model_type, model)
       self.nr_updates += 1
     return msg
   

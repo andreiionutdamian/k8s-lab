@@ -34,7 +34,7 @@ class ServingApp(
   
   def postgres_get_tables(self):
     tables ={
-      "predicts" : "id SERIAL PRIMARY KEY, hostname varchar(200), result varchar(255)"
+      "predicts" : "id SERIAL PRIMARY KEY, predict_date varchar(50), result varchar(255)"
     }
     return tables
 
@@ -60,8 +60,9 @@ class ServingApp(
   def save_state_to_db(self, result):
     # TODO: is this safe for multi worker?
     to_save = str(result)[:255]
+    predict_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     # save result to Postgres
-    self.postgres_insert_data("predicts", result=to_save)
+    self.postgres_insert_data("predicts", result=to_save, predict_date=predict_date)
     return
   
   def get_model(self, model_type: str):
@@ -107,12 +108,13 @@ class ServingApp(
    
   
   def get_health(self):
-    # TODO: response should include last 5 predictions
     n_predictions = 5
     result = {
       "redis": self.redis_alive,
       "postgres" : self.postgres_alive,
       "nr_predictions": self.no_predictions,  
-      f"last_{n_predictions}_predictions" : None,
+      f"last_{n_predictions}_predictions" : self.postgres_select_data_ordered(self, "predictions", "predict_date", "desc", n_predictions),
     }
     return result
+
+  

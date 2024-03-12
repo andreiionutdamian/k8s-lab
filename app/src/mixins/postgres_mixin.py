@@ -161,6 +161,9 @@ class _PostgresMixin(object):
 
   
   def postgres_select_data(self, table_name: str, **kwargs):
+    return self.postgres_select_data_ordered(self, table_name, None, None, None, **kwargs)
+  
+  def postgres_select_data_ordered(self, table_name: str, order_by:str, order:str, maxcount:int, **kwargs):
     result = None
     if self._has_postgres:
       try:
@@ -174,10 +177,20 @@ class _PostgresMixin(object):
             parameters.append(value)
           where_statement = ' AND '.join(where_clauses)
           str_sql += f" WHERE {where_statement}"
+        if order_by:
+          str_sql += f" ORDER BY {order_by}"
+          if order and order.lower() not in ["asc","desc"]:
+            str_sql += " ASC"
+          else:
+            str_sql += " "+order.upper()
+          #endif
+        #endif
         with self.__pg.cursor() as cur:
           cur.execute(str_sql, parameters)
-          rows = cur.fetchall()
-          result = rows
+          if maxcount:
+            result = cur.fetchall()
+          else:
+            result = cur.fetchmany(maxcount)
       except Exception as exc:
         self.P("Error in postgres_select_data: {}".format(exc))
         raise ValueError("Postgres issue")

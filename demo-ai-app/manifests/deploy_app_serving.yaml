@@ -1,19 +1,4 @@
 
-#pvc for models
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: ai-app-serve-pvc
-  namespace: hwal
-spec:
-  storageClassName: nfs
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Gi
-  volumeName: ai-app-serve-pv
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -30,7 +15,6 @@ spec:
       labels:
         run: ai-app-serve
     spec:
-      serviceAccountName: kmonitor-sa
       containers:
       - name: ai-app-serve-container
         image: aidamian/basic_cluster_serving_test 

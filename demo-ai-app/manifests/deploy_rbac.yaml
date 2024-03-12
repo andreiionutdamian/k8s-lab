@@ -1,3 +1,5 @@
+# define a ClusterRole that allows the service account to list and watch pods, 
+# services, nodes, deployments, and replicasets
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -10,12 +12,14 @@ rules:
   resources: ["deployments", "replicasets"]
   verbs: ["get", "list", "watch"]
 ---
+# define a ServiceAccount that will be used in the Deployment or StatefulSet
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: kmonitor-sa
   namespace: hwal
 ---
+# Bind the RBAC role to the ServiceAccount
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:

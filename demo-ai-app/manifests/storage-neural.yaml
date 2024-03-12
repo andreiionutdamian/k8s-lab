@@ -15,6 +15,21 @@ spec:
     server: 192.168.1.56
     readOnly: false
 ---
+#pvc for models
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ai-app-serve-pvc
+  namespace: hwal
+spec:
+  storageClassName: nfs
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: ai-app-serve-pv    
+---
 #pv for Postgres
 apiVersion: v1
 kind: PersistentVolume
@@ -31,3 +46,18 @@ spec:
     path: "/srv/nfs/k8s/pg_storage/demo-ai-app"
     server: 192.168.1.56
     readOnly: false
+---
+#pvc for Postgres
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ai-app-pg-pvc
+  namespace: hwal
+spec:
+  storageClassName: nfs
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 3Gi
+  volumeName: ai-app-pg-pv

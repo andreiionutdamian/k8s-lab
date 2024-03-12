@@ -5,11 +5,12 @@ from datetime import datetime
 from mixins.base_mixin import _BaseMixin
 from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
+from mixins.kube_mixin import _KubeMixin
 
 class MonitorApp(
   _PostgresMixin,
   _RedisMixin,
-
+  _KubeMixin,
   _BaseMixin,
   ):
   
@@ -19,6 +20,13 @@ class MonitorApp(
     self.nr_updates = 0
     self.__initialized = False
     return  
+  
+  def __get_k8s_status(self):
+    """
+    This function uses kube_mixin to get some status info from the k8s cluster
+    """
+    return self.get_namespace_info()
+  
   
   def setup(self):
     super(MonitorApp, self).setup()
@@ -66,7 +74,8 @@ class MonitorApp(
       "redis": self.redis_alive,
       "postgres" : self.postgres_alive,
       "session_model_updates" : self.nr_updates,
-      "lifetime_model_updates" : self.get_model_update_counts(),      
+      "lifetime_model_updates" : self.get_model_update_counts(),     
+      "k8s_status" : self.__get_k8s_status(),       
     }
     return result
   

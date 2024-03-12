@@ -8,7 +8,6 @@ from mixins.kube_mixin import _KubeMixin
 class ServingApp(
   _PostgresMixin,
   _RedisMixin,
-  _KubeMixin,
   _BaseMixin,
   ):
   
@@ -28,11 +27,6 @@ class ServingApp(
     }
     return
   
-  def __get_k8s_status(self):
-    """
-    This function uses kube_mixin to get some status info from the k8s cluster
-    """
-    return self.get_namespace_info()
   
   def appmon_callback(self):
     super(ServingApp, self).appmon_callback()
@@ -115,9 +109,6 @@ class ServingApp(
     result = {
       "redis": self.redis_alive,
       "postgres" : self.postgres_alive,
-  #    "session_model_updates" : self.nr_updates,
-  #    "lifetime_model_updates" : self.get_model_update_counts(), 
       "predictions": self.no_predictions,  
-      "k8s_status" : self.__get_k8s_status(),
     }
     return result

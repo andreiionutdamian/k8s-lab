@@ -13,6 +13,7 @@ spec:
       labels:
         run: ai-app-mon
     spec:
+      serviceAccountName: kmonitor-sa
       containers:
       - name: ai-app-mon-container
         image: aidamian/basic_cluster_monitor_test 

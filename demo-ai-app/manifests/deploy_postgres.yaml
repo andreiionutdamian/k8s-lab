@@ -1,18 +1,3 @@
-#pvc for Postgres
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: ai-app-pg-pvc
-  namespace: hwal
-spec:
-  storageClassName: nfs
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 3Gi
-  volumeName: ai-app-pg-pv
----
 # pg deployment
 apiVersion: apps/v1
 kind: Deployment
@@ -62,7 +47,6 @@ spec:
               key: postgres-user
         volumeMounts:
         - mountPath: /var/lib/postgresql/data
-          subPath: pg
           readOnly: false
           name: pg-volume
       volumes:

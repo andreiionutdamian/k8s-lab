@@ -11,7 +11,7 @@ from app_utils import boxed_print
 
 from monitor.monitor_app import MonitorApp  
 
-app = FastAPI(root_path="/ai_test_monitor")
+app = FastAPI(root_path=os.getenv('ROOT_PATH', ''))
 router_monitor= APIRouter()
 
 eng = MonitorApp()

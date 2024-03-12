@@ -1,5 +1,7 @@
 import os
 
+from datetime import datetime
+
 from mixins.base_mixin import _BaseMixin
 from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
@@ -113,7 +115,7 @@ class ServingApp(
       "redis": self.redis_alive,
       "postgres" : self.postgres_alive,
       "nr_predictions": self.no_predictions,  
-      f"last_{n_predictions}_predictions" : self.postgres_select_data_ordered(self, "predictions", "predict_date", "desc", n_predictions),
+      f"last_{n_predictions}_predictions" : self.postgres_select_data_ordered("predicts", "predict_date", "desc", n_predictions),
     }
     return result
 

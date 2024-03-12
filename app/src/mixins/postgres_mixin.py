@@ -163,7 +163,7 @@ class _PostgresMixin(object):
   def postgres_select_data(self, table_name: str, **kwargs):
     return self.postgres_select_data_ordered(self, table_name, None, None, None, **kwargs)
   
-  def postgres_select_data_ordered(self, table_name: str, order_by:str, order:str, maxcount:int, **kwargs):
+  def postgres_select_data_ordered(self, table_name : str, order_by : str, order : str, maxcount : int, **kwargs):
     result = None
     if self._has_postgres:
       try:

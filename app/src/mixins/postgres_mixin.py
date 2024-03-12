@@ -188,9 +188,9 @@ class _PostgresMixin(object):
         with self.__pg.cursor() as cur:
           cur.execute(str_sql, parameters)
           if maxcount:
-            result = cur.fetchall()
-          else:
             result = cur.fetchmany(maxcount)
+          else:    
+            result = cur.fetchall()
       except Exception as exc:
         self.P("Error in postgres_select_data: {}".format(exc))
         raise ValueError("Postgres issue")

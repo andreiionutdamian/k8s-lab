@@ -58,6 +58,7 @@ class ServingApp(
     return
   
   def save_state_to_db(self, result):
+    # TODO: is this safe for multi worker?
     to_save = str(result)[:255]
     # save result to Postgres
     self.postgres_insert_data("predicts", result=to_save)
@@ -106,9 +107,12 @@ class ServingApp(
    
   
   def get_health(self):
+    # TODO: response should include last 5 predictions
+    n_predictions = 5
     result = {
       "redis": self.redis_alive,
       "postgres" : self.postgres_alive,
-      "predictions": self.no_predictions,  
+      "nr_predictions": self.no_predictions,  
+      f"last_{n_predictions}_predictions" : None,
     }
     return result

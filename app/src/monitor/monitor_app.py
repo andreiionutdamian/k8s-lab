@@ -47,8 +47,9 @@ class MonitorApp(
     return tables
   
   
-  def save_model_update_to_db(self, model_type:str, model_name: str):
+  def save_model_update_to_db(self, model_type:str, model_name: str):  
     # save result to Postgres
+    # TODO: is this safe for multi-worker setup?
     model_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     self.postgres_insert_data(
       "models", 

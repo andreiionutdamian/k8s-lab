@@ -34,6 +34,8 @@ async def predict_text(text: str):
   result = eng.predict_text(text)
   return {"result": result}
 
+# TODO: predict json
+
 # json request
 class Item(BaseModel):
   field1: str

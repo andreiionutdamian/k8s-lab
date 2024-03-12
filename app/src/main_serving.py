@@ -12,7 +12,7 @@ from app_utils import boxed_print
 
 from serving.serving_app import ServingApp  
 
-app = FastAPI()
+app = FastAPI(root_path=os.getenv('ROOT_PATH', ''))
 router_serving = APIRouter()
 
 eng = ServingApp()

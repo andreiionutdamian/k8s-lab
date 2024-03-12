@@ -29,7 +29,7 @@ spec:
           protocol: TCP
         #enviroment variables
         env:
-        - name: ROOT-PATH
+        - name: ROOT_PATH
           value: "/ai_test_monitor"
         - name: PORT
           value: "4041"

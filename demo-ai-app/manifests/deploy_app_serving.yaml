@@ -30,6 +30,8 @@ spec:
           protocol: TCP
         #enviroment variables
         env:
+        - name: ROOT_PATH
+          value: "/ai_test_serving"
         - name: PORT
           value: "4040"
         - name: REDIS_PASSWORD

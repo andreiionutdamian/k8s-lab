@@ -25,14 +25,14 @@ eng = ServingApp()
 @router_serving.get("/health")
 async def health():
   result = eng.get_health()
-  return {"result": result}
+  return format_result(result)
 
 
 # string request
 @router_serving.get("/predict/text")
 async def predict_text(text: str):
   result = eng.predict_text(text)
-  return {"result": result}
+  return format_result(result)
 
 # TODO: predict json
 

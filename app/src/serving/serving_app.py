@@ -117,7 +117,7 @@ class ServingApp(
       "redis": self.redis_alive,
       "postgres" : self.postgres_alive,
       "lifetime_predictions": self.get_predict_counts(),
-      "session_predictions": n_predictions,
+      "session_predictions": self.no_predictions,
       f"last_{n_predictions}_predictions" : self.postgres_select_data_ordered("predicts", "predict_date", "desc", n_predictions),
     }
     return result

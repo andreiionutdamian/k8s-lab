@@ -110,7 +110,7 @@ class MonitorApp(
             if latest is None:
               latest = model
             else:
-              if datetime.strptime(model_date,"%Y-%m-%d %H:%M") > datetime.strptime(latest[1],"%Y-%m-%d %H:%M") :
+              if datetime.strptime(model_date,"%Y-%m-%d %H:%M:%S") > datetime.strptime(latest[1],"%Y-%m-%d %H:%M:%S") :
                 latest = model
               #endif
             #endif

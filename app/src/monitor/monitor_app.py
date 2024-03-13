@@ -92,12 +92,13 @@ class MonitorApp(
         - set __initialized to True
     """
     if not self.__initialized:
+      self.P("Loading models....")
       # get db models count if available
       db_count = self.postgres_get_count("models")
       if db_count is not None and db_count > 0 :
         # get a count grouped by model_type to get the list of types
         model_types = self.postgres_group_count("models","model_type")
-
+        self.P(f"Model types: {model_types}")
         #iterate model types
         for model_type in model_types:
           models = self.postgres_select_data("models", model_type=model_type[0])
@@ -115,6 +116,7 @@ class MonitorApp(
             #endif
           #endfor
           self.redis_set(model_type[0], latest[3])
+          self.P(f"Cache update: {model_type[0]} - {latest[3]}")
         #endfor
         self.__initialized = True
       #endif

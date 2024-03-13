@@ -115,7 +115,7 @@ class MonitorApp(
               #endif
             #endif
           #endfor
-          self.redis_set(model_type[0], latest[3])
+          self.redis_sethash("models",model_type[0], latest[3])
           self.P(f"Cache update: {model_type[0]} - {latest[3]}")
         #endfor
         self.__initialized = True

@@ -100,7 +100,7 @@ class MonitorApp(
 
         #iterate model types
         for model_type in model_types:
-          models = self.postgres_select_data("models", model_type[0])
+          models = self.postgres_select_data("models", model_type=model_type[0])
           latest = None
           # iterate models and get latest
           for model in models:

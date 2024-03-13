@@ -161,7 +161,7 @@ class _PostgresMixin(object):
 
   
   def postgres_select_data(self, table_name: str, **kwargs):
-    return self.postgres_select_data_ordered(self, table_name, None, None, None, **kwargs)
+    return self.postgres_select_data_ordered(table_name, None, None, None, **kwargs)
   
   def postgres_select_data_ordered(self, table_name : str, order_by : str, order : str, maxcount : int, **kwargs):
     result = None

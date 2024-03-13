@@ -60,7 +60,7 @@ class ServingApp(
     return
   
   def save_state_to_db(self, result):
-    # TODO: is this safe for multi worker?
+    # TODO: is this safe for multi worker? - YES
     to_save = str(result)[:255]
     predict_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     # save result to Postgres
@@ -107,14 +107,17 @@ class ServingApp(
     self.save_state_to_db(result=prediction)
     return prediction
   
-   
+  def get_predict_counts(self):
+    result = self.postgres_get_count("predicts")
+    return result
   
   def get_health(self):
     n_predictions = 5
     result = {
       "redis": self.redis_alive,
       "postgres" : self.postgres_alive,
-      "nr_predictions": self.no_predictions,  
+      "lifetime_predictions": self.get_predict_counts(),
+      "session_predictions": n_predictions,
       f"last_{n_predictions}_predictions" : self.postgres_select_data_ordered("predicts", "predict_date", "desc", n_predictions),
     }
     return result

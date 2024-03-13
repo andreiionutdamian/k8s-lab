@@ -29,6 +29,10 @@ spec:
           protocol: TCP
         #enviroment variables
         env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         - name: ROOT_PATH
           value: "/ai_test_monitor"
         - name: PORT

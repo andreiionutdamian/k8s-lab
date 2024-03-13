@@ -1,7 +1,7 @@
 import os
 
 if True:
-  from app_utils import show_inventory
+  from app_utils import show_inventory, format_result
   show_inventory()
 #endif
 
@@ -45,7 +45,7 @@ class Item(BaseModel):
 @router_serving.post("/predict/data")
 async def predict_data(item: Item):
   result = eng.predict_json(item.dict())
-  return {"result": result}
+  return format_result(result)
 
 # image request
 @router_serving.post("/predict/image")
@@ -53,19 +53,17 @@ async def predict_image(image: UploadFile = File(...)):
   contents = await image.read()
   # Process the image data
   result = eng.predict_image(contents)
-  return {"result": result}
+  return format_result(result)
 
 @router_serving.get("/predict")
 async def predict(text: str):
   result = eng.predict_text(text)
-  return {"result": result}
+  return format_result(result)
 
 @router_serving.get("/{full_path:path}", include_in_schema=False)
 async def catch_all(full_path: str):
   msg = "Received request on {} => redirected for catch-all".format(full_path)
-  return {"result": msg}
-
-
+  return format_result(msg)
 
 @app.on_event("startup")
 async def startup_event():

@@ -1,7 +1,7 @@
 import os
 
 if True:
-  from app_utils import show_inventory
+  from app_utils import show_inventory, format_result
   show_inventory()
 #endif
 
@@ -23,18 +23,18 @@ eng = MonitorApp()
 @router_monitor.get("/health")
 async def health():
   result = eng.get_health()
-  return {"result": result}
+  return format_result(result)
 
 
 @router_monitor.get("/modelconfig")
 async def modelconfig(modeltype:str, modelname: str):
   result = eng.set_model(model_type=modeltype, model=modelname)
-  return {"result": result}
+  return format_result(result)
 
 @router_monitor.get("/{full_path:path}", include_in_schema=False)
 async def catch_all(full_path: str):
   msg = "Received request on {} => redirected for catch-all".format(full_path)
-  return {"result": msg}
+  return format_result(msg)
 
 
 

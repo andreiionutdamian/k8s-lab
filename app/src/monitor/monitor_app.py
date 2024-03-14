@@ -80,6 +80,33 @@ class MonitorApp(
     }
     return self.format_result(result)
   
+  def get_latest_model(self, model_type: str):
+    latest = None
+    models = self.postgres_select_data("models", model_type=model_type)
+    if models:
+      # iterate models and get latest
+      for model in models:
+        model_date = model[1]
+        model_name = model[3]
+        if latest is None:
+          latest = model
+        else:
+          if datetime.strptime(model_date,"%Y-%m-%d %H:%M:%S") > datetime.strptime(latest[1],"%Y-%m-%d %H:%M:%S") :
+            latest = model
+          #endif
+        #endif
+      #endfor
+    #endif
+    return latest
+  
+  def get_latest_model_top(self, model_type: str):
+    latest = None
+    models = self.postgres_select_data_ordered("models","model_date", "desc", 1,  model_type=model_type)
+    if models:
+      latest = models[0]
+    #endif
+    return latest
+  
   def maybe_init_models(self):
     """
     TODO refactor using two possible methods - iterative and with top rows
@@ -94,20 +121,7 @@ class MonitorApp(
         self.P(f"Model types: {model_types}")
         #iterate model types
         for model_type in model_types:
-          models = self.postgres_select_data("models", model_type=model_type[0])
-          latest = None
-          # iterate models and get latest
-          for model in models:
-            model_date = model[1]
-            model_name = model[3]
-            if latest is None:
-              latest = model
-            else:
-              if datetime.strptime(model_date,"%Y-%m-%d %H:%M:%S") > datetime.strptime(latest[1],"%Y-%m-%d %H:%M:%S") :
-                latest = model
-              #endif
-            #endif
-          #endfor
+          latest = self.get_latest_model_top(model_type[0])
           self.redis_sethash("models",model_type[0], latest[3])
           self.P(f"Cache update: {model_type[0]} - {latest[3]}")
         #endfor

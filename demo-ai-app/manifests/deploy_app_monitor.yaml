@@ -35,6 +35,8 @@ spec:
               fieldPath: spec.nodeName
         - name: ROOT_PATH
           value: "/ai_test_monitor"
+        - name: CACHE_ROOT
+          value: "/test_app/.cache"
         - name: PORT
           value: "4041"
         - name: REDIS_PASSWORD
@@ -57,6 +59,13 @@ spec:
             configMapKeyRef:
               name: ai-app-conf
               key: postgres-user
+        volumeMounts:
+        - name: ai-app-storage
+          mountPath: /test_app/.cache
+      volumes:
+      - name: ai-app-storage
+        persistentVolumeClaim:
+          claimName: ai-app-pvc
 ---
 apiVersion: v1
 kind: Service

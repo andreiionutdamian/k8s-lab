@@ -7,6 +7,9 @@ from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
 from mixins.kube_mixin import _KubeMixin
 
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import AutoImageProcessor, AutoBackbone
+
 class MonitorApp(
   _PostgresMixin,
   _RedisMixin,
@@ -107,6 +110,23 @@ class MonitorApp(
     #endif
     return latest
   
+  def load_model(self, model_type: str, model_name: str ):
+    model_cache=f"{self.cache_root}/{model_name}"
+    result = None
+    try:
+      if model_type == "text":
+        tokenizer = AutoTokenizer.from_pretrained(model_name, cache_dir=model_cache)
+        model = AutoModelForSequenceClassification.from_pretrained(model_name, cache_dir=model_cache)
+        result = model
+      elif model_type == "image":
+        image_processor = AutoImageProcessor.from_pretrained(model_name, cache_dir=model_cache)
+        result = image_processor
+      elif model_type == "json":
+        self.P(f"Not implemented {model_type}")
+    except Exception as exc:
+      self.P("Error load_model: {}".format(exc))
+    return result
+  
   def maybe_init_models(self):
     """
     TODO refactor using two possible methods - iterative and with top rows
@@ -122,8 +142,10 @@ class MonitorApp(
         #iterate model types
         for model_type in model_types:
           latest = self.get_latest_model_top(model_type[0])
-          self.redis_sethash("models",model_type[0], latest[3])
-          self.P(f"Cache update: {model_type[0]} - {latest[3]}")
+          if self.load_model(model_type[0], latest[3]):
+            self.redis_sethash("models",model_type[0], latest[3])
+            self.P(f"Cache update: {model_type[0]} - {latest[3]}")
+          #endif
         #endfor
         self.__initialized = True
       #endif

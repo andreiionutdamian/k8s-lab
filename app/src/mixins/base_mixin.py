@@ -17,7 +17,8 @@ class _BaseMixin(object):
 
     self.node_name = os.getenv('NODE_NAME', 'N/A')
     self.host = os.getenv('HOSTNAME', 'N/A')
-    
+    self.cache_root = os.getenv('CACHE_ROOT', '.cache')
+
     self.__done = False
     self.__started = False
     self._packs = None

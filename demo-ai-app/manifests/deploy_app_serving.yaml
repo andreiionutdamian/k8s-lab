@@ -36,6 +36,8 @@ spec:
               fieldPath: spec.nodeName
         - name: ROOT_PATH
           value: "/ai_test_serving"
+        - name: CACHE_ROOT
+          value: "/test_app/.cache"
         - name: PORT
           value: "4040"
         - name: REDIS_PASSWORD
@@ -64,7 +66,7 @@ spec:
       volumes:
       - name: ai-app-storage
         persistentVolumeClaim:
-          claimName: ai-app-serve-pvc  
+          claimName: ai-app-pvc  
 ---
 apiVersion: v1
 kind: Service

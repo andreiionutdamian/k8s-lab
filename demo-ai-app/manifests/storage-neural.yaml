@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: ai-app-serve-pv
+  name: ai-app-pv
 spec:
   capacity:
     storage: 1Gi
@@ -19,7 +19,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ai-app-serve-pvc
+  name: ai-app-pvc
   namespace: hwal
 spec:
   storageClassName: nfs
@@ -28,7 +28,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  volumeName: ai-app-serve-pv    
+  volumeName: ai-app-pv    
 ---
 #pv for Postgres
 apiVersion: v1

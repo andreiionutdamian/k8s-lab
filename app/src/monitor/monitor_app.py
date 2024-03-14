@@ -82,14 +82,7 @@ class MonitorApp(
   
   def maybe_init_models(self):
     """
-    This method will try to initialize Redis models from Postgres db:
-      - run only if not __initialized
-      - run the select from Postgres
-      - if the select return None then we DO NOT have a active connection and return
-      - else:
-        - get the newest model for each model type     
-        - push the models to Redis
-        - set __initialized to True
+    TODO refactor using two possible methods - iterative and with top rows
     """
     if not self.__initialized:
       self.P("Loading models....")

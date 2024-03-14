@@ -80,7 +80,7 @@ class ServingApp(
     if model is None:
       prediction = "No model available"
     else:
-      prediction = "Predict with text-input model: '{}' on text {}".format(model, text)
+      prediction = "Predict with text-input model `{}` on text '{}'".format(model, text)
       self.no_predictions += 1
     self.save_state_to_db(result=prediction)
     return prediction
@@ -91,7 +91,7 @@ class ServingApp(
     if model is None:
       prediction = "No model available"
     else:
-      prediction = "Predict with struct model: '{}' on data {}".format(model, data)
+      prediction = "Predict with struct model `{}` on data {}".format(model, data)
       self.no_predictions += 1
     self.save_state_to_db(result=prediction)
     return prediction
@@ -102,7 +102,7 @@ class ServingApp(
     if model is None:
       prediction = "No model available"
     else:
-      prediction = "Predict with image model: '{}' on image {}".format(model, len(image))
+      prediction = "Predict with image model `{}` on image size {}".format(model, len(image))
       self.no_predictions += 1
     self.save_state_to_db(result=prediction)
     return prediction

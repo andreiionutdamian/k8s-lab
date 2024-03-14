@@ -53,7 +53,7 @@ $ CONFIG_FILE=inventory/<MY_CLUSTER>/hosts.yml python3 contrib/inventory_builder
 ```yaml
 all:
   vars:
-    ansible_user: itadmin
+    ansible_user: <USERNAME>
     ansible_ssh_private_key_file: ~/.ssh/master.pem
     
   hosts:
@@ -150,12 +150,23 @@ all:
 > OBS: If MetalLB is enabled as above then edit the `inventory/<MY_CLUSTER>/group_vars/k8s_cluster/k8s-cluster.yml` file and set `kube_proxy_strict_arp: true`
 
 
+## Check configuration of target hosts
+
+```bash
+ssh -i ~/.ssh/master.pem <USERNAME>@<IP1>
+sudo su
+```
+
+If `sudo su` will require password you either need to add the user to the sudoers file or to add `ansible_sudo_pass: "<PASSWORD>"` to the hosts file.
+
+
 ## The actual run
 
 Now you can run the kubespray playbooks
 
 ```bash
-$ ansible-playbook cluster.yml -i inventory/<MY_CLUSTER>/hosts.yml --become-user=root
+$ ansible-playbook cluster.yml -i inventory/<MY_CLUSTER>/hosts.yml --become-user=root --become
 ```
+> OBS: both --become-user=root and --become are required to run the playbooks as root
 
 You can re-run it as many times as you want to fix any issues that may arise based on the Ansible idempotency capability.

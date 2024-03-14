@@ -112,8 +112,8 @@ class _BaseMixin(object):
       self.appmon_callback()
     return
   
-def format_result(self, result):
-  return {"result": result, "node":self.node_name, "host": self.host}
+  def format_result(self, result):
+    return {"result": result, "node":self.node_name, "host": self.host}
     
     
     

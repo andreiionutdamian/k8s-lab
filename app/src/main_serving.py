@@ -38,9 +38,9 @@ async def predict_text(text: str):
 
 # json request
 class Item(BaseModel):
-  field1: str
-  field2: str
-  field3: str
+  input_field1: str
+  input_field2: str
+  input_field3: str
 
 @router_serving.post("/predict/data")
 async def predict_data(item: Item):

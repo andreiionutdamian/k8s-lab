@@ -64,7 +64,7 @@ class MonitorApp(
     if result:
       self.save_model_update_to_db(model_type, model)
       self.nr_updates += 1
-    return msg
+    return self.format_result(msg)
   
   def get_model_update_counts(self):
     result = self.postgres_get_count("models")
@@ -78,7 +78,7 @@ class MonitorApp(
       "lifetime_model_updates" : self.get_model_update_counts(),     
       "k8s_status" : self.__get_k8s_status(),       
     }
-    return result
+    return self.format_result(result)
   
   def maybe_init_models(self):
     """

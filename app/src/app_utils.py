@@ -97,5 +97,3 @@ def boxed_print(msg):
   print("\n".join([line1, line2, line3, line4, line5]), flush=True)
   return  
 
-def format_result(result):
-  return {"result": result, "node":os.getenv('NODE_NAME', 'N/A')}

@@ -83,7 +83,7 @@ class ServingApp(
       prediction = "Predict with text-input model `{}` on text '{}'".format(model, text)
       self.no_predictions += 1
     self.save_state_to_db(result=prediction)
-    return prediction
+    return self.format_result(prediction)
   
   
   def predict_json(self, data: dict):
@@ -94,7 +94,7 @@ class ServingApp(
       prediction = "Predict with struct model `{}` on data {}".format(model, data)
       self.no_predictions += 1
     self.save_state_to_db(result=prediction)
-    return prediction
+    return self.format_result(prediction)
   
   
   def predict_image(self, image: bytes):
@@ -105,7 +105,7 @@ class ServingApp(
       prediction = "Predict with image model `{}` on image size {}".format(model, len(image))
       self.no_predictions += 1
     self.save_state_to_db(result=prediction)
-    return prediction
+    return self.format_result(prediction)
   
   def get_predict_counts(self):
     result = self.postgres_get_count("predicts")
@@ -120,6 +120,6 @@ class ServingApp(
       "session_predictions": self.no_predictions,
       f"last_{n_predictions}_predictions" : self.postgres_select_data_ordered("predicts", "predict_date", "desc", n_predictions),
     }
-    return result
+    return self.format_result(result)
 
   

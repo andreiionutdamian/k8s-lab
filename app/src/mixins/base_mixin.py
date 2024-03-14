@@ -14,6 +14,9 @@ class _BaseMixin(object):
     super(_BaseMixin, self).__init__()
 
     self.debug = os.environ.get("DEBUG", "0") in ['1', 'true', 'True', 'yes', 'Yes', 'y', 'Y', 'TRUE', 'YES']
+
+    self.node_name = os.getenv('NODE_NAME', 'N/A')
+    self.host = os.getenv('HOSTNAME', 'N/A')
     
     self.__done = False
     self.__started = False
@@ -108,6 +111,9 @@ class _BaseMixin(object):
       sleep(1 / self.__resolution)
       self.appmon_callback()
     return
+  
+def format_result(self, result):
+  return {"result": result, "node":self.node_name, "host": self.host}
     
     
     

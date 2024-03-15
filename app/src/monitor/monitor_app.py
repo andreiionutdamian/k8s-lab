@@ -67,6 +67,7 @@ class MonitorApp(
     if result:
       self.save_model_update_to_db(model_type, model)
       self.nr_updates += 1
+      self.load_model(model_type, model)
     return self.format_result(msg)
   
   def get_model_update_counts(self):

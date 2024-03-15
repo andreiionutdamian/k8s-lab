@@ -1,6 +1,8 @@
 FROM aidamian/base_llm_env:latest
 WORKDIR /test_app
 
+RUN pip install psycopg2
+
 # basic stuff
 ADD src/mixins ./mixins/
 ADD src/app_utils.py ./app_utils.py

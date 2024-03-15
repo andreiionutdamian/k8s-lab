@@ -8,7 +8,7 @@ from mixins.redis_mixin import _RedisMixin
 from mixins.kube_mixin import _KubeMixin
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
-from transformers import AutoImageProcessor, AutoBackbone
+from transformers import AutoImageProcessor
 
 class MonitorApp(
   _PostgresMixin,
@@ -133,7 +133,7 @@ class MonitorApp(
     """
     if not self.__initialized:
       self.P("Loading models....")
-      # get db models count if available
+      # get db models count if availablecat 
       db_count = self.postgres_get_count("models")
       if db_count is not None and db_count > 0 :
         # get a count grouped by model_type to get the list of types

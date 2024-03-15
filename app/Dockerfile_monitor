@@ -1,4 +1,4 @@
-FROM aidamian/base_fastapi:py3.10.13-slim
+FROM aidamian/base_th_llm_fastapi:latest
 WORKDIR /test_app
 
 # basic stuff

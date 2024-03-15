@@ -1,4 +1,4 @@
-FROM aidamian/base_th_llm_fastapi:latest
+FROM aidamian/base_llm_env:latest
 WORKDIR /test_app
 
 # basic stuff

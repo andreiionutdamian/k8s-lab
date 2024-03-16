@@ -126,7 +126,7 @@ class _BaseMixin(object):
       if model_type == "text":
         tokenizer = AutoTokenizer.from_pretrained(model_name, cache_dir=model_cache)
         model = AutoModelForSequenceClassification.from_pretrained(model_name, cache_dir=model_cache)
-        model_pipeline = pipeline(model_type, model=model, tokenizer=tokenizer)
+        model_pipeline = pipeline("text-classification", model=model, tokenizer=tokenizer)
         result = model_pipeline
       elif model_type == "image":
         image_processor = AutoImageProcessor.from_pretrained(model_name, cache_dir=model_cache)

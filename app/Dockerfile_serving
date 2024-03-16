@@ -1,5 +1,7 @@
-FROM aidamian/base_fastapi:py3.10.13-slim
+FROM aidamian/base_llm_env:latest
 WORKDIR /test_app
+
+RUN pip install psycopg2-binary redis
 
 # basic stuff
 ADD src/mixins ./mixins/

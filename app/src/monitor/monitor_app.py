@@ -7,9 +7,6 @@ from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
 from mixins.kube_mixin import _KubeMixin
 
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-from transformers import AutoImageProcessor
-
 class MonitorApp(
   _PostgresMixin,
   _RedisMixin,
@@ -111,22 +108,7 @@ class MonitorApp(
     #endif
     return latest
   
-  def load_model(self, model_type: str, model_name: str ):
-    model_cache=f"{self.cache_root}/{model_name}"
-    result = None
-    try:
-      if model_type == "text":
-        tokenizer = AutoTokenizer.from_pretrained(model_name, cache_dir=model_cache)
-        model = AutoModelForSequenceClassification.from_pretrained(model_name, cache_dir=model_cache)
-        result = model
-      elif model_type == "image":
-        image_processor = AutoImageProcessor.from_pretrained(model_name, cache_dir=model_cache)
-        result = image_processor
-      elif model_type == "json":
-        self.P(f"Not implemented {model_type}")
-    except Exception as exc:
-      self.P("Error load_model: {}".format(exc))
-    return result
+
   
   def maybe_init_models(self):
     """

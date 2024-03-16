@@ -41,9 +41,9 @@ class ServingApp(
     return tables
 
   
-  def __load_model(self, model_type: str, model_name: str):
-    # load models 
-    return
+#  def __load_model(self, model_type: str, model_name: str):
+#    # load models 
+#   return
   
   
   def maybe_setup_models(self):
@@ -54,7 +54,7 @@ class ServingApp(
         redis_model = redis_models.get(k, None)
         if redis_model is not None:
           self.models[k] = redis_model
-          self.__load_model(k, redis_model)
+          self.load_model(k, redis_model)
           # now mark as "seen"
           self.redis_sethash("models", k, None)
     return

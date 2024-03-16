@@ -1,4 +1,7 @@
 import os
+from transformers import pipeline
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import AutoImageProcessor
 
 from app_utils import safe_jsonify, get_packages
 
@@ -115,6 +118,24 @@ class _BaseMixin(object):
   
   def format_result(self, result):
     return {"result": result, "node":self.node_name, "host": self.host}
+  
+  def load_model(self, model_type: str, model_name: str ):
+    model_cache=f"{self.cache_root}/{model_name}"
+    result = None
+    try:
+      if model_type == "text":
+        tokenizer = AutoTokenizer.from_pretrained(model_name, cache_dir=model_cache)
+        model = AutoModelForSequenceClassification.from_pretrained(model_name, cache_dir=model_cache)
+        model_pipeline = pipeline(model_type, model=model, tokenizer=tokenizer)
+        result = model_pipeline
+      elif model_type == "image":
+        image_processor = AutoImageProcessor.from_pretrained(model_name, cache_dir=model_cache)
+        result = image_processor
+      elif model_type == "json":
+        self.P(f"Not implemented {model_type}")
+    except Exception as exc:
+      self.P("Error load_model: {}".format(exc))
+    return result
     
     
     

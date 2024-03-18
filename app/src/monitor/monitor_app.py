@@ -6,8 +6,10 @@ from mixins.base_mixin import _BaseMixin
 from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
 from mixins.kube_mixin import _KubeMixin
+from mixins.llm_mixin import _LlmMixin
 
 class MonitorApp(
+  _LlmMixin,
   _PostgresMixin,
   _RedisMixin,
   _KubeMixin,
@@ -64,7 +66,7 @@ class MonitorApp(
     if result:
       self.save_model_update_to_db(model_type, model)
       self.nr_updates += 1
-      self.load_model(model_type, model)
+      self.load_model(model_type, model, False)
     return self.format_result(msg)
   
   def get_model_update_counts(self):
@@ -125,7 +127,7 @@ class MonitorApp(
         #iterate model types
         for model_type in model_types:
           latest = self.get_latest_model_top(model_type[0])
-          if self.load_model(model_type[0], latest[3]):
+          if self.load_model(model_type[0], latest[3], False):
             self.redis_sethash("models",model_type[0], latest[3])
             self.P(f"Cache update: {model_type[0]} - {latest[3]}")
           #endif

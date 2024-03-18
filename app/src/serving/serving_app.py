@@ -5,9 +5,10 @@ from datetime import datetime
 from mixins.base_mixin import _BaseMixin
 from mixins.postgres_mixin import _PostgresMixin
 from mixins.redis_mixin import _RedisMixin
-from mixins.kube_mixin import _KubeMixin
+from mixins.llm_mixin import _LlmMixin
 
 class ServingApp(
+  _LlmMixin,
   _PostgresMixin,
   _RedisMixin,
   _BaseMixin,
@@ -54,7 +55,7 @@ class ServingApp(
         redis_model = redis_models.get(k, None)
         if redis_model is not None:
           self.models[k] = redis_model
-          self.load_model(k, redis_model)
+          self.load_model(k, redis_model, True)
           # now mark as "seen"
           self.redis_sethash("models", k, None)
     return

@@ -71,7 +71,7 @@ class ServingApp(
     # get model from Redis
     model = self.models[model_type]
     if model is None:
-      self.maybe_setup_models()
+      self.maybe_setup_models() # only missing models should be loaded not all
       model = self.models[model_type]
     return model
   

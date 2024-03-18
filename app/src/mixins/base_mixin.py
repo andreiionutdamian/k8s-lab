@@ -119,7 +119,7 @@ class _BaseMixin(object):
   def format_result(self, result):
     return {"result": result, "node":self.node_name, "host": self.host}
   
-  def load_model(self, model_type: str, model_name: str ):
+  def load_model(self, model_type: str, model_name: str):
     model_cache=f"{self.cache_root}/{model_name}"
     result = None
     try:

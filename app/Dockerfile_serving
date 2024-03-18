@@ -1,6 +1,8 @@
 FROM aidamian/base_th_llm_fastapi:latest
 WORKDIR /test_app
 
+RUN pip install psycopg2-binary redis python-multipart
+
 # basic stuff
 ADD src/mixins ./mixins/
 ADD src/app_utils.py ./app_utils.py

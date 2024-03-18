@@ -28,6 +28,12 @@ class ServingApp(
       'json' : None,
       'image' : None,
     }
+
+    self.pipes = {
+      'text' : None,
+      'json' : None,
+      'image' : None,
+    }
     return
   
   
@@ -55,9 +61,19 @@ class ServingApp(
         redis_model = redis_models.get(k, None)
         if redis_model is not None:
           self.models[k] = redis_model
-          self.load_model(k, redis_model, True)
+          self.pipes[k] = self.load_model(k, redis_model, True)
           # now mark as "seen"
           self.redis_sethash("models", k, None)
+    return
+  
+  def maybe_setup_model(self, model_type:str):
+    # get models from Redis if available
+    redis_model = self.redis_hget("models", model_type)
+    if redis_model is not None:
+      self.models[model_type] = redis_model
+      self.pipes[model_type] = self.load_model(model_type, redis_model, True)
+      # now mark as "seen"
+      self.redis_sethash("models", model_type, None)
     return
   
   def save_state_to_db(self, result):
@@ -72,16 +88,25 @@ class ServingApp(
     # get model from Redis
     model = self.models[model_type]
     if model is None:
-      self.maybe_setup_models() # only missing models should be loaded not all
+      self.maybe_setup_model(model_type) # only missing models should be loaded not all
       model = self.models[model_type]
     return model
+  
+  def get_pipeline(self, model_type: str):
+    pipe = self.pipes[model_type]
+    if pipe is None:
+      self.maybe_setup_model(model_type) # only missing models should be loaded not all
+      pipe = self.pipes[model_type]
+    return pipe
   
   def predict_text(self, text: str):
     model = self.get_model('text')
     if model is None:
       prediction = "No model available"
     else:
-      prediction = "Predict with text-input model `{}` on text '{}'".format(model, text)
+      pipe = self.get_pipeline('text')
+      # prediction = "Predict with text-input model `{}` on text '{}'".format(model, text)
+      prediction = pipe(text)
       self.no_predictions += 1
     self.save_state_to_db(result=prediction)
     return self.format_result(prediction)

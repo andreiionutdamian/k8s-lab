@@ -128,7 +128,17 @@ class _RedisMixin(object):
         self.P("Failed to get key {}: {}".format(key, ex))
         raise ValueError("Redis issue")
     return result
-  
+
+  def redis_hget(self, hashname : str, key : str):
+    result = None
+    if self._has_redis:
+      try:
+        result = self.__redis.hget(hashname, key)  
+      except Exception as ex:
+        self.P("Failed to get hash {} key {}: {}".format(hashname, key, ex))
+        raise ValueError("Redis issue")
+    return result
+
   def redis_gethash(self, hashname : str):
     result = {}
     if self._has_redis:

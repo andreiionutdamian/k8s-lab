@@ -87,15 +87,21 @@ class ServingApp(
     redis_model = self.redis_hget("models", model_type)
     model = self.models[model_type]
     if redis_model is not None and ( model is None or model != redis_model) :
-      self.maybe_setup_model(model_type) # only missing models should be loaded not all
-      model = self.models[model_type]
+      try:
+        self.maybe_setup_model(model_type) # only missing models should be loaded not all
+        model = self.models[model_type]
+      except Exception as exc:
+        self.P("Error loading model: {}".format(exc))
     return model
   
   def get_pipeline(self, model_type: str):
     pipe = self.pipes[model_type]
     if pipe is None:
-      self.maybe_setup_model(model_type) # only missing models should be loaded not all
-      pipe = self.pipes[model_type]
+      try:
+        self.maybe_setup_model(model_type) # only missing models should be loaded not all
+        pipe = self.pipes[model_type]
+      except Exception as exc:
+        self.P("Error loading model: {}".format(exc))
     return pipe
   
   def predict_text(self, text: str):
@@ -105,8 +111,11 @@ class ServingApp(
     else:
       pipe = self.get_pipeline('text')
       # prediction = "Predict with text-input model `{}` on text '{}'".format(model, text)
-      prediction = pipe(text)
-      self.no_predictions += 1
+      if pipe is None:
+        prediction = "No pipeline available"
+      else:
+        prediction = pipe(text)
+        self.no_predictions += 1
     self.save_state_to_db(result=prediction)
     return self.format_result(prediction)
   

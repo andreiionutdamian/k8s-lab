@@ -58,12 +58,7 @@ class ServingApp(
     redis_models = self.redis_gethash("models")
     if len(redis_models) > 0:
       for k in self.models:
-        redis_model = redis_models.get(k, None)
-        if redis_model is not None and redis_model is not "":
-          self.models[k] = redis_model
-          self.pipes[k] = self.load_model(k, redis_model, True)
-          # now mark as "seen"
-          # self.redis_sethash("models", k, "")
+        self.maybe_setup_model(k)
     return
   
   def maybe_setup_model(self, model_type:str):
@@ -71,7 +66,10 @@ class ServingApp(
     redis_model = self.redis_hget("models", model_type)
     if redis_model is not None  and redis_model is not "":
       self.models[model_type] = redis_model
-      self.pipes[model_type] = self.load_model(model_type, redis_model, True)
+      if os.path.exists(self.cache_root+"/"+redis_model):
+        self.pipes[model_type] = self.load_model(model_type, redis_model, True)
+      else:
+        raise ValueError("Model not initialized") 
       # now mark as "seen"
       # self.redis_sethash("models", model_type, "")
     return

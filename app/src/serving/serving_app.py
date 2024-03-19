@@ -63,7 +63,7 @@ class ServingApp(
           self.models[k] = redis_model
           self.pipes[k] = self.load_model(k, redis_model, True)
           # now mark as "seen"
-          self.redis_sethash("models", k, "")
+          # self.redis_sethash("models", k, "")
     return
   
   def maybe_setup_model(self, model_type:str):

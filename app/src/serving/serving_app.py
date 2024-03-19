@@ -69,7 +69,7 @@ class ServingApp(
       if os.path.exists(self.cache_root+"/"+redis_model):
         self.pipes[model_type] = self.load_model(model_type, redis_model, True)
       else:
-        raise ValueError("Model not initialized") 
+        raise Exception("Model not initialized") 
       # now mark as "seen"
       # self.redis_sethash("models", model_type, "")
     return

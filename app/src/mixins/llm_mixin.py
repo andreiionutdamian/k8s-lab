@@ -16,7 +16,7 @@ class _LlmMixin(object):
     result = None
     try:
       if model_type == "text":
-        tokenizer = AutoTokenizer.from_pretrained(model_name, cache_dir=model_cache)
+        tokenizer = AutoTokenizer.from_pretrained(model_name, cache_dir=model_cache, trust_remote_code=True)
         model = AutoModelForSequenceClassification.from_pretrained(model_name, cache_dir=model_cache)
         result = pipeline("text-classification", model=model, tokenizer=tokenizer) if retunpipe else model
       elif model_type == "image":

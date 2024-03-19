@@ -73,7 +73,7 @@ class ServingApp(
       self.models[model_type] = redis_model
       self.pipes[model_type] = self.load_model(model_type, redis_model, True)
       # now mark as "seen"
-      self.redis_sethash("models", model_type, "")
+      # self.redis_sethash("models", model_type, "")
     return
   
   def save_state_to_db(self, result):

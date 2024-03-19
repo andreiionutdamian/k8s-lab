@@ -59,21 +59,21 @@ class ServingApp(
     if len(redis_models) > 0:
       for k in self.models:
         redis_model = redis_models.get(k, None)
-        if redis_model is not None:
+        if redis_model is not None and redis_model is not "":
           self.models[k] = redis_model
           self.pipes[k] = self.load_model(k, redis_model, True)
           # now mark as "seen"
-          self.redis_sethash("models", k, None)
+          self.redis_sethash("models", k, "")
     return
   
   def maybe_setup_model(self, model_type:str):
     # get models from Redis if available
     redis_model = self.redis_hget("models", model_type)
-    if redis_model is not None:
+    if redis_model is not None  and redis_model is not "":
       self.models[model_type] = redis_model
       self.pipes[model_type] = self.load_model(model_type, redis_model, True)
       # now mark as "seen"
-      self.redis_sethash("models", model_type, None)
+      self.redis_sethash("models", model_type, "")
     return
   
   def save_state_to_db(self, result):

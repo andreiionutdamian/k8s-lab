@@ -59,14 +59,25 @@ class MonitorApp(
     )
     return
   
-  
-  def set_model(self, model_type: str, model: str):
-    result = self.redis_sethash("models", model_type, model)
-    msg = f"Model <{model_type}:{model}> set." if result else "Failed to set model"
+  def _update_cache(self, model_type, model_name : str, model):
+    result = self.redis_sethash("models", model_type, model_name)
     if result:
-      self.save_model_update_to_db(model_type, model)
-      self.nr_updates += 1
-      self.load_model(model_type, model, False)
+      self.P(f"Cache update: {model_type} - {model_name}")
+      labels = model.config.id2label
+      self.P(f"Model labels: {labels}")
+    return result
+
+  def set_model(self, model_type: str, model_name: str):
+    result = None
+    model = self.load_model(model_type, model_name, False)
+    if model is not None:
+      result = self._update_cache (model_type, model_name, model)
+      if result:
+        self.save_model_update_to_db(model_type, model)
+        self.nr_updates += 1
+      #endif
+    #endif
+    msg = f"Model {model_name} for type {model_type} set" if result else "Failed to set model"
     return self.format_result(msg)
   
   def get_model_update_counts(self):
@@ -106,7 +117,7 @@ class MonitorApp(
     latest = None
     models = self.postgres_select_data_ordered(
       table_name="models",order_by="model_date", order="desc", 
-      maxcount=1,  model_type=model_type
+      maxrows=1,  model_type=model_type
     )
     if models:
       latest = models[0]
@@ -133,8 +144,7 @@ class MonitorApp(
           model = self.load_model(model_type[0], latest[3], False)
           model_exists = model is not None
           if model_exists:
-            self.redis_sethash("models",model_type[0], latest[3])
-            self.P(f"Cache update: {model_type[0]} - {latest[3]}")
+            self._update_cache (model_type=model_type[0], model_name=latest[3], model=model)
           #endif
         #endfor
         self.__initialized = True

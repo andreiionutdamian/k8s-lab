@@ -163,7 +163,7 @@ class _PostgresMixin(object):
   def postgres_select_data(self, table_name: str, **kwargs):
     return self.postgres_select_data_ordered(table_name, None, None, None, **kwargs)
   
-  def postgres_select_data_ordered(self, table_name : str, order_by : str, order : str, maxcount : int, **kwargs):
+  def postgres_select_data_ordered(self, table_name : str, order_by : str, order : str, maxrows : int, **kwargs):
     result = None
     if self._has_postgres:
       try:
@@ -187,8 +187,8 @@ class _PostgresMixin(object):
         #endif
         with self.__pg.cursor() as cur:
           cur.execute(str_sql, parameters)
-          if maxcount:
-            result = cur.fetchmany(maxcount)
+          if maxrows:
+            result = cur.fetchmany(maxrows)
           else:    
             result = cur.fetchall()
       except Exception as exc:

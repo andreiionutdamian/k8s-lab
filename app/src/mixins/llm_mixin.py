@@ -1,5 +1,5 @@
 import os
-import datetime
+from datetime import datetime
 
 from transformers import pipeline
 from transformers import AutoTokenizer, AutoModelForSequenceClassification

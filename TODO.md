@@ -19,10 +19,13 @@ model = AutoModelForSequenceClassification.from_pretrained(model_name, cache_dir
 ### Model loading in serving_app.py
 
 Change requests:
-  - move load model in separate mixin - separation of concerns
-  - use ultra-low footprint for monitor & use base_th_llm_fastapi for serving
   - add "lambda" model for json model load (identity function: f(x)=x)
   - create non-gpu serving for stg deployment
+  - add CPU/GPU to serving result
+  - add label conversion for monitor (if given)
+  - add predict/text with POST request and multiple inputs -> result has multiple outputs
+  - add predict time to output (in ms)
+  - refactor: short lines & named params for multi-param calls
 
 1. get `model_name`, `model_type` and `model_cache` from redis
 2. check if the model_cache folder contains a subfolder that contains model_name (maybe fail)

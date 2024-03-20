@@ -11,14 +11,14 @@ class _LlmMixin(object):
     self.cache_root = os.getenv('CACHE_ROOT', '.cache')
     return
   
-  def load_model(self, model_type: str, model_name: str, retunpipe=False):
+  def load_model(self, model_type: str, model_name: str, returnpipe=False):
     model_cache=f"{self.cache_root}/{model_name}"
     result = None
     try:
       if model_type == "text":
         tokenizer = AutoTokenizer.from_pretrained(model_name, cache_dir=model_cache)
         model = AutoModelForSequenceClassification.from_pretrained(model_name, cache_dir=model_cache, trust_remote_code=True)
-        result = pipeline("text-classification", model=model, tokenizer=tokenizer) if retunpipe else model
+        result = pipeline("text-classification", model=model, tokenizer=tokenizer) if returnpipe else model
       elif model_type == "image":
         image_processor = AutoImageProcessor.from_pretrained(model_name, cache_dir=model_cache)
         result = image_processor

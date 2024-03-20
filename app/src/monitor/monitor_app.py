@@ -104,7 +104,10 @@ class MonitorApp(
   
   def get_latest_model_top(self, model_type: str):
     latest = None
-    models = self.postgres_select_data_ordered("models","model_date", "desc", 1,  model_type=model_type)
+    models = self.postgres_select_data_ordered(
+      table_name="models",order_by="model_date", order="desc", 
+      maxcount=1,  model_type=model_type
+    )
     if models:
       latest = models[0]
     #endif
@@ -127,7 +130,9 @@ class MonitorApp(
         #iterate model types
         for model_type in model_types:
           latest = self.get_latest_model_top(model_type[0])
-          if self.load_model(model_type[0], latest[3], False):
+          model = self.load_model(model_type[0], latest[3], False)
+          model_exists = model is not None
+          if model_exists:
             self.redis_sethash("models",model_type[0], latest[3])
             self.P(f"Cache update: {model_type[0]} - {latest[3]}")
           #endif

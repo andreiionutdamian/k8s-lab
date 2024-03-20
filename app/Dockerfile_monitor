@@ -2,7 +2,7 @@ FROM aidamian/base_fastapi:latest
 WORKDIR /test_app
 
 RUN pip3 install torch --index-url https://download.pytorch.org/whl/cpu
-RUN pip install --no-cache transformers scipy psycopg2-binary redis
+RUN pip install --no-cache transformers scipy psycopg2-binary redis pillow
 
 # basic stuff
 ADD src/mixins ./mixins/

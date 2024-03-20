@@ -1,6 +1,8 @@
 import os
+import io
 
 from datetime import datetime
+from PIL import Image
 
 from mixins.base_mixin import _BaseMixin
 from mixins.postgres_mixin import _PostgresMixin
@@ -130,18 +132,22 @@ class ServingApp(
     return self.format_result(prediction)
   
   
-  def predict_image(self, image: bytes):
-    model = self.get_model('image')
-    if model is None:
-      prediction = "No model available"
-    else:
-      pipe = self.get_pipeline('image')
-      if pipe is None:
-        prediction = "No pipeline available"
+  def predict_image(self, image_data: bytes):
+    image = Image.open(io.BytesIO(image_data))
+    if image:
+      model = self.get_model('image')
+      if model is None:
+        prediction = "No model available"
       else:
-        prediction = pipe(image)
-        self.no_predictions += 1
-    self.save_state_to_db(result=prediction)
+        pipe = self.get_pipeline('image')
+        if pipe is None:
+          prediction = "No pipeline available"
+        else:
+          prediction = pipe(image)
+          self.no_predictions += 1
+      self.save_state_to_db(result=prediction)
+    else:
+      prediction = "Invalid image content"
     return self.format_result(prediction)
   
   def get_predict_counts(self):

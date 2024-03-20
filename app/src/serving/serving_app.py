@@ -110,7 +110,6 @@ class ServingApp(
       prediction = "No model available"
     else:
       pipe = self.get_pipeline('text')
-      # prediction = "Predict with text-input model `{}` on text '{}'".format(model, text)
       if pipe is None:
         prediction = "No pipeline available"
       else:
@@ -136,8 +135,12 @@ class ServingApp(
     if model is None:
       prediction = "No model available"
     else:
-      prediction = "Predict with image model `{}` on image size {}".format(model, len(image))
-      self.no_predictions += 1
+      pipe = self.get_pipeline('image')
+      if pipe is None:
+        prediction = "No pipeline available"
+      else:
+        prediction = pipe(image)
+        self.no_predictions += 1
     self.save_state_to_db(result=prediction)
     return self.format_result(prediction)
   

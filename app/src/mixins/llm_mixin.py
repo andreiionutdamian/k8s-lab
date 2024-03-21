@@ -31,6 +31,7 @@ class _LlmMixin(object):
           text_model = AutoModelForSequenceClassification.from_pretrained(
             model_name, cache_dir=model_cache, config=config
           )
+          text_model.save_pretrained(model_cache)
         else:
           text_model = AutoModelForSequenceClassification.from_pretrained(
             model_name, cache_dir=model_cache

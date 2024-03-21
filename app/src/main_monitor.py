@@ -8,7 +8,6 @@ if True:
 
 from fastapi import FastAPI, APIRouter
 from app_utils import boxed_print
-from pydantic import BaseModel
 
 from monitor.monitor_app import MonitorApp  
 
@@ -26,15 +25,10 @@ async def health():
   result = eng.get_health()
   return result
 
-# json request
-class Item(BaseModel):
-  id: str
-  label: str
-
 
 @router_monitor.get("/modelconfig")
-async def modelconfig(modeltype:str, modelname:  str, labels: Item = None ):
-  result = eng.set_model(model_type=modeltype, model_name=modelname, labels=labels.dict())
+async def modelconfig(modeltype:str, modelname:  str, labels: dict = None ):
+  result = eng.set_model(model_type=modeltype, model_name=modelname, labels=labels)
   return result
 
 @router_monitor.get("/{full_path:path}", include_in_schema=False)

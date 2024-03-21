@@ -116,10 +116,12 @@ class ServingApp(
       if pipe is None:
         prediction = "No pipeline available"
       else:
+        starttime=datetime.now()
         prediction = pipe(text)
+        duration = datetime.now() - starttime
         self.no_predictions += 1
     self.save_state_to_db(result=prediction)
-    return self.format_result(prediction)
+    return self.format_result({"inference_result":prediction, "inference_time":duration})
   
   def predict_texts(self, texts: List[str]):
     model = self.get_model('text')
@@ -130,12 +132,14 @@ class ServingApp(
       if pipe is None:
         prediction = "No pipeline available"
       else:
+        starttime=datetime.now()
         prediction=[]
         for text in texts:
           prediction.append(pipe(text))
           self.no_predictions += 1
+        duration = datetime.now() - starttime
     self.save_state_to_db(result=prediction)
-    return self.format_result(prediction)
+    return self.format_result({"inference_result":prediction, "inference_time":duration})
   
   
   def predict_json(self, data: dict):
@@ -160,12 +164,14 @@ class ServingApp(
         if pipe is None:
           prediction = "No pipeline available"
         else:
+          starttime=datetime.now()
           prediction = pipe(image)
+          duration=datetime.now()-starttime
           self.no_predictions += 1
       self.save_state_to_db(result=prediction)
     else:
       prediction = "Invalid image content"
-    return self.format_result(prediction)
+    return self.format_result({"inference_result":prediction, "inference_time":duration})
   
   def get_predict_counts(self):
     result = self.postgres_get_count("predicts")

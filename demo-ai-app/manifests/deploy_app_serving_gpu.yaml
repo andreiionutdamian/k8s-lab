@@ -1,0 +1,104 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ai-app-serve
+  namespace: hwal
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      run: ai-app-serve
+  serviceName: ai-app-serve-svc
+  template:
+    metadata:
+      labels:
+        run: ai-app-serve
+    spec:
+      containers:
+      - name: ai-app-serve-container
+        image: aidamian/basic_serving_test_gpu
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          limits:
+            memory: "1024Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 4040
+          protocol: TCP
+        #enviroment variables
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: ROOT_PATH
+          value: "/ai_test_serving"
+        - name: CACHE_ROOT
+          value: "/test_app/.cache"
+        - name: PORT
+          value: "4040"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ai-app-sec
+              key: redis-password
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ai-app-sec
+              key: postgres-password
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: ai-app-conf
+              key: postgres-db
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: ai-app-conf
+              key: postgres-user
+        volumeMounts:
+        - name: ai-app-storage
+          mountPath: /test_app/.cache
+      volumes:
+      - name: ai-app-storage
+        persistentVolumeClaim:
+          claimName: ai-app-pvc  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-app-serve-svc
+  namespace: hwal
+spec:
+  type: ClusterIP
+  selector:
+    run: ai-app-serve
+  ports:
+    - protocol: TCP
+      port: 4040
+      targetPort: 4040
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ai-app-serve-ingress
+  namespace: hwal
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /ai_test_serving(/|$)(.*) # 172..../ai_test_serving/health
+        pathType: Prefix
+        backend:
+          service:
+            name: ai-app-serve-svc
+            port:
+              number: 4040
+

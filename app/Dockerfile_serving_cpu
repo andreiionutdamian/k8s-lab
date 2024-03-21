@@ -1,8 +1,8 @@
-FROM aidamian/base_fastapi:latest
+FROM FROM aidamian/base_fastapi:latest
 WORKDIR /test_app
 
 RUN pip3 install torch --index-url https://download.pytorch.org/whl/cpu
-RUN pip install --no-cache transformers scipy pillow
+RUN pip install  --no-cache transformers python-multipart scipy pillow
 
 # basic stuff
 ADD src/mixins ./mixins/
@@ -10,8 +10,8 @@ ADD src/app_utils.py ./app_utils.py
 ADD src/version.py ./version.py
 
 # specific app stuff
-ADD src/monitor ./monitor/
-ADD src/main_monitor.py ./main.py
+ADD src/serving/ ./serving/
+ADD src/main_serving.py ./main.py
 
 ENV PORT=5050
 EXPOSE $PORT

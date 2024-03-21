@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: ai-app-serve-container
-        image: aidamian/basic_cluster_serving_test 
+        image: aidamian/basic_serving_test_cpu
         resources:
           requests:
             memory: "128Mi"

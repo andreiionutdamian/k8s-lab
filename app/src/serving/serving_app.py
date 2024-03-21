@@ -120,6 +120,22 @@ class ServingApp(
     self.save_state_to_db(result=prediction)
     return self.format_result(prediction)
   
+  def predict_texts(self, texts: list):
+    model = self.get_model('text')
+    if model is None:
+      prediction = "No model available"
+    else:
+      pipe = self.get_pipeline('text')
+      if pipe is None:
+        prediction = "No pipeline available"
+      else:
+        prediction=[]
+        for text in texts:
+          prediction.append(pipe(text))
+          self.no_predictions += 1
+    self.save_state_to_db(result=prediction)
+    return self.format_result(prediction)
+  
   
   def predict_json(self, data: dict):
     model = self.get_model('json')

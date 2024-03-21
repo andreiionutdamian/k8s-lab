@@ -34,6 +34,11 @@ async def predict_text(text: str):
   result = eng.predict_text(text)
   return result
 
+@router_serving.post("/predict/text")
+async def predict_texts(texts: list):
+  result = eng.predict_texts(texts)
+  return result
+
 # TODO: predict json
 
 # json request

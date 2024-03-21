@@ -59,19 +59,19 @@ class MonitorApp(
     )
     return
   
-  def _update_cache(self, model_type, model_name : str, model):
+  def _update_cache(self, model_type:str, model_name : str):
     result = self.redis_sethash("models", model_type, model_name)
     if result:
       self.P(f"Cache update: {model_type} - {model_name}")
-      info = model.config.id2label
-      self.P(f"Model config: {info}")
+      #info = model.config.id2label
+      #self.P(f"Model config: {info}")
     return result
 
   def set_model(self, model_type: str, model_name: str):
     result = None
     model = self.load_model(model_type, model_name, False)
     if model is not None:
-      result = self._update_cache (model_type, model_name, model)
+      result = self._update_cache (model_type, model_name)
       if result:
         self.save_model_update_to_db(model_type, model_name)
         self.nr_updates += 1
@@ -144,7 +144,7 @@ class MonitorApp(
           model = self.load_model(model_type[0], latest[3], False)
           model_exists = model is not None
           if model_exists:
-            self._update_cache (model_type=model_type[0], model_name=latest[3], model=model)
+            self._update_cache (model_type=model_type[0], model_name=latest[3])
           #endif
         #endfor
         self.__initialized = True

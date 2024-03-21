@@ -73,7 +73,7 @@ class MonitorApp(
     if model is not None:
       result = self._update_cache (model_type, model_name, model)
       if result:
-        self.save_model_update_to_db(model_type, model)
+        self.save_model_update_to_db(model_type, model_name)
         self.nr_updates += 1
       #endif
     #endif

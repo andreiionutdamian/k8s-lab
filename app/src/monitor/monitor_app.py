@@ -141,7 +141,7 @@ class MonitorApp(
         #iterate model types
         for model_type in model_types:
           latest = self.get_latest_model_top(model_type[0])
-          model = self.load_model(model_type[0], latest[3], False)
+          model = self.load_model(model_type[0], latest[3], None, False)
           model_exists = model is not None
           if model_exists:
             self._update_cache (model_type=model_type[0], model_name=latest[3], model=model)

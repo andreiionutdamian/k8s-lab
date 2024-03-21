@@ -1,4 +1,5 @@
 import os
+from typing import Dict
 
 if True:
   from app_utils import show_inventory
@@ -26,8 +27,8 @@ async def health():
   return result
 
 
-@router_monitor.get("/modelconfig")
-async def modelconfig(modeltype:str, modelname:  str, labels: dict = None ):
+@router_monitor.post("/modelconfig")
+async def modelconfig(modeltype:str, modelname:  str, labels: Dict[int, str] = None ):
   result = eng.set_model(model_type=modeltype, model_name=modelname, labels=labels)
   return result
 

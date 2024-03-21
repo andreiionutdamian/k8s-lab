@@ -1,6 +1,8 @@
 import os
 from datetime import datetime
 
+import torch
+
 from transformers import pipeline
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from transformers import AutoImageProcessor, AutoModelForImageClassification
@@ -17,6 +19,7 @@ class _LlmMixin(object):
     result = None
     self.P(f"Loading model {model_name}....")
     starttime= datetime.now()
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
     try:
       if model_type == "text":
         tokenizer = AutoTokenizer.from_pretrained(
@@ -25,10 +28,12 @@ class _LlmMixin(object):
         text_model = AutoModelForSequenceClassification.from_pretrained(
           model_name, cache_dir=model_cache
         )
+        text_model = text_model.to(device)
         if returnpipe:
           result = pipeline(
             "text-classification", 
-            model=text_model, tokenizer=tokenizer
+            model=text_model, tokenizer=tokenizer, 
+            device=device
           )
         else:
           result = text_model
@@ -39,10 +44,12 @@ class _LlmMixin(object):
         image_model =  AutoModelForImageClassification.from_pretrained(
           model_name, cache_dir=model_cache
         )
+        image_model=image_model.to(device)
         if returnpipe:
           result = pipeline(
             "image-classification", 
-            model=image_model, image_processor=image_processor
+            model=image_model, image_processor=image_processor, 
+            device=device
           )
         else:
           result = image_model

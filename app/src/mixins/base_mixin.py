@@ -2,6 +2,8 @@ import os
 
 from app_utils import safe_jsonify, get_packages
 
+import torch
+
 from threading import Thread, Lock
 from time import sleep
 from datetime import datetime
@@ -17,6 +19,8 @@ class _BaseMixin(object):
 
     self.node_name = os.getenv('NODE_NAME', 'N/A')
     self.host = os.getenv('HOSTNAME', 'N/A')
+
+    self.device =  "cuda:0" if torch.cuda.is_available() else "cpu"
 
     self.__done = False
     self.__started = False
@@ -113,7 +117,7 @@ class _BaseMixin(object):
     return
   
   def format_result(self, result):
-    return {"result": result, "node":self.node_name, "host": self.host}
+    return {"result" : result, "node" : self.node_name, "host" : self.host, "device" : self.device}
   
 
     

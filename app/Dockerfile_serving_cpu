@@ -1,4 +1,4 @@
-FROM FROM aidamian/base_fastapi:latest
+FROM aidamian/base_fastapi:latest
 WORKDIR /test_app
 
 RUN pip3 install torch --index-url https://download.pytorch.org/whl/cpu

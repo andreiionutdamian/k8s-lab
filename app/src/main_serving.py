@@ -5,7 +5,7 @@ if True:
   show_inventory()
 #endif
 
-
+from typing import List
 from fastapi import FastAPI, APIRouter, File, UploadFile
 from pydantic import BaseModel
 from app_utils import boxed_print
@@ -35,7 +35,7 @@ async def predict_text(text: str):
   return result
 
 @router_serving.post("/predict/text")
-async def predict_texts(texts: list):
+async def predict_texts(texts: List[str]):
   result = eng.predict_texts(texts)
   return result
 

@@ -1,6 +1,7 @@
 import os
 import io
 
+from typing import List
 from datetime import datetime
 from PIL import Image
 
@@ -120,7 +121,7 @@ class ServingApp(
     self.save_state_to_db(result=prediction)
     return self.format_result(prediction)
   
-  def predict_texts(self, texts: list):
+  def predict_texts(self, texts: List[str]):
     model = self.get_model('text')
     if model is None:
       prediction = "No model available"

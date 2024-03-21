@@ -28,7 +28,7 @@ async def health():
 
 @router_monitor.get("/modelconfig")
 async def modelconfig(modeltype:str, modelname: str):
-  result = eng.set_model(model_type=modeltype, model=modelname)
+  result = eng.set_model(model_type=modeltype, model_name=modelname)
   return result
 
 @router_monitor.get("/{full_path:path}", include_in_schema=False)

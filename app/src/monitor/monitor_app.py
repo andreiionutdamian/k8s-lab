@@ -67,9 +67,9 @@ class MonitorApp(
       self.P(f"Model config: {info}")
     return result
 
-  def set_model(self, model_type: str, model_name: str):
+  def set_model(self, model_type: str, model_name: str, labels: dict):
     result = None
-    model = self.load_model(model_type, model_name, False)
+    model = self.load_model(model_type, model_name, labels, False)
     if model is not None:
       result = self._update_cache (model_type, model_name, model)
       if result:

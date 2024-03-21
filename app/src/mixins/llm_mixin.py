@@ -4,7 +4,7 @@ from datetime import datetime
 import torch
 
 from transformers import pipeline
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification
 from transformers import AutoImageProcessor, AutoModelForImageClassification
 
 class _LlmMixin(object):
@@ -14,7 +14,7 @@ class _LlmMixin(object):
     self.cache_root = os.getenv('CACHE_ROOT', '.cache')
     return
   
-  def load_model(self, model_type: str, model_name: str, returnpipe=False):
+  def load_model(self, model_type: str, model_name: str, labels: dict,  returnpipe=False):
     model_cache=f"{self.cache_root}/{model_name}"
     result = None
     self.P(f"Loading model {model_name}....")
@@ -25,9 +25,16 @@ class _LlmMixin(object):
         tokenizer = AutoTokenizer.from_pretrained(
           model_name, cache_dir=model_cache
         )
-        text_model = AutoModelForSequenceClassification.from_pretrained(
-          model_name, cache_dir=model_cache
-        )
+        if labels:
+          rev_labels = dict((v,k) for k,v in labels.items())
+          config = AutoConfig.from_pretrained(model_name, label2id=rev_labels, id2label=labels)
+          text_model = AutoModelForSequenceClassification.from_pretrained(
+            model_name, cache_dir=model_cache, config=config
+          )
+        else:
+          text_model = AutoModelForSequenceClassification.from_pretrained(
+            model_name, cache_dir=model_cache
+          )
         text_model = text_model.to(device)
         if returnpipe:
           result = pipeline(

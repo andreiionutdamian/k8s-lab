@@ -44,22 +44,22 @@ class MonitorApp(
     
   def postgres_get_tables(self):
     tables ={
-      "models" : "id SERIAL PRIMARY KEY, model_date varchar(50), model_type varchar(100), model_name varchar(200)"
+      "models" : "id SERIAL PRIMARY KEY, model_date varchar(50), model_type varchar(100), model_name varchar(200), dlabels json"
     }
     return tables
   
   
-  def save_model_update_to_db(self, model_type:str, model_name: str):  
+  def save_model_update_to_db(self, model_type:str, model_name: str, labels: dict):  
     # save result to Postgres
     # TODO: is this safe for multi-worker setup?
     model_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     self.postgres_insert_data(
       "models", 
-      model_type=model_type, model_name=model_name, model_date=model_date
+      model_type=model_type, model_name=model_name, model_date=model_date, dlabels=labels
     )
     return
   
-  def _update_cache(self, model_type:str, model_name : str, model):
+  def _update_cache(self, model_type:str, model_name : str):
     result = self.redis_sethash("models", model_type, model_name)
     if result:
       self.P(f"Cache update: {model_type} - {model_name}")
@@ -69,9 +69,9 @@ class MonitorApp(
     result = None
     model = self.load_model(model_type, model_name, labels, False)
     if model is not None:
-      result = self._update_cache (model_type, model_name, model)
+      result = self._update_cache (model_type, model_name)
       if result:
-        self.save_model_update_to_db(model_type, model_name)
+        self.save_model_update_to_db(model_type, model_name, labels)
         self.nr_updates += 1
       #endif
     #endif
@@ -139,10 +139,10 @@ class MonitorApp(
         #iterate model types
         for model_type in model_types:
           latest = self.get_latest_model_top(model_type[0])
-          model = self.load_model(model_type[0], latest[3], None, False)
+          model = self.load_model(model_type[0], latest[3], latest[4], False)
           model_exists = model is not None
           if model_exists:
-            self._update_cache (model_type=model_type[0], model_name=latest[3], model=model)
+            self._update_cache (model_type=model_type[0], model_name=latest[3])
           #endif
         #endfor
         self.__initialized = True

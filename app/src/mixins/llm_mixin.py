@@ -28,10 +28,10 @@ class _LlmMixin(object):
         if labels:
           rev_labels = dict((v,k) for k,v in labels.items())
           config = AutoConfig.from_pretrained(model_name, label2id=rev_labels, id2label=labels)
+          config.save_pretrained(model_cache)
           text_model = AutoModelForSequenceClassification.from_pretrained(
             model_name, cache_dir=model_cache, config=config
           )
-          text_model.save_pretrained(model_name)
         else:
           text_model = AutoModelForSequenceClassification.from_pretrained(
             model_name, cache_dir=model_cache

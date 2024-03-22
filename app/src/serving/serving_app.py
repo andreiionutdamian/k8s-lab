@@ -133,10 +133,8 @@ class ServingApp(
         prediction = "No pipeline available"
       else:
         starttime=datetime.now()
-        prediction=[]
-        for text in texts:
-          prediction.append(pipe(text))
-          self.no_predictions += 1
+        prediction = pipe(texts)
+        self.no_predictions += 1
         duration = datetime.now() - starttime
     self.save_state_to_db(result=prediction)
     return self.format_result({"inference_result":prediction, "inference_time":duration})

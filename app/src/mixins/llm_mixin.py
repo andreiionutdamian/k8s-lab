@@ -28,23 +28,23 @@ class _LlmMixin(object):
         if labels:
           rev_labels = dict((v,k) for k,v in labels.items())
           config = AutoConfig.from_pretrained(model_name, label2id=rev_labels, id2label=labels)
-          config.save_pretrained(model_cache)
+          #config.save_pretrained(model_cache)
           text_model = AutoModelForSequenceClassification.from_pretrained(
             model_name, cache_dir=model_cache, config=config
           )
         else:
           text_model = AutoModelForSequenceClassification.from_pretrained(
             model_name, cache_dir=model_cache
-          )
-        text_model = text_model.to(device)
+          )     
         if returnpipe:
+          text_model = text_model.to(device)
           result = pipeline(
             "text-classification", 
             model=text_model, tokenizer=tokenizer, 
             device=device
           )
         else:
-          result = text_model
+          result = True
       elif model_type == "image":
         image_processor = AutoImageProcessor.from_pretrained(
           model_name, cache_dir=model_cache
@@ -52,15 +52,15 @@ class _LlmMixin(object):
         image_model =  AutoModelForImageClassification.from_pretrained(
           model_name, cache_dir=model_cache
         )
-        image_model=image_model.to(device)
         if returnpipe:
+          image_model=image_model.to(device)
           result = pipeline(
             "image-classification", 
             model=image_model, image_processor=image_processor, 
             device=device
           )
         else:
-          result = image_model
+          result = True
       elif model_type == "json":
         self.P(f"Not implemented {model_type}")
     except Exception as exc:

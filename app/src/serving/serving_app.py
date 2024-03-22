@@ -121,9 +121,12 @@ class ServingApp(
   def _output_labels (self, model_type:str, result:list):
     output = result
     if self.output_labels[model_type] is not None:
+      self.P(f"converting labels using {self.output_labels[model_type]}")
       key_mapping = self.output_labels[model_type]
+      output = []
       for result_item in result:
-        output = {key_mapping.get(key, key): value for key, value in result_item.items()}
+        self.P(f"for item {result_item}")
+        output.append({key_mapping[k]: v for k, v in result_item.items() if k in key_mapping})
     return output
   
   def predict_text(self, text: str):

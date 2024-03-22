@@ -64,7 +64,7 @@ class MonitorApp(
   def _update_cache(self, model_type:str, model_name : str, labels:dict = None):
     result = self.redis_sethash("models", model_type, model_name)
     if labels is not None:
-      result = self.redis_sethash("labels", model_name, labels)
+      result = self.redis_sethash("labels", model_name, json.dumps(labels))
     if result:
       self.P(f"Cache update: {model_type} - {model_name}")
     return result

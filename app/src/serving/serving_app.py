@@ -1,5 +1,6 @@
 import os
 import io
+import json
 
 from typing import List
 from datetime import datetime
@@ -27,6 +28,12 @@ class ServingApp(
     super(ServingApp, self).setup()    
     # setup serving
     self.models = {
+      'text' : None,
+      'json' : None,
+      'image' : None,
+    }
+
+    self.output_labels = {
       'text' : None,
       'json' : None,
       'image' : None,
@@ -69,6 +76,9 @@ class ServingApp(
     redis_model = self.redis_hget("models", model_type)
     if redis_model is not None  and redis_model is not "":
       self.models[model_type] = redis_model
+      redis_labels = self.redis_hget("labels", redis_model)
+      if redis_labels:
+        self.output_labels[model_type] = json.loads(redis_labels)
       if os.path.exists(self.cache_root+"/"+redis_model):
         self.pipes[model_type] = self.load_model(model_type, redis_model, True)
       else:
@@ -106,6 +116,14 @@ class ServingApp(
       except Exception as exc:
         self.P("Error loading model: {}".format(exc))
     return pipe
+  
+  def _output_labels (self, model_type:str, result:list):
+    output = result
+    if self.output_labels[model_type] is not None:
+      key_mapping = self.output_labels[model_type]
+      for result_item in result:
+        output = {key_mapping.get(key, key): value for key, value in result_item.items()}
+    return output
   
   def predict_text(self, text: str):
     model = self.get_model('text')

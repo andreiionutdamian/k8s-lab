@@ -63,10 +63,13 @@ class MonitorApp(
   
   def _update_cache(self, model_type:str, model_name : str, labels:dict = None):
     result = self.redis_sethash("models", model_type, model_name)
+    if result:
+      self.P(f"Cache update model: {model_type} - {model_name}")
+    
     if labels is not None:
       result = self.redis_sethash("labels", model_name, json.dumps(labels))
-    if result:
-      self.P(f"Cache update: {model_type} - {model_name}")
+      self.P(f"Cache update labels: {model_name} - {labels}")
+
     return result
 
   def set_model(self, model_type: str, model_name: str, labels: dict):
@@ -146,7 +149,11 @@ class MonitorApp(
           model = self.load_model(model_type[0], latest[3], False)
           model_exists = model is not None
           if model_exists:
-            self._update_cache (model_type=model_type[0], model_name=latest[3])
+            self._update_cache (
+              model_type=model_type[0], 
+              model_name=latest[3], 
+              labels=latest[4]
+          )
           #endif
         #endfor
         self.__initialized = True

@@ -79,6 +79,7 @@ class ServingApp(
       redis_labels = self.redis_hget("labels", redis_model)
       if redis_labels:
         self.output_labels[model_type] = json.loads(redis_labels)
+        self.P(f"Output lables loaded {self.output_labels[model_type]}")
       if os.path.exists(self.cache_root+"/"+redis_model):
         self.pipes[model_type] = self.load_model(model_type, redis_model, True)
       else:
@@ -138,6 +139,7 @@ class ServingApp(
         prediction = pipe(text)
         duration = datetime.now() - starttime
         self.no_predictions += 1
+        prediction = self._output_labels(prediction)
     self.save_state_to_db(result=prediction)
     return self.format_result({"inference_result":prediction, "inference_time":duration})
   
@@ -154,6 +156,7 @@ class ServingApp(
         prediction = pipe(texts)
         self.no_predictions += 1
         duration = datetime.now() - starttime
+        prediction = self._output_labels(prediction)
     self.save_state_to_db(result=prediction)
     return self.format_result({"inference_result":prediction, "inference_time":duration})
   
@@ -184,6 +187,7 @@ class ServingApp(
           prediction = pipe(image)
           duration=datetime.now()-starttime
           self.no_predictions += 1
+          prediction = self._output_labels(prediction)
       self.save_state_to_db(result=prediction)
     else:
       prediction = "Invalid image content"

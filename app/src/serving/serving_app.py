@@ -139,7 +139,7 @@ class ServingApp(
         prediction = pipe(text)
         duration = datetime.now() - starttime
         self.no_predictions += 1
-        prediction = self._output_labels(prediction)
+        prediction = self._output_labels('text', prediction)
     self.save_state_to_db(result=prediction)
     return self.format_result({"inference_result":prediction, "inference_time":duration})
   
@@ -156,7 +156,7 @@ class ServingApp(
         prediction = pipe(texts)
         self.no_predictions += 1
         duration = datetime.now() - starttime
-        prediction = self._output_labels(prediction)
+        prediction = self._output_labels('text', prediction)
     self.save_state_to_db(result=prediction)
     return self.format_result({"inference_result":prediction, "inference_time":duration})
   
@@ -187,7 +187,7 @@ class ServingApp(
           prediction = pipe(image)
           duration=datetime.now()-starttime
           self.no_predictions += 1
-          prediction = self._output_labels(prediction)
+          prediction = self._output_labels('image', prediction)
       self.save_state_to_db(result=prediction)
     else:
       prediction = "Invalid image content"

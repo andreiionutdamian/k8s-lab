@@ -119,15 +119,16 @@ class ServingApp(
     return pipe
   
   def _output_labels (self, model_type:str, result:list):
-    output = result
     if self.output_labels[model_type] is not None:
       self.P(f"converting labels using {self.output_labels[model_type]}")
       key_mapping = self.output_labels[model_type]
       output = []
       for result_item in result:
         self.P(f"for item {result_item}")
-        output.append({key_mapping[k]: v for k, v in result_item.items() if k in key_mapping})
-    return output
+        for key in result_item :
+          if result_item[key] in key_mapping:
+            result_item[key] = key_mapping[result_item[key]]
+    return
   
   def predict_text(self, text: str):
     model = self.get_model('text')
@@ -142,7 +143,7 @@ class ServingApp(
         prediction = pipe(text)
         duration = datetime.now() - starttime
         self.no_predictions += 1
-        prediction = self._output_labels('text', prediction)
+        self._output_labels('text', prediction)
     self.save_state_to_db(result=prediction)
     return self.format_result({"inference_result":prediction, "inference_time":duration})
   
@@ -159,7 +160,7 @@ class ServingApp(
         prediction = pipe(texts)
         self.no_predictions += 1
         duration = datetime.now() - starttime
-        prediction = self._output_labels('text', prediction)
+        self._output_labels('text', prediction)
     self.save_state_to_db(result=prediction)
     return self.format_result({"inference_result":prediction, "inference_time":duration})
   
@@ -190,7 +191,7 @@ class ServingApp(
           prediction = pipe(image)
           duration=datetime.now()-starttime
           self.no_predictions += 1
-          prediction = self._output_labels('image', prediction)
+          self._output_labels('image', prediction)
       self.save_state_to_db(result=prediction)
     else:
       prediction = "Invalid image content"

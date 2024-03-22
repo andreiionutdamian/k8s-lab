@@ -63,8 +63,6 @@ class MonitorApp(
     result = self.redis_sethash("models", model_type, model_name)
     if result:
       self.P(f"Cache update: {model_type} - {model_name}")
-      info = model.config.id2label
-      self.P(f"Model config: {info}")
     return result
 
   def set_model(self, model_type: str, model_name: str, labels: dict):

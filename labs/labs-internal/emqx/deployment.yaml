@@ -74,7 +74,7 @@ spec:
     spec:
       containers:
       - name: basic-mqtt-read
-        image: aidamian/basic_mqtt_listener
+        image: aidamian/simple_mqtt_listener
         resources:
           requests:
             memory: "256Mi"   # 256Mi = 0.25GB

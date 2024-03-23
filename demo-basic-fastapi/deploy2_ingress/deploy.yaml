@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: test-py-container
-        image: aidamian/basic_test_fastapi        
+        image: aidamian/simple_test_fastapi        
         ports:
         - containerPort: 5050
           protocol: TCP
@@ -55,7 +55,7 @@ spec:
   rules:
   - http:
       paths:
-      - path: /basic_test(/|$)(.*)
+      - path: /simple_test(/|$)(.*)
         pathType: ImplementationSpecific
         backend:
           service:

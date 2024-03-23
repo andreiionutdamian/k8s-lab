@@ -16,7 +16,7 @@ spec:
       serviceAccountName: kmonitor-sa
       containers:
       - name: ai-app-mon-container
-        image: aidamian/basic_cluster_monitor_test 
+        image: aidamian/simple_cluster_monitor_test 
         resources:
           requests:
             memory: "128Mi"

@@ -1,2 +1,2 @@
-docker build -t aidamian/basic_mqtt_listener .
-docker push aidamian/basic_mqtt_listener
+docker build -t aidamian/simple_mqtt_listener .
+docker push aidamian/simple_mqtt_listener

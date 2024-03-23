@@ -13,7 +13,7 @@ spec:
         run: hello-world
     spec:
       containers:
-      - image: aidamian/basic-test-node
+      - image: aidamian/simple-test-node
         name: hello-world
         ports:
         - containerPort: 8080

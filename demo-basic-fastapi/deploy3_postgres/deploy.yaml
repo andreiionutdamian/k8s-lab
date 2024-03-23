@@ -72,7 +72,7 @@ spec:
     - ReadWriteMany
   nfs:
     server: 192.168.1.56  
-    path: "/srv/nfs/k8s/pg_storage/basic-test-py-simple"
+    path: "/srv/nfs/k8s/pg_storage/simple-test-py-simple"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -179,7 +179,7 @@ spec:
     spec:
       containers:
       - name: test-py-container
-        image: aidamian/basic_test_fastapi        
+        image: aidamian/simple_test_fastapi        
         ports:
         - containerPort: 5050
           protocol: TCP

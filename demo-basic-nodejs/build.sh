@@ -1,2 +1,2 @@
-docker build -t aidamian/basic-test-nodejs .
-docker push aidamian/basic-test-nodejs
+docker build -t aidamian/simple-test-nodejs .
+docker push aidamian/simple-test-nodejs

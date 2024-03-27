@@ -91,7 +91,7 @@ class ServingApp(
   def save_state_to_db(self, result):
     # TODO: is this safe for multi worker? - YES
     to_save = str(result)[:255]
-    predict_date =time.strftime("%Y-%m-%d %H:%M:%S", time.time())
+    predict_date =time.strftime("%Y-%m-%d %H:%M:%S")
     # save result to Postgres
     self.postgres_insert_data("predicts", result=to_save, predict_date=predict_date)
     return

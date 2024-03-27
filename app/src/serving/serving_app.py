@@ -132,7 +132,7 @@ class ServingApp(
   
   def _predict(self, model_type: str, input, params:dict = None):
    duration = 0
-   device =  params['device'] if params else None
+   device =  params['device'] if (params and params['device']) else None
    no_runs = params['no_runs'] if (params and params['no_runs']) else 1
    if input:
     model = self.get_model(model_type)

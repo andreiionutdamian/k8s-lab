@@ -157,7 +157,7 @@ class ServingApp(
      {
        "inference_result": prediction, 
        "inference_runs": no_runs,
-       "inference_avg": duration,
+       "inference_avg": duration
      }
    )
   

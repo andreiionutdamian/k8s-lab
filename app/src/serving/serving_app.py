@@ -1,9 +1,9 @@
 import os
 import io
 import json
+import time
 
 from typing import List
-from datetime import datetime
 from PIL import Image
 
 from mixins.base_mixin import _BaseMixin
@@ -91,7 +91,7 @@ class ServingApp(
   def save_state_to_db(self, result):
     # TODO: is this safe for multi worker? - YES
     to_save = str(result)[:255]
-    predict_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    predict_date =time.strftime("%Y-%m-%d %H:%M:%S", time.time())
     # save result to Postgres
     self.postgres_insert_data("predicts", result=to_save, predict_date=predict_date)
     return
@@ -130,42 +130,48 @@ class ServingApp(
             result_item[key] = key_mapping[result_item[key]]
     return
   
-  def predict_text(self, text: str):
-    model = self.get_model('text')
+  def _predict(self, model_type: str, input, params:dict = None):
+   device =  params['device'] if params else None
+   no_runs = params['no_runs'] if (params and params['no_runs']) else 1
+   if input:
+    model = self.get_model(model_type)
     if model is None:
       prediction = "No model available"
     else:
-      pipe = self.get_pipeline('text')
+      pipe = self.get_pipeline(model_type)
       if pipe is None:
         prediction = "No pipeline available"
       else:
-        starttime=datetime.now()
-        prediction = pipe(text)
-        duration = datetime.now() - starttime
+        duration = 0
+        for i in range(no_runs):
+          starttime=time.time_ns()
+          prediction = pipe(input)
+          duration += (time.time_ns()-starttime)/1e+6
+        duration = duration/no_runs
         self.no_predictions += 1
-        self._output_labels('text', prediction)
-    self.save_state_to_db(result=prediction)
-    return self.format_result({"inference_result":prediction, "inference_time":duration})
+        self._output_labels(model_type, prediction)
+      self.save_state_to_db(result=prediction)
+   else:
+      prediction = "Invalid input content"
+   return self.format_result(
+     {
+       "inference_result": prediction, 
+       "inference_runs": no_runs,
+       "inference_avg": duration,
+     }
+   )
   
-  def predict_texts(self, texts: List[str]):
-    model = self.get_model('text')
-    if model is None:
-      prediction = "No model available"
-    else:
-      pipe = self.get_pipeline('text')
-      if pipe is None:
-        prediction = "No pipeline available"
-      else:
-        starttime=datetime.now()
-        prediction = pipe(texts)
-        self.no_predictions += 1
-        duration = datetime.now() - starttime
-        self._output_labels('text', prediction)
-    self.save_state_to_db(result=prediction)
-    return self.format_result({"inference_result":prediction, "inference_time":duration})
+  def predict_text(self, text: str, params: dict = None):
+    return self._predict('text', text, params)
   
+  def predict_texts(self, texts: List[str], params: dict = None):
+    return self._predict('text', texts, params)
+      
+  def predict_image(self, image_data: bytes, params: dict = None):
+    image = Image.open(io.BytesIO(image_data))
+    return self._predict('image', image, params)
   
-  def predict_json(self, data: dict):
+  def predict_json(self, data: dict, params: dict = None):
     model = self.get_model('json')
     if model is None:
       prediction = "No model available"
@@ -174,28 +180,6 @@ class ServingApp(
       self.no_predictions += 1
     self.save_state_to_db(result=prediction)
     return self.format_result(prediction)
-  
-  
-  def predict_image(self, image_data: bytes):
-    image = Image.open(io.BytesIO(image_data))
-    if image:
-      model = self.get_model('image')
-      if model is None:
-        prediction = "No model available"
-      else:
-        pipe = self.get_pipeline('image')
-        if pipe is None:
-          prediction = "No pipeline available"
-        else:
-          starttime=datetime.now()
-          prediction = pipe(image)
-          duration=datetime.now()-starttime
-          self.no_predictions += 1
-          self._output_labels('image', prediction)
-      self.save_state_to_db(result=prediction)
-    else:
-      prediction = "Invalid image content"
-    return self.format_result({"inference_result":prediction, "inference_time":duration})
   
   def get_predict_counts(self):
     result = self.postgres_get_count("predicts")

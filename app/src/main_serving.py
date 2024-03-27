@@ -1,12 +1,13 @@
 import os
+import json
 
 if True:
   from app_utils import show_inventory
   show_inventory()
 #endif
 
-from typing import List
-from fastapi import FastAPI, APIRouter, File, UploadFile
+from typing import List, Optional
+from fastapi import FastAPI, APIRouter, File, UploadFile, Form
 from pydantic import BaseModel
 from app_utils import boxed_print
 
@@ -29,14 +30,16 @@ async def health():
 
 
 # string request
-@router_serving.get("/predict/text")
-async def predict_text(text: str):
-  result = eng.predict_text(text)
+@router_serving.post("/predict/text")
+async def predict_text(text: str, exec_params: Optional[str] = Form(None)):
+  params = json.loads(exec_params) if exec_params else None
+  result = eng.predict_text(text, params)
   return result
 
-@router_serving.post("/predict/text")
-async def predict_texts(texts: List[str]):
-  result = eng.predict_texts(texts)
+@router_serving.post("/predict/texts")
+async def predict_texts(texts: List[str], exec_params: Optional[str] = Form(None)):
+  params = json.loads(exec_params) if exec_params else None
+  result = eng.predict_texts(texts, params)
   return result
 
 # TODO: predict json
@@ -48,21 +51,24 @@ class Item(BaseModel):
   input_field3: str
 
 @router_serving.post("/predict/data")
-async def predict_data(item: Item):
-  result = eng.predict_json(item.dict())
+async def predict_data(item: Item, exec_params: Optional[str] = Form(None)):
+  params = json.loads(exec_params) if exec_params else None
+  result = eng.predict_json(item.dict(), params)
   return result
 
 # image request
 @router_serving.post("/predict/image")
-async def predict_image(image: UploadFile = File(...)):
+async def predict_image(image: UploadFile = File(...), exec_params: Optional[str] = Form(None)):
   contents = await image.read()
+  params = json.loads(exec_params) if exec_params else None
   # Process the image data
-  result = eng.predict_image(contents)
+  result = eng.predict_image(contents, params)
   return result
 
-@router_serving.get("/predict")
-async def predict(text: str):
-  result = eng.predict_text(text)
+@router_serving.post("/predict")
+async def predict(text: str , exec_params: Optional[str] = Form(None)):
+  params = json.loads(exec_params) if exec_params else None
+  result = eng.predict_text(text, params)
   return result
 
 @router_serving.get("/{full_path:path}", include_in_schema=False)

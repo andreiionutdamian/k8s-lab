@@ -131,6 +131,7 @@ class ServingApp(
     return
   
   def _predict(self, model_type: str, input, params:dict = None):
+   duration = 0
    device =  params['device'] if params else None
    no_runs = params['no_runs'] if (params and params['no_runs']) else 1
    if input:
@@ -142,7 +143,6 @@ class ServingApp(
       if pipe is None:
         prediction = "No pipeline available"
       else:
-        duration = 0
         for i in range(no_runs):
           starttime=time.time_ns()
           prediction = pipe(input)

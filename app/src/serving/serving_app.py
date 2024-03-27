@@ -28,16 +28,9 @@ class ServingApp(
     super(ServingApp, self).setup()    
     # setup serving
     self.models = {
-      "cpu": {
-        'text' : None,
-        'json' : None,
-        'image' : None,
-      },
-      "gpu": {
-        'text' : None,
-        'json' : None,
-        'image' : None,
-      }
+      'text' : None,
+      'json' : None,
+      'image' : None,
     }
 
     self.output_labels = {
@@ -90,7 +83,7 @@ class ServingApp(
     # get models from Redis if available
     redis_model = self.redis_hget("models", model_type)
     if redis_model is not None  and redis_model is not "":
-      self.models[device][model_type] = redis_model
+      self.models[model_type] = redis_model
       redis_labels = self.redis_hget("labels", redis_model)
       if redis_labels:
         self.output_labels[model_type] = json.loads(redis_labels)
@@ -111,15 +104,15 @@ class ServingApp(
     self.postgres_insert_data("predicts", result=to_save, predict_date=predict_date)
     return
   
-  def get_model(self, model_type: str, target_device:str = None):
+  def get_model(self, model_type: str,target_device:str = None):
     # get model from Redis
-    device = target_device if target_device else self.get_default_device()
     redis_model = self.redis_hget("models", model_type)
-    model = self.models[device][model_type]
+    model = self.models[model_type]
     if redis_model is not None and ( model is None or model != redis_model) :
       try:
+        device = target_device if target_device else self.get_default_device()
         self.maybe_setup_model(model_type, device) # only missing models should be loaded not all
-        model = self.models[device][model_type]
+        model = self.models[model_type]
       except Exception as exc:
         self.P("Error loading model: {}".format(exc))
     return model

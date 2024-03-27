@@ -78,8 +78,17 @@ class ServingApp(
         self.maybe_setup_model(k)
     return
   
-  def maybe_setup_model(self, model_type:str, target_device:str = None):
+  def _set_pipe_cache(self, model_type:str, pipeline, target_device:str = None):
     device = target_device if target_device else self.get_default_device()
+    if target_device == "gpu" and self.get_default_device() == "cpu":
+      device = "cpu"
+    if device == "cuda:0":
+      device = "gpu"
+      
+    self.pipes[device][model_type]=pipeline
+    return
+
+  def maybe_setup_model(self, model_type:str, target_device:str = None):
     # get models from Redis if available
     redis_model = self.redis_hget("models", model_type)
     if redis_model is not None  and redis_model is not "":
@@ -89,7 +98,8 @@ class ServingApp(
         self.output_labels[model_type] = json.loads(redis_labels)
         self.P(f"Output lables loaded {self.output_labels[model_type]}")
       if os.path.exists(self.cache_root+"/"+redis_model):
-        self.pipes[device][model_type] = self.load_model(model_type, redis_model, True, target_device)
+        pipeline = self.load_model(model_type, redis_model, True, target_device)
+        self._set_pipe_cache(model_type, pipeline, target_device) 
       else:
         raise Exception("Model not initialized") 
       # now mark as "seen"

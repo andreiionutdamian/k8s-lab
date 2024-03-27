@@ -78,15 +78,14 @@ class ServingApp(
         self.maybe_setup_model(k)
     return
   
-  def _set_pipe_cache(self, model_type:str, pipeline, target_device:str = None):
+  def _get_device(self, target_device:str = None):
     device = target_device if target_device else self.get_default_device()
     if target_device == "gpu" and self.get_default_device() == "cpu":
       device = "cpu"
     if device == "cuda:0":
       device = "gpu"
-      
-    self.pipes[device][model_type]=pipeline
-    return
+    return device
+  
 
   def maybe_setup_model(self, model_type:str, target_device:str = None):
     # get models from Redis if available
@@ -99,7 +98,8 @@ class ServingApp(
         self.P(f"Output lables loaded {self.output_labels[model_type]}")
       if os.path.exists(self.cache_root+"/"+redis_model):
         pipeline = self.load_model(model_type, redis_model, True, target_device)
-        self._set_pipe_cache(model_type, pipeline, target_device) 
+        device = self._get_device(target_device)
+        self.pipes[device][model_type]=pipeline
       else:
         raise Exception("Model not initialized") 
       # now mark as "seen"
@@ -120,7 +120,7 @@ class ServingApp(
     model = self.models[model_type]
     if redis_model is not None and ( model is None or model != redis_model) :
       try:
-        device = target_device if target_device else self.get_default_device()
+        device = self._get_device(target_device)
         self.maybe_setup_model(model_type, device) # only missing models should be loaded not all
         model = self.models[model_type]
       except Exception as exc:
@@ -128,7 +128,7 @@ class ServingApp(
     return model
   
   def get_pipeline(self, model_type: str, target_device:str = None):
-    device = target_device if target_device else self.get_default_device()
+    device = self._get_device(target_device)
     pipe = self.pipes[device][model_type]
     if pipe is None:
       try:

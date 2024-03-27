@@ -74,7 +74,7 @@ class MonitorApp(
 
   def set_model(self, model_type: str, model_name: str, labels: dict):
     result = None
-    model = self.load_model(model_type, model_name, False)
+    model = self.load_model(model_type, model_name)
     if model is not None:
       result = self._update_cache (model_type, model_name, labels)
       if result:
@@ -146,7 +146,7 @@ class MonitorApp(
         #iterate model types
         for model_type in model_types:
           latest = self.get_latest_model_top(model_type[0])
-          model = self.load_model(model_type[0], latest[3], False)
+          model = self.load_model(model_type[0], latest[3])
           model_exists = model is not None
           if model_exists:
             self._update_cache (

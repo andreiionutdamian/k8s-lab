@@ -20,7 +20,7 @@ class _BaseMixin(object):
     self.node_name = os.getenv('NODE_NAME', 'N/A')
     self.host = os.getenv('HOSTNAME', 'N/A')
 
-    self.device =  "cuda:0" if torch.cuda.is_available() else "cpu"
+    self.default_device =  "cuda:0" if torch.cuda.is_available() else "cpu"
 
     self.__done = False
     self.__started = False
@@ -116,8 +116,16 @@ class _BaseMixin(object):
       self.appmon_callback()
     return
   
-  def format_result(self, result):
-    return {"result" : result, "node" : self.node_name, "host" : self.host, "device" : self.device}
+  def format_result(self, result, device_type: str = None):
+    return {
+      "result" : result, 
+      "node" : self.node_name, 
+      "host" : self.host, 
+      "device" : device_type if device_type else self.default_device
+    }
+  
+  def get_default_device(self):
+    return self.default_device
   
 
     

@@ -14,12 +14,14 @@ class _LlmMixin(object):
     self.cache_root = os.getenv('CACHE_ROOT', '.cache')
     return
   
-  def load_model(self, model_type: str, model_name: str, returnpipe=False):
+  def load_model(self, model_type: str, model_name: str, returnpipe=False, target_device:str = None):
     model_cache=f"{self.cache_root}/{model_name}"
     result = None
     self.P(f"Loading model {model_name}....")
     starttime= datetime.now()
-    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    device = target_device if target_device else (
+      "cuda:0" if torch.cuda.is_available() else "cpu"
+    )
     try:
       if model_type == "text":
         tokenizer = AutoTokenizer.from_pretrained(

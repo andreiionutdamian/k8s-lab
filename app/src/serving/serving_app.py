@@ -153,8 +153,13 @@ class ServingApp(
   def _predict(self, model_type: str, input, params:dict = None):
    avg_exec = 0
    exec_time =[]
-   device = self._get_device(params['device']) if (params and "device" in params) else self.get_default_device()
+
+   device = self.get_default_device()
+   if (params and "device" in params):
+    device = self._get_device(params['device'])
+
    no_runs = int(params['no_runs']) if (params and "no_runs" in params) else 1
+
    if input:
     model = self.get_model(model_type, device)
     if model is None:
@@ -186,13 +191,16 @@ class ServingApp(
    )
   
   def predict_text(self, text: str, params: dict = None):
+    self.P(f"Predict text: {text}")
     return self._predict('text', text, params)
   
   def predict_texts(self, texts: List[str], params: dict = None):
+    self.P(f"Predict texts: {texts}")
     return self._predict('text', texts, params)
       
   def predict_image(self, image_data: bytes, params: dict = None):
     image = Image.open(io.BytesIO(image_data))
+    self.P(f"Predict image with size: {image.size}")
     return self._predict('image', image, params)
   
   def predict_json(self, data: dict, params: dict = None):

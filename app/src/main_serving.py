@@ -37,11 +37,12 @@ async def predict_text(text: str, exec_params: Optional[str] = Form(None)):
   return result
 
 @router_serving.post("/predict/texts")
-#async def predict_texts(texts: List[str], exec_params: Optional[str] = Form(None)):
-async def predict_texts(texts: List[str]):
-  #params = json.loads(exec_params) if exec_params else None
-  #result = eng.predict_texts(texts, params)
-  result = eng.predict_texts(texts)
+async def predict_texts(
+  texts: List[str] = Form(...), 
+  exec_params: Optional[str] = Form(None)
+):
+  params = json.loads(exec_params) if exec_params else None
+  result = eng.predict_texts(texts, params)
   return result
 
 # TODO: predict json

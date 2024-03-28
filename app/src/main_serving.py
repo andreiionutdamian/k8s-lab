@@ -30,13 +30,13 @@ async def health():
 
 class ExecParams(BaseModel):
   device: Optional[str] = None
-  no_runs: Optional[int] = None
+  no_runs: Optional[str] = None
 
 
 # string request
 @router_serving.post("/predict/text")
 async def predict_text(
-  text: str, 
+  text: str = Form(...), 
   exec_params: Optional[ExecParams] = None
 ):
   params = json.loads(exec_params) if exec_params else None
@@ -45,8 +45,8 @@ async def predict_text(
 
 @router_serving.post("/predict/texts")
 async def predict_texts(
-  texts: List[str] = Form(...), 
-  exec_params: Optional[ExecParams] = Form(None)
+  texts: List[str], 
+  exec_params: Optional[ExecParams] = None
 ):
   params = json.loads(exec_params) if exec_params else None
   result = eng.predict_texts(texts, params)

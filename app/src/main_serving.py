@@ -73,10 +73,10 @@ async def predict_data(
 @router_serving.post("/predict/image")
 async def predict_image(
   image: UploadFile = File(...), 
-  exec_params: Optional[str] = Form(None)
+  exec_params: Optional[ExecParams] = None
 ):
   contents = await image.read()
-  params = json.loads(exec_params) if exec_params else None
+  params = exec_params.dict() if exec_params else None
   # Process the image data
   result = eng.predict_image(contents, params)
   return result
@@ -84,9 +84,9 @@ async def predict_image(
 @router_serving.post("/predict")
 async def predict(
   text: str , 
-  exec_params: Optional[str] = Form(None)
+  exec_params: Optional[ExecParams] = None
 ):
-  params = json.loads(exec_params) if exec_params else None
+  params = exec_params.dict() if exec_params else None
   result = eng.predict_text(text, params)
   return result
 

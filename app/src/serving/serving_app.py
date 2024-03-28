@@ -153,7 +153,7 @@ class ServingApp(
   def _predict(self, model_type: str, input, params:dict = None):
    avg_exec = 0
    exec_time =[]
-   device =  params['device'] if (params and "device" in params) else self.get_default_device()
+   device = self._get_device(params['device']) if (params and "device" in params) else self.get_default_device()
    no_runs = int(params['no_runs']) if (params and "no_runs" in params) else 1
    if input:
     model = self.get_model(model_type, device)
@@ -181,7 +181,8 @@ class ServingApp(
        "inference_runs": no_runs,
        "inference_exec_time": exec_time,
        "inference_avg_exec_time": avg_exec
-     }
+     }, 
+     device
    )
   
   def predict_text(self, text: str, params: dict = None):

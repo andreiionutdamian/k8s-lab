@@ -6,8 +6,8 @@ if True:
   show_inventory()
 #endif
 
-from typing import List, Optional
-from fastapi import FastAPI, APIRouter, File, UploadFile, Form
+from typing import List, Optional, Annotated
+from fastapi import FastAPI, APIRouter, File, UploadFile, Form, Body
 from pydantic import BaseModel
 from app_utils import boxed_print
 
@@ -36,8 +36,8 @@ class ExecParams(BaseModel):
 # string request
 @router_serving.post("/predict/text")
 async def predict_text(
-  text: str = Form(...), 
-  exec_params: Optional[ExecParams] = Form(None)
+  text: str = Annotated[str, Body()], 
+  exec_params: Optional[ExecParams] = None
 ):
   params = json.loads(exec_params) if exec_params else None
   result = eng.predict_text(text, params)
@@ -45,8 +45,8 @@ async def predict_text(
 
 @router_serving.post("/predict/texts")
 async def predict_texts(
-  texts: List[str]=Form(...), 
-  exec_params: Optional[ExecParams] = Form(None)
+  texts: List[str], 
+  exec_params: Optional[ExecParams] = None
 ):
   params = json.loads(exec_params) if exec_params else None
   result = eng.predict_texts(texts, params)

@@ -31,12 +31,15 @@ async def health():
 
 # string request
 @router_serving.post("/predict/text")
-async def predict_text(text: str, exec_params: Optional[str] = Form(None)):
+async def predict_text(
+  text: str, 
+  exec_params: Optional[str] = Form(None)
+):
   params = json.loads(exec_params) if exec_params else None
   result = eng.predict_text(text, params)
   return result
 
-@router_serving.post("/predict/texts")
+@router_serving.post("/predict/texts", tags=["forms"])
 async def predict_texts(
   texts: List[str] = Form(...), 
   exec_params: Optional[str] = Form(None)
@@ -54,14 +57,20 @@ class Item(BaseModel):
   input_field3: str
 
 @router_serving.post("/predict/data")
-async def predict_data(item: Item, exec_params: Optional[str] = Form(None)):
+async def predict_data(
+  item: Item, 
+  exec_params: Optional[str] = Form(None)
+):
   params = json.loads(exec_params) if exec_params else None
   result = eng.predict_json(item.dict(), params)
   return result
 
 # image request
 @router_serving.post("/predict/image")
-async def predict_image(image: UploadFile = File(...), exec_params: Optional[str] = Form(None)):
+async def predict_image(
+  image: UploadFile = File(...), 
+  exec_params: Optional[str] = Form(None)
+):
   contents = await image.read()
   params = json.loads(exec_params) if exec_params else None
   # Process the image data
@@ -69,7 +78,10 @@ async def predict_image(image: UploadFile = File(...), exec_params: Optional[str
   return result
 
 @router_serving.post("/predict")
-async def predict(text: str , exec_params: Optional[str] = Form(None)):
+async def predict(
+  text: str , 
+  exec_params: Optional[str] = Form(None)
+):
   params = json.loads(exec_params) if exec_params else None
   result = eng.predict_text(text, params)
   return result

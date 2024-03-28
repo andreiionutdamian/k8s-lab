@@ -37,7 +37,7 @@ class ExecParams(BaseModel):
 @router_serving.post("/predict/text")
 async def predict_text(
   text: str = Form(...), 
-  exec_params: Optional[ExecParams] = None
+  exec_params: Optional[ExecParams] = Form(None)
 ):
   params = json.loads(exec_params) if exec_params else None
   result = eng.predict_text(text, params)
@@ -45,8 +45,8 @@ async def predict_text(
 
 @router_serving.post("/predict/texts")
 async def predict_texts(
-  texts: List[str], 
-  exec_params: Optional[ExecParams] = None
+  texts: List[str]=Form(...), 
+  exec_params: Optional[ExecParams] = Form(None)
 ):
   params = json.loads(exec_params) if exec_params else None
   result = eng.predict_texts(texts, params)

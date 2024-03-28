@@ -30,7 +30,7 @@ async def health():
 
 class ExecParams(BaseModel):
   device: Optional[str] = None
-  no_runs: Optional[str] = None
+  no_runs: Optional[int] = None
 
 
 # string request
@@ -39,7 +39,7 @@ async def predict_text(
   text: str = Annotated[str, Body()], 
   exec_params: Optional[ExecParams] = None
 ):
-  params = json.loads(exec_params) if exec_params else None
+  params = exec_params.dict() if exec_params else None
   result = eng.predict_text(text, params)
   return result
 
@@ -48,7 +48,7 @@ async def predict_texts(
   texts: List[str], 
   exec_params: Optional[ExecParams] = None
 ):
-  params = json.loads(exec_params) if exec_params else None
+  params = exec_params.dict() if exec_params else None
   result = eng.predict_texts(texts, params)
   return result
 

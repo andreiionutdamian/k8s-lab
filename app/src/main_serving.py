@@ -28,21 +28,25 @@ async def health():
   result = eng.get_health()
   return result
 
+class ExecParams(BaseModel):
+  device: Optional[str] = None
+  no_runs: Optional[int] = None
+
 
 # string request
 @router_serving.post("/predict/text")
 async def predict_text(
   text: str, 
-  exec_params: Optional[str] = Form(None)
+  exec_params: Optional[ExecParams] = None
 ):
   params = json.loads(exec_params) if exec_params else None
   result = eng.predict_text(text, params)
   return result
 
-@router_serving.post("/predict/texts", tags=["forms"])
+@router_serving.post("/predict/texts")
 async def predict_texts(
   texts: List[str] = Form(...), 
-  exec_params: Optional[str] = Form(None)
+  exec_params: Optional[ExecParams] = Form(None)
 ):
   params = json.loads(exec_params) if exec_params else None
   result = eng.predict_texts(texts, params)

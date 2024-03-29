@@ -6,9 +6,9 @@ if True:
   show_inventory()
 #endif
 
-from typing import List, Optional, Annotated
+from typing import List, Optional, Annotated, Any
 from fastapi import FastAPI, APIRouter, File, UploadFile, Form, Body
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 from app_utils import boxed_print
 
 from serving.serving_app import ServingApp  
@@ -31,6 +31,14 @@ async def health():
 class ExecParams(BaseModel):
   device: Optional[str] = None
   no_runs: Optional[int] = None
+
+  @model_validator(mode='before')
+  @classmethod
+  def validate_to_json(cls, value: Any) -> Any:
+    print(value)
+    if isinstance(value, str):
+      return cls(**json.loads(value))
+    return value
 
 
 # string request
@@ -73,7 +81,7 @@ async def predict_data(
 @router_serving.post("/predict/image")
 async def predict_image(
   image: UploadFile = File(...), 
-  exec_params: Optional[ExecParams] = None
+  exec_params: Optional[ExecParams] = Form(None)
 ):
   contents = await image.read()
   params = exec_params.dict() if exec_params else None

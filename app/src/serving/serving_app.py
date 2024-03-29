@@ -156,11 +156,11 @@ class ServingApp(
 
    self.P(f"execution parameters: {params}")
    device = self.get_default_device()
-   if (params and "device" in params):
+   if (params and "device" in params and params['device'] is not None):
     device = self._get_device(params['device'])
 
    no_runs = 1
-   if(params and "no_runs" in params):
+   if(params and "no_runs" in params and params['no_runs'] is not None):
      no_runs= self._get_device(params['no_runs'])
 
    if input:

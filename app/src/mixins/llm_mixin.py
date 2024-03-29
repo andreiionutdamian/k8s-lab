@@ -2,6 +2,8 @@ import os
 from datetime import datetime
 
 import torch
+from PIL import Image
+import numpy as np
 
 from transformers import pipeline
 from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification
@@ -50,6 +52,9 @@ class _LlmMixin(object):
             model=text_model, tokenizer=tokenizer, 
             device=device
           )
+          if result:
+            warming = result("Text pentru incalzire")
+            self.P(f"Warming result {warming}")
         else:
           result = True
       elif model_type == "image":
@@ -66,6 +71,12 @@ class _LlmMixin(object):
             model=image_model, image_processor=image_processor, 
             device=device
           )
+          if result:
+            self.P(f"Warming up model {model_name}....")
+            data=np.random.randint(low=0,high=256,size=128*128*3)
+            data=data.reshape(128,128,3)
+            warming = result(Image.fromarray(data,'RGB'))
+            self.P(f"Warming result {warming}")
         else:
           result = True
       elif model_type == "json":

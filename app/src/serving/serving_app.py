@@ -154,11 +154,14 @@ class ServingApp(
    avg_exec = 0
    exec_time =[]
 
+   self.P(f"execution parameters: {params}")
    device = self.get_default_device()
    if (params and "device" in params):
     device = self._get_device(params['device'])
 
-   no_runs = int(params['no_runs']) if (params and "no_runs" in params) else 1
+   no_runs = 1
+   if(params and "no_runs" in params):
+     device = self._get_device(params['no_runs'])
 
    if input:
     model = self.get_model(model_type, device)

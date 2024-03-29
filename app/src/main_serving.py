@@ -81,7 +81,10 @@ async def predict_data(
 @router_serving.post("/predict/image")
 async def predict_image(
   image: UploadFile = File(...), 
-  exec_params: Optional[ExecParams] = Form(None)
+  exec_params: Optional[ExecParams] = Form(
+    None, 
+    description="Example:\n\n \{\n\"device\":\"cpu|gpu\",\n\"no_runs\":int\n\}"
+  )
 ):
   contents = await image.read()
   params = exec_params.dict() if exec_params else None

@@ -2,7 +2,7 @@ docker build -t aidamian/simple_test_fastapi -f Dockerfile_basic .
 docker push aidamian/simple_test_fastapi
 
 serving_ver=$(yq -e ".application.serving.version" "../demo-ai-app/manifests/version.yaml")
-docker build -t aidamian/simple_serving_test_gpu:${serv.ing_ver} -f Dockerfile_serving_gpu .
+docker build -t aidamian/simple_serving_test_gpu:${serving_ver} -f Dockerfile_serving_gpu .
 docker push aidamian/simple_serving_test_gpu:${serving_ver}
 
 docker build -t aidamian/simple_serving_test_cpu:${serving_ver} -f Dockerfile_serving_cpu .

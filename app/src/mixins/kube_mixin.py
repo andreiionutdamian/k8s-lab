@@ -75,17 +75,33 @@ class _KubeMixin(object):
     result = {}
     # Now you can use the API, for example, list all pods in the current namespace
     v1 = self.__v1
+    v1apps = self.__v1apps
     namespace = self.get_current_namespace()
     result["namespace"] = namespace
     result["pods"] = []
+    result["deployments"] = []
+    result["stefulsets"] = []
     if verbose: 
-      self.P(f"Listing pods in namespace '{namespace}':")
+      self.P(f" Listing apps  in namespace '{namespace}':")
     try:
+      ret = v1apps.list_namespaced_deployment(namespace=namespace)
+      for i in ret.items:
+        result["deployments"].append(i.metadata.name)
+        if verbose:
+          self.P(f"  {i.metadata.namespace}/{i.metadata.name}") 
+
+      ret = v1apps.list_namespaced_stateful_set(namespace=namespace)
+      for i in ret.items:
+        result["statefulsets"].append(i.metadata.name)
+        if verbose:
+          self.P(f"  {i.metadata.namespace}/{i.metadata.name}") 
+      
       ret = v1.list_namespaced_pod(namespace=namespace)
       for i in ret.items:
         result["pods"].append(i.metadata.name)
         if verbose:
-          self.P(f"  {i.metadata.namespace}/{i.metadata.name}")    
+          self.P(f"  {i.metadata.namespace}/{i.metadata.name}") 
+
     except ApiException as exc:
       self.__handle_exception(exc)
       result = f"Exception when calling Kubernetes API"

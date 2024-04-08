@@ -10,7 +10,7 @@ rules:
   verbs: ["get", "list", "watch"]
 - apiGroups: ["apps"]
   resources: ["deployments", "statefulsets"]
-  verbs: ["get", "list", "watch", "update"]
+  verbs: ["get", "list", "watch", "update", "patch"]
 ---
 # define a ServiceAccount that will be used in the Deployment or StatefulSet
 apiVersion: v1

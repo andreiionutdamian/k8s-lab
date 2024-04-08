@@ -88,7 +88,7 @@ class MonitorApp(
   def update_monitor(self, app_module: dict):
     result = self.update_deployment(
       deployment_name="ai-app-mon",
-      container_name="ai-app-mon-container",\
+      container_name="ai-app-mon-container",
       new_ver=app_module['new_ver'],
       check_ver=app_module['cur_ver']
     )
@@ -97,7 +97,7 @@ class MonitorApp(
   def update_serving(self, app_module: dict):
     result = self.update_statefulset(
       deployment_name="ai-app-serve",
-      container_name="ai-app-serve-container",\
+      container_name="ai-app-serve-container",
       new_ver=app_module['new_ver'],
       check_ver=app_module['cur_ver']
     )

@@ -80,7 +80,7 @@ class _KubeMixin(object):
     result["namespace"] = namespace
     result["pods"] = []
     result["deployments"] = []
-    result["stefulsets"] = []
+    result["statefulsets"] = []
     if verbose: 
       self.P(f" Listing apps  in namespace '{namespace}':")
     try:

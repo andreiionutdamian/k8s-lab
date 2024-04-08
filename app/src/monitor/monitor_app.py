@@ -85,6 +85,24 @@ class MonitorApp(
     msg = f"Model {model_name} for type {model_type} set" if result else "Failed to set model"
     return self.format_result(msg)
   
+  def update_monitor(self, app_module: dict):
+    result = self.update_deployment(
+      deployment_name="ai-app-mon",
+      container_name="ai-app-mon-container",\
+      new_ver=app_module['new_ver'],
+      check_ver=app_module['cur_ver']
+    )
+    return self.format_result(result)
+  
+  def update_serving(self, app_module: dict):
+    result = self.update_statefulset(
+      deployment_name="ai-app-serve",
+      container_name="ai-app-serve-container",\
+      new_ver=app_module['new_ver'],
+      check_ver=app_module['cur_ver']
+    )
+    return self.format_result(result)
+  
   def get_model_update_counts(self):
     result = self.postgres_get_count("models")
     return result

@@ -50,6 +50,7 @@ class _KubeMixin(object):
       self.P("  Running outside a Kubernetes cluster.")
     
     self.__v1 = k8s.client.CoreV1Api()
+    self.__v1apps = k8s.client.AppsV1Api()
     self.P("  K8s helper initialized. Checking namepace pods...")
     self.get_namespace_info()
     return
@@ -85,6 +86,67 @@ class _KubeMixin(object):
         result["pods"].append(i.metadata.name)
         if verbose:
           self.P(f"  {i.metadata.namespace}/{i.metadata.name}")    
+    except ApiException as exc:
+      self.__handle_exception(exc)
+      result = f"Exception when calling Kubernetes API"
+    return result
+  
+  def update_deployment(self, deployment_name: str, container_name:str, new_ver:str, check_ver:str = None ):
+    result = None
+    namespace = self.get_current_namespace()
+    apps_v1_api = self.__v1apps
+    try:
+      deployment = apps_v1_api.read_namespaced_deployment(name=deployment_name, namespace=namespace)
+      # Update the container image
+      for container in deployment.spec.template.spec.containers:
+        if container.name == container_name:
+          image = container.image.split(":",1)
+          image_name = image[0]
+          image_tag = image[1] if len(image) > 1 else None
+
+          if check_ver:
+            self.P("Version checking...")
+            if image_tag is None or  image_tag != check_ver:
+              result = "Version mismatch"
+
+          if result is None:
+            container.image = image_name+":"+ new_ver
+            # Apply the update
+            apps_v1_api.patch_namespaced_deployment(name=deployment_name, namespace=namespace, body=deployment)
+            result = f"Deployment {deployment_name} version changed to {new_ver}"
+
+      if result is None:
+        result = f"Deployment {deployment_name} not found"
+    except ApiException as exc:
+      self.__handle_exception(exc)
+      result = f"Exception when calling Kubernetes API"
+    return result
+  
+  def update_statefulset(self, sset_name: str, container_name:str, check_ver:str, new_ver:str):
+    result = None
+    namespace = self.get_current_namespace()
+    apps_v1_api = self.__v1apps
+    try:
+      sset = apps_v1_api.read_namespaced_stateful_set(name=sset_name, namespace=namespace)
+      for container in sset.spec.template.spec.containers:
+        if container.name == container_name:
+          image = container.image.split(":",1)
+          image_name = image[0]
+          image_tag = image[1] if len(image) > 1 else None
+
+          if check_ver:
+            self.P("Version checking...")
+            if image_tag is None or  image_tag != check_ver:
+              result = "Version mismatch"
+
+          if result is None:
+            container.image = image_name+":"+ new_ver
+            # Apply the update
+            apps_v1_api.patch_namespaced_statefulset(name=sset_name, namespace=namespace, body=sset)
+            result = f"Statefulset {sset_name} version changed to {new_ver}"
+
+      if result is None:
+        result = f"Statefulset {sset_name} not found"
     except ApiException as exc:
       self.__handle_exception(exc)
     return result

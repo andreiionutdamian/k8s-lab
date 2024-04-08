@@ -9,8 +9,8 @@ rules:
   resources: ["pods", "services", "nodes"]
   verbs: ["get", "list", "watch"]
 - apiGroups: ["apps"]
-  resources: ["deployments", "replicasets"]
-  verbs: ["get", "list", "watch"]
+  resources: ["deployments", "statefulsets"]
+  verbs: ["get", "list", "watch", "update"]
 ---
 # define a ServiceAccount that will be used in the Deployment or StatefulSet
 apiVersion: v1

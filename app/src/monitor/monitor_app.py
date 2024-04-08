@@ -96,7 +96,7 @@ class MonitorApp(
   
   def update_serving(self, app_module: dict):
     result = self.update_statefulset(
-      deployment_name="ai-app-serve",
+      sset_name="ai-app-serve",
       container_name="ai-app-serve-container",
       new_ver=app_module['new_ver'],
       check_ver=app_module['cur_ver']

@@ -112,6 +112,7 @@ class _KubeMixin(object):
           if result is None:
             container.image = image_name+":"+ new_ver
             # Apply the update
+            self.P("Changing version...to "+ container.image)
             apps_v1_api.patch_namespaced_deployment(name=deployment_name, namespace=namespace, body=deployment)
             result = f"Deployment {deployment_name} version changed to {new_ver}"
 
@@ -127,6 +128,7 @@ class _KubeMixin(object):
     namespace = self.get_current_namespace()
     apps_v1_api = self.__v1apps
     try:
+
       sset = apps_v1_api.read_namespaced_stateful_set(name=sset_name, namespace=namespace)
       for container in sset.spec.template.spec.containers:
         if container.name == container_name:
@@ -142,7 +144,8 @@ class _KubeMixin(object):
           if result is None:
             container.image = image_name+":"+ new_ver
             # Apply the update
-            apps_v1_api.patch_namespaced_statefulset(name=sset_name, namespace=namespace, body=sset)
+            self.P("Changing version...to "+ container.image)
+            apps_v1_api.patch_namespaced_stateful_set(name=sset_name, namespace=namespace, body=sset)
             result = f"Statefulset {sset_name} version changed to {new_ver}"
 
       if result is None:

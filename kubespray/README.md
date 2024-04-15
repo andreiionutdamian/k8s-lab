@@ -170,3 +170,13 @@ $ ansible-playbook cluster.yml -i inventory/<MY_CLUSTER>/hosts.yml --become-user
 > OBS: both --become-user=root and --become are required to run the playbooks as root
 
 You can re-run it as many times as you want to fix any issues that may arise based on the Ansible idempotency capability.
+
+
+Finally make sure your `kubectl` is properly configured to access the cluster. 
+Run the following command on 1st master or so.
+
+```bash
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```

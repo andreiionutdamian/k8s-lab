@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: glusterfs-cluster
+  labels:
+    storage.k8s.io/name: glusterfs
+    storage.k8s.io/part-of: kubernetes-complete-reference
+    storage.k8s.io/created-by: aidamian
+subsets:
+  - addresses:
+    - ip: 172.31.3.105
+      hostname: PreProd-K8s-GlusterFs01
+    - ip: 172.31.3.106
+      hostname: PreProd-K8s-GlusterFs02
+    - ip: 172.31.3.107
+      hostname: PreProd-K8s-GlusterFs03
+    ports:
+    - port: 1

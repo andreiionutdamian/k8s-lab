@@ -31,6 +31,8 @@ async def health():
 class ExecParams(BaseModel):
   device: Optional[str] = None
   no_runs: Optional[int] = None
+  paralel_run: Optional[bool] = None
+  batch_size: Optional[int]=None
 
   @model_validator(mode='before')
   @classmethod

@@ -11,6 +11,7 @@ class _PostgresMixin(object):
     self.__connects = 0
     self.__config = self.__get_postgres_config()
     self._has_postgres = False
+    self.__transaction_started = False
     self.P("Postgres init-config done: {} keys".format(len(self.__config)))
     return
     
@@ -96,6 +97,7 @@ class _PostgresMixin(object):
             user=postgres_user, password=postgres_password,
             dbname=postgres_db,
           )
+          self.__transaction_started = False
           pg_server_info = self.__pg.get_dsn_parameters()
           self.P("Connected to Postgres at {}:{} with user: {} to database: {}".format(
             pg_server_info['host'], pg_server_info['port'], 
@@ -141,7 +143,28 @@ class _PostgresMixin(object):
         self.postgres_maybe_connect()
     return
   
-  
+  def postgres_start_transaction(self)
+    if self._has_postgres:
+      try:
+        self.postgres_maybe_reconnect()
+        self.__pg.autocommit = False
+        self.__transaction_started =  True
+      except Exception as exc:
+        self.P("Error in postgres_start_transaction: {}".format(exc))     
+        raise Exception("Postgres issue transaction")   
+    return
+
+  def postgres_end_transaction(self)
+    if self._has_postgres:
+        if __transaction_started && self.is_connection_still_alive():
+          self.__pg.commit()
+          self.__transaction_started =  False
+        else:
+          self.P("Transaction not started, or connection not alive anymore") 
+      except Exception as exc:
+        self.P("Error in postgres_end_transaction: {}".format(exc))     
+        raise Exception("Postgres issue transaction")   
+    return
   
   def postgres_insert_data(self, table_name: str, **kwargs):
     if self._has_postgres:
@@ -154,16 +177,51 @@ class _PostgresMixin(object):
         with self.__pg.cursor() as cur:
           cur.execute(str_sql, values)
           self.__pg.commit()
+          self.__transaction_started =  False
       except Exception as exc:
+        if self.__transaction_started:
+          self.__pg.rollback()
+          self.__transaction_started = False
+        self.P("Error in postgres_insert_data: {}".format(exc))     
+        raise ValueError("Postgres issue")   
+    return
+
+  def postgres_update_data(self, table_name: str, identifier: dict,  **kwargs):
+    if self._has_postgres:
+      try:
+        self.postgres_maybe_reconnect()
+
+        set_clause = ', '.join([f"{key} = %s" for key in kwargs.keys()])
+        where_clause = ' AND '.join([f"{key} = %s" for key in identifier.keys()])
+
+        str_sql = f"UPDATE {table_name} SET {set_clause} WHERE {where_clause};"
+
+        values = list(kwargs.values()) + list(identifier.values())
+
+        with self.__pg.cursor() as cur:
+          cur.execute(str_sql, values)
+          self.__pg.commit()
+          self.__transaction_started =  False
+      except Exception as exc:
+        if self.__transaction_started:
+          self.__pg.rollback()
+          self.__transaction_started = False
         self.P("Error in postgres_insert_data: {}".format(exc))     
         raise ValueError("Postgres issue")   
     return
 
   
-  def postgres_select_data(self, table_name: str, **kwargs):
-    return self.postgres_select_data_ordered(table_name, None, None, None, **kwargs)
+  def postgres_select_data(self, table_name: str, for_update: False,  **kwargs):
+    return self.postgres_select_data_ordered(
+                                            table_name, for_update,
+                                            order_by=None, order=None, maxrows=None, 
+                                            **kwargs
+    )
   
-  def postgres_select_data_ordered(self, table_name : str, order_by : str, order : str, maxrows : int, **kwargs):
+  def postgres_select_data_ordered(self, table_name : str, for_update=False,
+                                   order_by : str, order : str, maxrows : int, 
+                                   **kwargs
+  ):
     result = None
     if self._has_postgres:
       try:
@@ -185,6 +243,10 @@ class _PostgresMixin(object):
             str_sql += " "+order.upper()
           #endif
         #endif
+        if for_update:
+          str_sql += " FOR UPDATE"
+          if not self.__transaction_started:
+            self.postgres_start_transaction()
         with self.__pg.cursor() as cur:
           cur.execute(str_sql, parameters)
           if maxrows:
@@ -192,6 +254,9 @@ class _PostgresMixin(object):
           else:    
             result = cur.fetchall()
       except Exception as exc:
+        if self.__transaction_started:
+          self.__pg.rollback()
+          self.__transaction_started = False
         self.P("Error in postgres_select_data: {}".format(exc))
         raise ValueError("Postgres issue")
     return result

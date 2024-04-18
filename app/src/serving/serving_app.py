@@ -120,8 +120,12 @@ class ServingApp(
             except Exception as exc:
               self.P("Content file read error: {}".format(exc))
           if input is not None:
-            result = self._predict(model_type, input, {"device":device, "no_runs":no_runs})
-          else
+            result = self._predict(
+              model_type,
+              input, 
+              {"device":device, "no_runs":no_runs}
+            )
+          else:
             result = "Input not available"
         else:
           result = f"Parent job not found: {jobid}"

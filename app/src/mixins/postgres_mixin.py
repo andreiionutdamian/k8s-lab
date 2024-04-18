@@ -130,7 +130,7 @@ class _PostgresMixin(object):
       # Use a simple query to check the connection
       with self.__pg.cursor() as cur:
         cur.execute("SELECT 1")
-        cur.commit() # ensure no transaction is left open
+        self.__pg.commit() # ensure no transaction is left open
       result = True
     except Exception as exc:
       self.P("Connection to Postgres is dead. Reconnecting is required...{}".format(exc))

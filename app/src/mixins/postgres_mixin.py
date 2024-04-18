@@ -158,7 +158,7 @@ class _PostgresMixin(object):
   def postgres_end_transaction(self):
     if self._has_postgres:
       try:
-        if __transaction_started and self.is_connection_still_alive():
+        if self.__transaction_started and self.is_connection_still_alive():
           self.__pg.commit()
           self.__transaction_started =  False
         else:

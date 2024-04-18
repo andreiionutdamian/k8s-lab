@@ -156,6 +156,7 @@ class _PostgresMixin(object):
 
   def postgres_end_transaction(self):
     if self._has_postgres:
+      try:
         if __transaction_started and self.is_connection_still_alive():
           self.__pg.commit()
           self.__transaction_started =  False
@@ -218,8 +219,8 @@ class _PostgresMixin(object):
                                             **kwargs
     )
   
-  def postgres_select_data_ordered(self, table_name : str, for_update=False,
-                                   order_by : str, order : str, maxrows : int, 
+  def postgres_select_data_ordered(self, table_name : str, for_update: False,
+                                   order_by : str = None, order : str = None, maxrows : int = None, 
                                    **kwargs
   ):
     result = None

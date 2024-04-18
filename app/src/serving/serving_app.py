@@ -250,13 +250,13 @@ class ServingApp(
       no_runs= self._get_device(params['no_runs'])
 
     if input:
-        workername = None
-        status = STATUS_CREATED 
-        if self.__available :
-          #check if current instance is available for processing
-          workername = self.host
-          status = STATUS_ASSIGNED
-          self.__input = input
+      workername = None
+      status = STATUS_CREATED 
+      if self.__available :
+        #check if current instance is available for processing
+        workername = self.host
+        status = STATUS_ASSIGNED
+        self.__input = input
 
       # save job to database
       jobid = uuid.uuid4().hex
@@ -278,8 +278,9 @@ class ServingApp(
       # save tasks to database
       if result is None:
         taskid = uuid.uuid4().hex
-        else:
-          #if current insance is unavailable, save input to file
+       
+        if not self.__available :
+        #if current insance is unavailable, save input to file
           task_content_path = self.cache_root+"/tasks/"+taskid+".bin"
           try:
             bytes_data = None

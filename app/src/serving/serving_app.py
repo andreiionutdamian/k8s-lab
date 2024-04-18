@@ -116,15 +116,17 @@ class ServingApp(
             task_content_path = self.cache_root+"/tasks/"+taskid+".bin"
             try:
               with open(task_content_path, 'rb') as file:
-                input = file.read()
+                byte_data = file.read()
                 # convert if necessary
                 if model_type == 'text':
-                  input_str = input.decode('utf-8')
+                  input_str = byte_data.decode('utf-8')
                   try:
                     #check if list
                     input = json.loads(input_str)
                   except json.JSONDecodeError:
                     input = input_str
+                if model_type == 'image':
+                  input = Image.open(io.BytesIO(byte_data))
             except Exception as exc:
               self.P("Content file read error: {}".format(exc))
           if input is not None:
@@ -300,8 +302,8 @@ class ServingApp(
             #transform input to bytes if necessary
             if isinstance(input, str):
               bytes_data = input.encode('utf-8')
-            elif isinstance(input, bytes):
-              bytes_data = input
+            elif isinstance(input, Image):
+              bytes_data = input.tobytes()
             elif isinstance(input, List):
               bytes_data = json.dumps(input).encode('utf-8')
             with open(task_content_path, 'wb') as file:
@@ -381,7 +383,7 @@ class ServingApp(
     return self._predict_job('text', texts, params)
       
   def predict_image(self, image_data: bytes, params: dict = None):
-    #image = Image.open(io.BytesIO(image_data))
+    image = Image.open(io.BytesIO(image_data))
     self.P(f"Predict image with size: {len(image_data)}")
     return self._predict_job('image', image, params)
   

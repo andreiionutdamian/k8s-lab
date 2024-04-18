@@ -291,7 +291,7 @@ class ServingApp(
             os.makedirs(os.path.dirname(task_content_path), exist_ok=True)
             #transform input to bytes if necessary
             if isinstance(input, str):
-              bytes_data = input.encode(utf-8)
+              bytes_data = input.encode('utf-8')
             elif isinstance(input, bytes):
               bytes_data = input
             elif isinstance(input, List):

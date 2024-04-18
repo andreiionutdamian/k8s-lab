@@ -131,13 +131,15 @@ class ServingApp(
           result = f"Parent job not found: {jobid}"
 
         self.postgres_update_data(
-          "tasks",{"uuid":taskid}, 
+          table_name="tasks",
+          identifier={"uuid":taskid}, 
           predict_date = time.strftime("%Y-%m-%d %H:%M:%S"),
           result=result, 
           status=STATUS_FINISHED
         )
         self.postgres_update_data(
-          "jobs",{"uuid":jobid},
+          table_name="jobs",
+          identifier={"uuid":jobid},
           status=STATUS_FINISHED
         )
         self.__available = True

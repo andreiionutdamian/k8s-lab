@@ -119,7 +119,7 @@ class MonitorApp(
   
   def get_latest_model(self, model_type: str):
     latest = None
-    models = self.postgres_select_data("models", model_type=model_type)
+    models = self.postgres_select_data("models", for_update=False, model_type=model_type)
     if models:
       # iterate models and get latest
       for model in models:
@@ -139,7 +139,8 @@ class MonitorApp(
   def get_latest_model_top(self, model_type: str):
     latest = None
     models = self.postgres_select_data_ordered(
-      table_name="models",order_by="model_date", order="desc", 
+      table_name="models",for_update=False, 
+      order_by="model_date", order="desc", 
       maxrows=1,  model_type=model_type
     )
     if models:

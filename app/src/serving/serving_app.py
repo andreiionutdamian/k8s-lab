@@ -72,7 +72,7 @@ class ServingApp(
       # search preassigned tasks
       assigned_tasks = self.postgres_select_data_ordered(
         "tasks", 
-        for_update=true, order_by=None,order=None, maxrows=1,
+        for_update=True, order_by=None,order=None, maxrows=1,
         workername=self.host,status=STATUS_ASSIGNED
       )
       if assigned_tasks:
@@ -83,7 +83,7 @@ class ServingApp(
         # try unnassigned tasks
         unassigned_tasks = self.postgres_select_data_ordered(
           "tasks", 
-          for_update=true, order_by=None,order=None, maxrows=1,
+          for_update=True, order_by=None,order=None, maxrows=1,
           workername=None,status=STATUS_CREATED
         )
         if unassigned_tasks:
@@ -102,7 +102,7 @@ class ServingApp(
         jobid = task[1]
         result = None
         self.P(f"Processing task {taskid}")
-        jobs = self.postgres_select_data("jobs",uuid=jobid)
+        jobs = self.postgres_select_data("jobs",for_update=False, uuid=jobid)
 
         if jobs:
           job = jobs[0]

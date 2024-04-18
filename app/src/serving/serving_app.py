@@ -117,18 +117,17 @@ class ServingApp(
             try:
               with open(task_content_path, 'rb') as file:
                 input = file.read()
+                # convert if necessary
+                if model_type == 'text':
+                  input_str = input.decode('utf-8')
+                  try:
+                    #check if list
+                    input = json.loads(input_str)
+                  except json.JSONDecodeError:
+                    input = input_str
             except Exception as exc:
               self.P("Content file read error: {}".format(exc))
           if input is not None:
-            # convert if necessary
-            if model_type == 'text':
-              input_str = input.decode('utf-8')
-              try:
-                #check if list
-                input = json.loads(input_str)
-              except json.JSONDecodeError:
-                input = input_str
-
             result = self._predict(
               model_type,
               input, 

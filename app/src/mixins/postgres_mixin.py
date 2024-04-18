@@ -143,7 +143,7 @@ class _PostgresMixin(object):
         self.postgres_maybe_connect()
     return
   
-  def postgres_start_transaction(self)
+  def postgres_start_transaction(self):
     if self._has_postgres:
       try:
         self.postgres_maybe_reconnect()
@@ -154,7 +154,7 @@ class _PostgresMixin(object):
         raise Exception("Postgres issue transaction")   
     return
 
-  def postgres_end_transaction(self)
+  def postgres_end_transaction(self):
     if self._has_postgres:
         if __transaction_started && self.is_connection_still_alive():
           self.__pg.commit()

@@ -147,7 +147,7 @@ class ServingApp(
     tables ={
       "predicts" : "id SERIAL PRIMARY KEY, predict_date varchar(50), result varchar(255)",
       "jobs" : "uuid varchar(32) PRIMARY KEY, job_date varchar(50), model_type varchar(10), device varchar(10), no_runs integer, paralel_run boolean, batch_size int, status int",
-      "tasks" : "uuid varchar(32) PRIMARY KEY, jobid varchar(32), workername vachar(50), predict_date varchar(50), result json, status int"
+      "tasks" : "uuid varchar(32) PRIMARY KEY, jobid varchar(32), workername varchar(50), predict_date varchar(50), result json, status int"
     }
     return tables
 

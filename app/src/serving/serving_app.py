@@ -108,7 +108,7 @@ class ServingApp(
           job = jobs[0]
           model_type=job[2]
           device = job[3]
-          no_runs = jobs[4]
+          no_runs = job[4]
 
           input = self.__input
           if input is None:

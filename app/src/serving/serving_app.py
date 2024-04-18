@@ -126,15 +126,17 @@ class ServingApp(
               {"device":device, "no_runs":no_runs}
             )
           else:
-            result = "Input not available"
+            result = self.format_result("Input not available", device)
         else:
-          result = f"Parent job not found: {jobid}"
+          result = self.format_result(
+            result=f"Parent job not found: {jobid}"
+          )
 
         self.postgres_update_data(
           table_name="tasks",
           identifier={"uuid":taskid}, 
           predict_date = time.strftime("%Y-%m-%d %H:%M:%S"),
-          result=result, 
+          result=json.dumps(result), 
           status=STATUS_FINISHED
         )
         self.postgres_update_data(
@@ -317,12 +319,7 @@ class ServingApp(
             result = "Exception saving processing task to database" 
     else:
       result = "Invalid input content"
-    return  self.format_result(
-     {
-      "result": result
-     }, 
-     device
-    )
+    return  self.format_result(result, device) 
 
   def _predict(self, model_type: str, input, params:dict = None):
    avg_exec = 0

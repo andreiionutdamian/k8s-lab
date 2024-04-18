@@ -197,7 +197,6 @@ class _PostgresMixin(object):
         where_clause = ' AND '.join([f"{key} = %s" for key in identifier.keys()])
 
         str_sql = f"UPDATE {table_name} SET {set_clause} WHERE {where_clause};"
-
         values = list(kwargs.values()) + list(identifier.values())
 
         with self.__pg.cursor() as cur:
@@ -208,7 +207,7 @@ class _PostgresMixin(object):
         if self.__transaction_started:
           self.__pg.rollback()
           self.__transaction_started = False
-        self.P("Error in postgres_insert_data: {}".format(exc))     
+        self.P("Error in postgres_update_data: {}".format(exc))     
         raise ValueError("Postgres issue")   
     return
 

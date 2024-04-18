@@ -84,7 +84,7 @@ class ServingApp(
         unassigned_tasks = self.postgres_select_data_ordered(
           "tasks", 
           for_update=True, order_by=None,order=None, maxrows=1,
-          workername=None,status=STATUS_CREATED
+          status=STATUS_CREATED
         )
         if unassigned_tasks:
           task =  unassigned_tasks[0]

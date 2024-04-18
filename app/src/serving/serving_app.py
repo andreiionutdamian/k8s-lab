@@ -302,7 +302,7 @@ class ServingApp(
             #transform input to bytes if necessary
             if isinstance(input, str):
               bytes_data = input.encode('utf-8')
-            elif isinstance(input, Image):
+            elif isinstance(input, Image.Image):
               bytes_data = input.tobytes()
             elif isinstance(input, List):
               bytes_data = json.dumps(input).encode('utf-8')

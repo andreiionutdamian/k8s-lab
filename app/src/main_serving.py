@@ -94,6 +94,24 @@ async def predict_image(
   result = eng.predict_image(contents, params)
   return result
 
+# image request
+@router_serving.post("/predict/images")
+async def predict_images(
+  images: List[UploadFile] = File(...),
+  exec_params: Optional[ExecParams] = Form(
+    None, 
+    description="Example:\n\n \{\n\"device\":\"cpu|gpu\",\n\"no_runs\":int\n\}"
+  )
+):
+  contents =[]
+  for image in images:
+    contents.append(await image.read())
+  
+  params = exec_params.dict() if exec_params else None
+  # Process the image data
+  result = eng.predict_images(contents, params)
+  return result
+
 @router_serving.post("/predict")
 async def predict(
   text: str , 

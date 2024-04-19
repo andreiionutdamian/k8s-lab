@@ -113,22 +113,31 @@ class ServingApp(
           input = self.__input
           if input is None:
             # try loading from disk
-            task_content_path = self.cache_root+"/tasks/"+taskid+".bin"
-            try:
-              with open(task_content_path, 'rb') as file:
-                byte_data = file.read()
-                # convert if necessary
-                if model_type == 'text':
-                  input_str = byte_data.decode('utf-8')
-                  try:
-                    #check if list
-                    input = json.loads(input_str)
-                  except json.JSONDecodeError:
-                    input = input_str
-                if model_type == 'image':
-                  input = Image.open(io.BytesIO(byte_data))
-            except Exception as exc:
-              self.P("Content file read error: {}".format(exc))
+            content_list = []
+            iterate = True
+            while iterate:
+              task_content_path = f"{self.cache_root}/tasks/{taskid}_{len(content_list)}.bin"
+              try:
+                with open(task_content_path, 'rb') as file:
+                  byte_data = file.read()
+                  # convert if necessary
+                  if model_type == 'text':
+                    input_str = byte_data.decode('utf-8')
+                    try:
+                      #check if list
+                      content_list.append(json.loads(input_str))
+                    except json.JSONDecodeError:
+                      content_list.append(input_str)
+                  if model_type == 'image':
+                   content_list.append(Image.open(io.BytesIO(byte_data)))
+                
+              except FileNotFoundError:
+                iterate = False
+              except IOError as exc:
+                self.P("Content file read error: {}".format(exc))
+                iterate = False
+              if len(content_list) > 0:
+                input = content_list if len(content_list) > 1 else content_list[0]
           if input is not None:
             result = self._predict(
               model_type,
@@ -295,20 +304,33 @@ class ServingApp(
        
         if not self.__available :
         #if current insance is unavailable, save input to file
-          task_content_path = self.cache_root+"/tasks/"+taskid+".bin"
+          
           try:
-            bytes_data = None
-            os.makedirs(os.path.dirname(task_content_path), exist_ok=True)
-            #transform input to bytes if necessary
-            if isinstance(input, str):
-              bytes_data = input.encode('utf-8')
-            elif isinstance(input, Image.Image):
-              bytes_data = input.tobytes()
-            elif isinstance(input, List):
-              bytes_data = json.dumps(input).encode('utf-8')
-            with open(task_content_path, 'wb') as file:
-              file.write(bytes_data)
-              print(f"Data successfully written to {task_content_path}")
+            content_list = []
+            if isinstance(input, List):
+              if isinstance(input[0], str):
+                content_list.append(json.dumps(input))
+              else:
+                content_list.extend(input)
+            else:
+              content_list.append(input)
+
+            ndx=0
+            for ndx, content in enumerate(content_list):
+              task_content_path = f"{self.cache_root}/tasks/{taskid}_{ndx}.bin"
+              os.makedirs(os.path.dirname(task_content_path), exist_ok=True)
+              #transform input to bytes if necessary
+              bytes_data = None
+              if isinstance(content, str):
+                bytes_data=content.encode('utf-8')
+              elif isinstance(input, Image.Image):
+                bytes_data.content.tobytes()
+              else:
+                raise Exception("Unsupported content type")
+            
+              with open(task_content_path, 'wb') as file:
+                file.write(bytes_data)
+                print(f"Data successfully written to {task_content_path}")
           except Exception as exc:
             self.P("Error saving job input: {}".format(exc))
             result = "Exception saving job input"
@@ -386,6 +408,14 @@ class ServingApp(
     image = Image.open(io.BytesIO(image_data))
     self.P(f"Predict image with size: {len(image_data)}")
     return self._predict_job('image', image, params)
+
+  def predict_image(self, image_data_list: List[bytes], params: dict = None):
+    images = []
+    for image_data in image_data_list:
+      image = Image.open(io.BytesIO(image_data))
+      images.add(image)
+    self.P(f"Predict {len(image_data_list)} images")
+    return self._predict_job('image', images, params)
   
   def predict_json(self, data: dict, params: dict = None):
     model = self.get_model('json')

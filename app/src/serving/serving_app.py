@@ -409,7 +409,7 @@ class ServingApp(
     self.P(f"Predict image with size: {len(image_data)}")
     return self._predict_job('image', image, params)
 
-  def predict_image(self, image_data_list: List[bytes], params: dict = None):
+  def predict_images(self, image_data_list: List[bytes], params: dict = None):
     images = []
     for image_data in image_data_list:
       image = Image.open(io.BytesIO(image_data))

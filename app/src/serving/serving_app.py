@@ -324,7 +324,7 @@ class ServingApp(
               if isinstance(content, str):
                 bytes_data=content.encode('utf-8')
               elif isinstance(content, Image.Image):
-                bytes_data.content.tobytes()
+                bytes_data=content.tobytes()
               else:
                 raise Exception("Unsupported content type")
             

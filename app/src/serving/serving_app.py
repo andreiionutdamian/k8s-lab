@@ -413,7 +413,7 @@ class ServingApp(
     images = []
     for image_data in image_data_list:
       image = Image.open(io.BytesIO(image_data))
-      images.add(image)
+      images.append(image)
     self.P(f"Predict {len(image_data_list)} images")
     return self._predict_job('image', images, params)
   

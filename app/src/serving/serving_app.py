@@ -355,6 +355,7 @@ class ServingApp(
         
           if result is None:
             try:
+              workername = workername if tndx == 0 else None
               self.postgres_insert_data(
                   "tasks",
                   uuid = taskid, 

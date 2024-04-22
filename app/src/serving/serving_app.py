@@ -315,6 +315,7 @@ class ServingApp(
         self.P (f"Saving {no_tasks} ...")
 
         for tndx in range(no_tasks):
+          result = None
           taskid = uuid.uuid4().hex
           if (tndx == 0 and not self.__available) or tndx > 0 :
             #if current insance is unavailable, or need to split job - save input to file

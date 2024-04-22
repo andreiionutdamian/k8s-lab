@@ -166,6 +166,7 @@ class ServingApp(
           status=STATUS_FINISHED
         )
         self.__available = True
+        self.__input = None
     return
   
   def postgres_get_tables(self):

@@ -270,17 +270,29 @@ class ServingApp(
 
     no_runs = 1
     if(params and "no_runs" in params and params['no_runs'] is not None):
-      no_runs= self._get_device(params['no_runs'])
+      no_runs= params['no_runs']
+
+    batch_size = 0
+    if(params and "batch_size" in params and params['batch_size'] is not None):
+      batch_size = params['batch_size']
 
     if input:
       workername = None
       status = STATUS_CREATED 
+      no_tasks = 1
+      if isinstance(input, List) and batch_size > 0 and len(input) > batch_size :
+        no_tasks = len(input)//batch_size 
+        if len(input) % batch_size > 0 :
+          no_tasks= no_tasks + 1
+
       if self.__available :
         #check if current instance is available for processing
         workername = self.host
         status = STATUS_ASSIGNED
-        self.__input = input
-
+        if no_tasks > 1 :
+          self.__input = input[:batch_size]
+        else:
+          self.__input = input
       # save job to database
       jobid = uuid.uuid4().hex
       try:
@@ -300,55 +312,60 @@ class ServingApp(
 
       # save tasks to database
       if result is None:
-        taskid = uuid.uuid4().hex
-       
-        if not self.__available :
-        #if current insance is unavailable, save input to file
-          
-          try:
-            content_list = []
-            if isinstance(input, List):
-              if isinstance(input[0], str):
-                content_list.append(json.dumps(input))
-              else:
-                content_list.extend(input)
-            else:
-              content_list.append(input)
+        self.P (f"Saving {no_tasks} ...")
 
-            ndx=0
-            for ndx, content in enumerate(content_list):
-              task_content_path = f"{self.cache_root}/tasks/{taskid}_{ndx}.bin"
-              os.makedirs(os.path.dirname(task_content_path), exist_ok=True)
-              #transform input to bytes if necessary
-              bytes_data = None
-              if isinstance(content, str):
-                bytes_data=content.encode('utf-8')
-              elif isinstance(content, Image.Image):
-                bytes_data=content.tobytes()
+        for tndx in range(no_tasks):
+          taskid = uuid.uuid4().hex
+          if (tndx == 0 and not self.__available) or tndx > 0 :
+            #if current insance is unavailable, or need to split job - save input to file
+            try:
+              content_list = []
+              if isinstance(input, List):
+                batch = []
+                for cnt in range(batch_size):
+                  if (tndx*batch_size+cnt < len(input)):
+                    batch[cnt] = input[tndx*batch_size+cnt]
+
+                if isinstance(batch[0], str):
+                  content_list.append(json.dumps(batch))
+                else:
+                  content_list.extend(batch)
               else:
-                raise Exception("Unsupported content type")
-            
-              with open(task_content_path, 'wb') as file:
-                file.write(bytes_data)
-                print(f"Data successfully written to {task_content_path}")
-          except Exception as exc:
-            self.P("Error saving job input: {}".format(exc))
-            result = "Exception saving job input"
+                content_list.append(input)
+
+              for cndx, content in enumerate(content_list):
+                task_content_path = f"{self.cache_root}/tasks/{taskid}_{cndx}.bin"
+                os.makedirs(os.path.dirname(task_content_path), exist_ok=True)
+                #transform input to bytes if necessary
+                bytes_data = None
+                if isinstance(content, str):
+                  bytes_data=content.encode('utf-8')
+                elif isinstance(content, Image.Image):
+                  bytes_data=content.tobytes()
+                else:
+                  raise Exception("Unsupported content type")
+              
+                with open(task_content_path, 'wb') as file:
+                  file.write(bytes_data)
+                  print(f"Data successfully written to {task_content_path}")
+            except Exception as exc:
+              self.P("Error saving job input: {}".format(exc))
+              result = "Exception saving job input"
         
-        if result is None:
-          try:
-            self.postgres_insert_data(
-                "tasks",
-                uuid = taskid, 
-                jobid = jobid,
-                workername = workername,
-                status = status
-            )
-            result = jobid
-            self.P(f"Task saved: {taskid}")
-          except Exception as exc:
-            self.P("Error saving task: {}".format(exc))
-            result = "Exception saving processing task to database" 
+          if result is None:
+            try:
+              self.postgres_insert_data(
+                  "tasks",
+                  uuid = taskid, 
+                  jobid = jobid,
+                  workername = workername,
+                  status = status
+              )
+              result = jobid
+              self.P(f"Task saved: {taskid}")
+            except Exception as exc:
+              self.P("Error saving task: {}".format(exc))
+              result = "Exception saving processing task to database" 
     else:
       result = "Invalid input content"
     return  self.format_result(result, device) 

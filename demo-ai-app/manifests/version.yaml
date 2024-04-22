@@ -1,5 +1,5 @@
 application:
   serving:
-    version: 1.0.2
+    version: 1.0.3
   monitor:
     version: 1.0.1

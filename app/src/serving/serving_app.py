@@ -118,19 +118,19 @@ class ServingApp(
             while iterate:
               task_content_path = f"{self.cache_root}/tasks/{taskid}_{len(content_list)}.bin"
               try:
-                with open(task_content_path, 'rb') as file:
-                  byte_data = file.read()
+                if model_type == 'text':
+                  with open(task_content_path, 'rb') as file:
+                    byte_data = file.read()
                   # convert if necessary
-                  if model_type == 'text':
-                    input_str = byte_data.decode('utf-8')
-                    try:
-                      #check if list
+                  input_str = byte_data.decode('utf-8')
+                  try:
+                    #check if list
                       content_list.append(json.loads(input_str))
-                    except json.JSONDecodeError:
-                      content_list.append(input_str)
-                  if model_type == 'image':
-                   content_list.append(Image.open(io.BytesIO(byte_data)))
-                
+                  except json.JSONDecodeError:
+                    content_list.append(input_str)
+                if model_type == 'image':
+                  with Image.open(task_content_path) as img:
+                    content_list.append(img)  
               except FileNotFoundError:
                 iterate = False
               except IOError as exc:

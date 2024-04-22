@@ -158,6 +158,8 @@ class ServingApp(
           result=json.dumps(result), 
           status=STATUS_FINISHED
         )
+
+        #TODO improve
         self.postgres_update_data(
           table_name="jobs",
           identifier={"uuid":jobid},
@@ -356,6 +358,7 @@ class ServingApp(
           if result is None:
             try:
               workername = workername if tndx == 0 else None
+              status =  status if tndx == 0  else STATUS_CREATED
               self.postgres_insert_data(
                   "tasks",
                   uuid = taskid, 

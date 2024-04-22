@@ -323,8 +323,8 @@ class ServingApp(
               if isinstance(input, List):
                 batch = []
                 for cnt in range(batch_size):
-                  if (tndx*batch_size+cnt < len(input)):
-                    batch[cnt] = input[tndx*batch_size+cnt]
+                  if ((tndx*batch_size+cnt) < len(input)):
+                    batch.append(input[tndx*batch_size+cnt])
 
                 if isinstance(batch[0], str):
                   content_list.append(json.dumps(batch))

@@ -125,12 +125,11 @@ class ServingApp(
                   input_str = byte_data.decode('utf-8')
                   try:
                     #check if list
-                      content_list.append(json.loads(input_str))
+                    content_list.append(json.loads(input_str))
                   except json.JSONDecodeError:
                     content_list.append(input_str)
                 if model_type == 'image':
-                  with Image.open(task_content_path) as img:
-                    content_list.append(img)  
+                  content_list.append(Image.open(task_content_path))
               except FileNotFoundError:
                 iterate = False
               except IOError as exc:
@@ -427,16 +426,15 @@ class ServingApp(
     return self._predict_job('text', texts, params)
       
   def predict_image(self, image_data: bytes, params: dict = None):
-    with Image.open(io.BytesIO(image_data)) as image:
-     self.P(f"Predict image with size: {len(image_data)}")
-     result = self._predict_job('image', image, params)  
-    return result
+    image = Image.open(io.BytesIO(image_data))
+    self.P(f"Predict image with size: {len(image_data)}")
+    return self._predict_job('image', image, params)  
 
   def predict_images(self, image_data_list: List[bytes], params: dict = None):
     images = []
     for image_data in image_data_list:
-      with Image.open(io.BytesIO(image_data)) as image:
-        images.append(image)
+      image = Image.open(io.BytesIO(image_data))
+      images.append(image)
     self.P(f"Predict {len(image_data_list)} images")
     return self._predict_job('image', images, params)
   

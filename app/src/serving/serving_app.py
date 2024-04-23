@@ -345,7 +345,8 @@ class ServingApp(
                   with open(task_content_path, 'wb') as file:
                     file.write(content.encode('utf-8'))      
                 elif isinstance(content, Image.Image):
-                  content.save(task_content_path, format=content.format)
+                  with content as img:
+                    img.save(task_content_path, format=content.format)
                 else:
                   raise Exception("Unsupported content type")
                 
@@ -426,15 +427,16 @@ class ServingApp(
     return self._predict_job('text', texts, params)
       
   def predict_image(self, image_data: bytes, params: dict = None):
-    image = Image.open(io.BytesIO(image_data))
-    self.P(f"Predict image with size: {len(image_data)}")
-    return self._predict_job('image', image, params)
+    with Image.open(io.BytesIO(image_data)) as image:
+     self.P(f"Predict image with size: {len(image_data)}")
+     result = self._predict_job('image', image, params)  
+    return result
 
   def predict_images(self, image_data_list: List[bytes], params: dict = None):
     images = []
     for image_data in image_data_list:
-      image = Image.open(io.BytesIO(image_data))
-      images.append(image)
+      with Image.open(io.BytesIO(image_data)) as image:
+        images.append(image)
     self.P(f"Predict {len(image_data_list)} images")
     return self._predict_job('image', images, params)
   

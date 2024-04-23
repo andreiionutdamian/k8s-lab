@@ -344,8 +344,7 @@ class ServingApp(
                   with open(task_content_path, 'wb') as file:
                     file.write(content.encode('utf-8'))      
                 elif isinstance(content, Image.Image):
-                  with content as img:
-                    img.save(task_content_path, format=content.format)
+                  content.save(task_content_path, format=content.format)
                 else:
                   raise Exception("Unsupported content type")
                 

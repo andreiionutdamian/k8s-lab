@@ -341,17 +341,15 @@ class ServingApp(
                 task_content_path = f"{self.cache_root}/tasks/{taskid}_{cndx}.bin"
                 os.makedirs(os.path.dirname(task_content_path), exist_ok=True)
                 #transform input to bytes if necessary
-                bytes_data = None
                 if isinstance(content, str):
-                  bytes_data=content.encode('utf-8')
+                  with open(task_content_path, 'wb') as file:
+                    file.write(content.encode('utf-8'))      
                 elif isinstance(content, Image.Image):
-                  bytes_data=content.tobytes()
+                  content.save(task_content_path, format=content.format)
                 else:
                   raise Exception("Unsupported content type")
-              
-                with open(task_content_path, 'wb') as file:
-                  file.write(bytes_data)
-                  print(f"Data successfully written to {task_content_path}")
+                
+                print(f"Data successfully written to {task_content_path}")
             except Exception as exc:
               self.P("Error saving job input: {}".format(exc))
               result = "Exception saving job input"

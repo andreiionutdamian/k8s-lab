@@ -7,6 +7,7 @@ metadata:
     storage.k8s.io/part-of: kubernetes-complete-reference
     storage.k8s.io/created-by: aidamian
 subsets:
+  
   - addresses:
     - ip: 172.31.3.105
       hostname: PreProd-K8s-GlusterFs01

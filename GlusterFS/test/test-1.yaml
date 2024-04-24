@@ -41,6 +41,13 @@ spec:
       containers:
       - name: test-glusterfs-1-container
         image: busybox
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi        
         command: ["/bin/sh", "-c"]
         args: 
         - |
@@ -51,7 +58,7 @@ spec:
         volumeMounts:
         - name: glusterfs-volume-1
           mountPath: "/data"
-          subPath: test-app
+          subPath: test-app # preventics-prod-pg, optizone-emqx, test-app
       volumes:
       - name: glusterfs-volume-1
         persistentVolumeClaim:

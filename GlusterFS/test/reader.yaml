@@ -5,6 +5,13 @@ metadata:
 spec:
   containers:
   - name: reader-test-container
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+      limits:
+        cpu: 200m
+        memory: 200Mi
     image: busybox
     command: ["/bin/sh", "-c"]
     args: 

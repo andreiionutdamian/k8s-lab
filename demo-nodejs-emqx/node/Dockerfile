@@ -1,5 +1,8 @@
 FROM node:18-alpine
 
+COPY HyfyRoot.crt /usr/local/share/ca-certificates/HyfyRoot.crt
+RUN cat /usr/local/share/ca-certificates/HyfyRoot.crt >> /etc/ssl/certs/ca-certificates.crt
+
 WORKDIR /app
 
 COPY . .

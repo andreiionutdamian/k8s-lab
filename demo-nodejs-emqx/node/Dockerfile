@@ -1,7 +1,11 @@
 FROM node:18-alpine
 
-COPY ./cert/HyfyRoot.crt /usr/local/share/ca-certificates/HyfyRoot.crt
-RUN cat /usr/local/share/ca-certificates/HyfyRoot.crt >> /etc/ssl/certs/ca-certificates.crt
+COPY ./cert/HyfyRoot.crt /usr/local/share/ca-certificates/
+
+# Update the certificate store
+RUN apk update && \
+    apk add --no-cache ca-certificates && \
+    update-ca-certificates
 
 WORKDIR /app
 

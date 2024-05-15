@@ -1,0 +1,1 @@
+kubectl logs $(kubectl get pods -n ne | grep ne-offense | awk '{print $1}' | head -n 1) -n ne

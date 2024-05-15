@@ -1,0 +1,37 @@
+# "ne" namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ne
+---
+#pv for serving app
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ne-offense-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
+  nfs:
+    path: "/srv/nfs/k8s/ro_offense_storage"
+    server: 192.168.1.56
+    readOnly: false
+---
+#pvc for models
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ne-offense-pvc
+  namespace: ne
+spec:
+  storageClassName: nfs
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: ne-offense-pv

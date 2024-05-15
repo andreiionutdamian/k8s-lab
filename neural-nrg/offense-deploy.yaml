@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ne-offense
+  namespace: ne
+  labels: # this is not mandatory but it is a good practice
+    app: ne-offense
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      run: ne-offense
+  template:
+    metadata:
+      labels:
+        run: ne-offense
+    spec:
+      containers:
+      - name: ne-offense-container
+        image: aidamian/ro_offense_api        
+        ports:
+        - containerPort: 5050
+          protocol: TCP
+        # enviroment variables
+        env:
+        - name: PORT
+          value: "5050"
+        volumeMounts:
+        - name: ne-offense-volume
+          mountPath: /offense_api/_models_cache
+      volumes:
+      - name: ne-offense-volume
+        persistentVolumeClaim:
+          claimName: ne-offense-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ne-offense-svc
+  namespace: ne
+spec:
+  type: NodePort
+  selector:
+    run: ne-offense
+  ports:
+    - protocol: TCP
+      port: 5050
+      nodePort: 30050  # Optional: Remove or change this if you want Kubernetes to assign a port automatically

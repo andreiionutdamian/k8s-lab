@@ -5,6 +5,7 @@ import { listenForFileRequests, subscribeToTopic } from './subscriber.js';
 const clientOptions = {
     clean: true,
     clientId: '',
+    port: Number(process.env.MQTT_PORT) || 1883,
 };
 
 if (process.env.MQTT_USER) {

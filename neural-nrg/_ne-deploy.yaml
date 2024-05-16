@@ -6,7 +6,7 @@ metadata:
   labels: # this is not mandatory but it is a good practice
     app: ne-bot
 spec:
-  replicas: 4
+  replicas: 1  # single replica must due to single key
   selector:
     matchLabels:
       run: ne-bot

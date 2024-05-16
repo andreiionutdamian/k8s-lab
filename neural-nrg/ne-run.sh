@@ -1,0 +1,1 @@
+kubectl apply -f _ne-deploy.yaml

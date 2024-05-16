@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ne-bot
+  namespace: ne
+  labels: # this is not mandatory but it is a good practice
+    app: ne-bot
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      run: ne-bot
+  template:
+    metadata:
+      labels:
+        run: ne-bot
+    spec:
+      containers:
+      - name: ne-bot-container
+        image: neuralenergy/ai_library
+        ports:
+        - containerPort: 5050
+          protocol: TCP
+        # enviroment variables
+        env:
+        - name: PORT
+          value: "5050"
+        - name: NEAIL_TELEGRAM_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: ne-secrets
+              key: NEAIL_TELEGRAM_TOKEN
+        - name: NEAIL_MOTION_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: ne-secrets
+              key: NEAIL_MOTION_TOKEN
+        - name: NEAIL_GPT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ne-secrets
+              key: NEAIL_GPT_KEY
+        - name: NEAIL_HF_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: ne-secrets
+              key: NEAIL_HF_TOKEN
+        

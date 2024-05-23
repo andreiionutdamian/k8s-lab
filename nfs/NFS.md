@@ -455,3 +455,88 @@ This pod attempts to read from `/data/testfile.txt` every 5 seconds, printing it
     You should see the same messages as in the `write-test` pod's logs, indicating that the `read-test` pod is successfully reading the updates made by the `write-test` pod to the shared NFS volume.
 
 This simple exercise demonstrates how NFS can be used to share data between pods in a Kubernetes environment, enabling scenarios where multiple pods need to access and manipulate shared data.
+
+
+## Handle NFS storage and already existing data
+
+Follow the steps bellow:
+
+1. Check current state of the disks 
+
+```bash
+lsblk
+vgdisplay extra-vg
+lvdisplay /dev/extra-vg/extra-lv
+```
+
+1. Resize the physical volume
+
+```bash
+pvresize /dev/sdb
+```
+
+The output of the above command should be similar to
+
+```bash
+root@pre-w1:/# pvresize /dev/sdb
+  Physical volume "/dev/sdb" changed
+  1 physical volume(s) resized or updated / 0 physical volume(s) not resized
+```
+
+1. Extend the logical volume to use all free space
+
+```bash
+lvextend -l +100%FREE /dev/extra-vg/extra-lv
+```
+
+The output of the above command should be similar to
+
+```bash
+root@pre-w1:/# lvextend -l +100%FREE /dev/extra-vg/extra-lv
+  New size (51199 extents) matches existing size (51199 extents).
+```
+
+1. Resize filesystem
+
+```bash
+resize2fs /dev/extra-vg/extra-lv
+```
+
+### Handle data
+
+1. Create a temporary directory
+
+```bash
+mkdir /mnt/new_nfs
+```
+
+1. Mount the new logical volume to this temporary mount point
+
+```bash
+mount /dev/extra-vg/extra-lv /mnt/new_nfs
+```
+
+1. Use **`rsync`** to copy the data from the old **`/nfs`** to the new mount point.
+
+```bash
+rsync -av /nfs/ /mnt/new_nfs/
+```
+
+1. Unmount the temporary mount point
+
+```bash
+umount /mnt/new_nfs
+```
+
+1. **Update `/etc/fstab`**
+
+```bash
+vim /etc/fstab
+```
+
+Add the following line
+
+```bash
+# NFS 
+/dev/extra-vg/extra-lv  /nfs  ext4  defaults  0  2
+```

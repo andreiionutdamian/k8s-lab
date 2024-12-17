@@ -147,6 +147,7 @@ all:
                   primary:
                     ip_range:
                       - <IP_START>-<IP_END>
+                      - <SINGLE_IP_ADDR>/32 # if you want to use a single IP address
                     auto_assign: true
                 layer2:
                   - primary
@@ -154,6 +155,8 @@ all:
 ```
 
 > OBS: If MetalLB is enabled as above then edit the `inventory/<MY_CLUSTER>/group_vars/k8s_cluster/k8s-cluster.yml` file and set `kube_proxy_strict_arp: true`
+
+
 
 
 ## Check configuration of target hosts

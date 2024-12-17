@@ -1,2 +1,2 @@
 echo "This command assumes there is a hosts.yaml already created in the inventory/<CLUSTER NAME> directory with the correct IP addresses and user access"
-ansible-playbook -i inventory/<CLUSTER NAME>/hosts.yaml  -v --become --become-user=root cluster.yml
+ansible-playbook -i inventory/<CLUSTER NAME>/  -v --become --become-user=root cluster.yml

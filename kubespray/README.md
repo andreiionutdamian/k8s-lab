@@ -18,6 +18,13 @@ sudo apt install python3-pip -y
 $ git clone https://github.com/kubernetes-sigs/kubespray
 ```
 
+Then check for the latest release - ie 2.26 and checkout
+
+```bash
+cd kubespray
+git checkout release-2.26
+```
+
 4. Change to `kubespray` and install requirements (with or without `sudo`)
 
 ```bash
@@ -30,7 +37,6 @@ pip3 install -r requirements.txt
 ```bash
 sed -i 's/\["ingress-controller-leader-{{ ingress_nginx_class }}"\]/\["ingress-controller-leader-{{ ingress_nginx_class }}","ingress-controller-leader"\]/g' roles/kubernetes-apps/ingress_controller/ingress_nginx/templates/role-ingress-nginx.yml.j2
 ```
-
 
 ## Prepare the kubespray playbooks
 
@@ -183,8 +189,9 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 ## Install shortcut
 
+Use either `ini` or the `yaml` version
 ```bash
-./deployinstall.sh
+./deploy-ini.sh
 ```
 
 ## Reset the installation

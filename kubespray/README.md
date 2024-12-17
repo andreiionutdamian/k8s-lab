@@ -180,3 +180,20 @@ mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
+
+## Install shortcut
+
+```bash
+./deployinstall.sh
+```
+
+## Reset the installation
+
+If you need to reset the installation you can run the following command
+
+```bash
+./reset.sh
+```
+
+# using
+

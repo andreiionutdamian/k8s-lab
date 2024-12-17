@@ -1,0 +1,1 @@
+ansible-playbook -i inventory/<CLUSTER NAME>/hosts.yaml  --become --become-user=root reset.yml

@@ -1,0 +1,1 @@
+ansible-playbook -i inventory/<CLUSTER NAME>/ -u <USER NAMEE> -private-key=~/.ssh/id_rsa -v --become --become-user=root  cluster.yml 

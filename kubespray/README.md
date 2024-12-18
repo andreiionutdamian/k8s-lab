@@ -205,5 +205,11 @@ If you need to reset the installation you can run the following command
 ./reset.sh
 ```
 
-# using
+## Finally make sure client is correctly configured
+
+```bash
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+kubectl get nodes -o wide
+```
 

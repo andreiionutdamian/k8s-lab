@@ -3,6 +3,24 @@
 Collection of Kubernetes resources and examples.
 
 
+# Some git related stuff
+
+Check if you have connection
+
+```bash
+ssh -vvvT git@github.com
+```
+
+If not create a new ssh key
+
+```bash
+ssh-keygen -t rsa -b 4096 -C "andrei@k8s-lab.test"
+```
+Then add `id_rsa.pub` to your github account
+
+
+
+
 # Grant Disclosure
 
 This repository was made possible through the generous support of the research grant obtained from the project:
